@@ -1,19 +1,21 @@
 <template>
-  <RouterView/>
+    <RouterView />
 </template>
 
 <script setup>
-  import { onMounted } from 'vue'
-  import { RouterView } from "vue-router";
-  import { useProductStore } from '@/stores/product';
+    import { onMounted } from 'vue'
+    import { RouterView } from "vue-router";
+    import { useBlogStore } from "@/stores/blog";
+    import { useProductStore } from '@/stores/product';
 
-  // Initialize the product store
-  const prductStore = useProductStore()
+    const blogStore = useBlogStore();
+    const prductStore = useProductStore()
 
-  /**
-   * Fetch the list of products from the store when the component is mounted.
-   */
-  onMounted(() => {
-    prductStore.fetchProducts()
-  })
+    /**
+     * Fetch the list of products from the store when the component is mounted.
+     */
+    onMounted(async () => {
+        await blogStore.fetchBlogs();
+        await prductStore.fetchProducts()
+    })
 </script>
