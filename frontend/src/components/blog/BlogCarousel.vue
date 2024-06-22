@@ -27,7 +27,7 @@
                         v-for="blog in blogsOnTrending" :key="blog.id"
                         class="flex-none w-full sm:w-1/2 lg:w-1/5 px-2 cursor-pointer">
                         <div class="shadow">
-                            <img :src="blog.image" :alt="blog.title"
+                            <img :src="blog.image_url" :alt="blog.title"
                                 class="w-full object-cover mb-4" />
                             <div class="text-center">
                                 <h3 class="text-lg font-semibold">

@@ -1,17 +1,29 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 from .models import Blog, Product, Sale, SoldProduct
-from .forms import ProductForm
+from .forms.blog import BlogForm
+from .forms.product import ProductForm
 from django_attachments.admin import AttachmentsAdminMixin
+
+class BlogAdmin(AttachmentsAdminMixin, admin.ModelAdmin):
+    form = BlogForm
+    list_display = ('title', 'category')
+
+    def delete_queryset(self, request, queryset):
+        for obj in queryset:
+            obj.delete()
 
 class ProductAdmin(AttachmentsAdminMixin, admin.ModelAdmin):
     form = ProductForm
+    list_display = ('title', 'category', 'sub_category', 'price')
 
     def delete_queryset(self, request, queryset):
         for obj in queryset:
             obj.delete()
 
 class SaleAdmin(admin.ModelAdmin):
+    list_display = ('email', 'address', 'city', 'state', 'postal_code')
+
     def delete_queryset(self, request, queryset):
         for sale in queryset:
             sale.delete()
@@ -49,7 +61,7 @@ class BaseFeatureAdminSite(admin.AdminSite):
 admin_site = BaseFeatureAdminSite(name='myadmin')
 
 # Register models with the custom AdminSite
-admin_site.register(Blog)
+admin_site.register(Blog, BlogAdmin)
 admin_site.register(Product, ProductAdmin)
 admin_site.register(Sale, SaleAdmin)
 admin_site.register(SoldProduct)

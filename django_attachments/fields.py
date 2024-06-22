@@ -30,3 +30,16 @@ class GalleryField(LibraryField):
 		defaults = {'form_class': GalleryFormField}
 		defaults.update(kwargs)
 		return super().formfield(**defaults)
+	
+
+class SingleImageFormField(LibraryFormField):
+    pass
+
+
+class SingleImageField(LibraryField):
+    description = "Single Image"
+
+    def formfield(self, **kwargs):
+        defaults = {'form_class': SingleImageFormField}
+        defaults.update(kwargs)
+        return super().formfield(**defaults)

@@ -9,7 +9,7 @@ class Command(BaseCommand):
     python3 manage.py delete_fake_data
     """
     def handle(self, *args, **options):
-        Blog.objects.all().delete()
-        products = Product.objects.all()
-        for product in products:
+        for blog in Blog.objects.all():
+            blog.delete()
+        for product in Product.objects.all():
             product.delete()

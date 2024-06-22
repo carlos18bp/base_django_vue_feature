@@ -1,6 +1,6 @@
 from django.db import models
-from django_attachments.fields import GalleryField
 from django_attachments.models import Library
+from django_attachments.fields import GalleryField
 
 class Product(models.Model):
     """
@@ -21,9 +21,9 @@ class Product(models.Model):
     :ivar categoria: category of the product in Spanish.
     """
 
-    category = models.CharField(max_length=40)
-    sub_category = models.CharField(max_length=40)
     title = models.CharField(max_length=40)
+    category = models.CharField(max_length=40)
+    sub_category = models.CharField(max_length=40)    
     description = models.TextField()
 
     price = models.IntegerField()
@@ -33,9 +33,6 @@ class Product(models.Model):
         return self.title
 
     def delete(self, *args, **kwargs):
-        """
-        Custom delete method to ensure the gallery is also deleted when a Product is deleted.
-        """
         try:
             if self.gallery:
                 self.gallery.delete()

@@ -6,7 +6,7 @@
     <div v-if="blog" class="flex flex-col px-8 m-8">
         <div class="relative flex pb-8">
             <div class="w-full max-h-96 flex items-center justify-center">
-                <img :src="blog.image" class="object-cover w-full h-full"/>
+                <img :src="blog.image_url" class="object-cover w-full h-full"/>
             </div>
 
             <div class="bg-white absolute bottom-0 -left-px p-8 pt-4 flex flex-col">

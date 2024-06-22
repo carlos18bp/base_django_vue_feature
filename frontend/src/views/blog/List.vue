@@ -3,7 +3,7 @@
     <div v-if="blogs.length" class="flex flex-col m-8 md:px-16">
         <div class="flex pb-12">
             <div class="w-full md:w-1/2 mt-4 -m-8 md:-m-0 md:mt-0">
-                <img v-if="firstBlog && firstBlog.image" :src="`${firstBlog.image}`"
+                <img v-if="firstBlog" :src="`${firstBlog.image_url}`"
                     class="w-full md:h-96 object-cover" />
             </div>
             <div class="w-full md:w-1/2 flex flex-col justify-center pl-10 md:px-8">

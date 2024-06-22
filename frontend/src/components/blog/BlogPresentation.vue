@@ -2,7 +2,7 @@
     <div class="flex flex-col pt-16">
         <RouterLink v-if="blog.id" :to="{ name: 'blog', params: { blog_id: blog.id } }" >
             <div>
-                <img :src="blog.image" class="object-cover w-full h-96 pb-4">
+                <img :src="blog.image_url" class="object-cover w-full h-96 pb-4">
             </div>
             <h2 v-if="currentLanguage === 'en'" class="text-xl uppercase pb-2">
                 {{ blog.category }}
