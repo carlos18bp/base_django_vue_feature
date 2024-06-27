@@ -35,11 +35,11 @@
     import { MagnifyingGlassIcon, ShoppingBagIcon } from '@heroicons/vue/24/outline';
     import SearchBar from "@/components/layouts/SearchBar.vue";
     import ShoppingCart from "@/components/product/ShoppingCart.vue";
-    import { useAppStore } from "@/stores/language.js";
+    import { useLanguageStore } from "@/stores/language.js";
     import { useProductStore } from "@/stores/product";
 
     // Reactive references
-    const appStore = useAppStore();
+    const appStore = useLanguageStore();
     const currentLanguage = computed(() => appStore.getCurrentLanguage);
 
     const showSearchBar = ref(false);

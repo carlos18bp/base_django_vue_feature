@@ -42,7 +42,7 @@
 
 <script setup>
     import { computed, ref, onMounted, watchEffect } from "vue";
-    import { useAppStore } from '@/stores/language.js';
+    import { useLanguageStore } from '@/stores/language.js';
     import { useProductStore } from "@/stores/product";
     import { XMarkIcon } from "@heroicons/vue/24/outline";
     import { gsap } from "gsap";
@@ -58,7 +58,7 @@
     const emit = defineEmits(["update:visible"]);
 
     // Store instances and reactive variables
-    const appStore = useAppStore();
+    const appStore = useLanguageStore();
     const currentLanguage = computed(() => appStore.getCurrentLanguage);
     const productStore = useProductStore();
     const products = ref([]);

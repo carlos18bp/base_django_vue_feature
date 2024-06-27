@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 
-export const useAppStore = defineStore({
-  id: 'app',
+export const useLanguageStore = defineStore("language", {
   state: () => ({
     currentLanguage: 'en',
   }),
@@ -21,8 +20,8 @@ export const useAppStore = defineStore({
      * Get the current language.
      * @returns {string} - Current language code.
      */
-    getCurrentLanguage() {
-      return this.currentLanguage;
+    getCurrentLanguage: (state) => {
+      return state.currentLanguage;
     },
   },
 });

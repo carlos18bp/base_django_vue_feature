@@ -6,8 +6,8 @@
 
 <script setup>
     import { computed, onMounted, ref, watch, watchEffect } from "vue";
-    import { useAppStore } from '@/stores/language.js';
+    import { useLanguageStore } from '@/stores/language.js';
 
-    const appStore = useAppStore();
+    const appStore = useLanguageStore();
     const currentLanguage = computed(() => appStore.getCurrentLanguage);
 </script>

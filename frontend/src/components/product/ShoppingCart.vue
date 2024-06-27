@@ -60,14 +60,14 @@
     import CartProduct from "./CartProduct.vue";
     import { gsap } from "gsap";
     import { XMarkIcon } from "@heroicons/vue/24/outline";
-    import { useAppStore } from "@/stores/language.js";
+    import { useLanguageStore } from "@/stores/language.js";
     import { useProductStore } from "@/stores/product";
 
     // Create references for Background and Cart Elements
     const background = ref(null);
     const cart = ref(null);
 
-    const appStore = useAppStore();
+    const appStore = useLanguageStore();
     const currentLanguage = computed(() => appStore.getCurrentLanguage);
 
     // Product store references

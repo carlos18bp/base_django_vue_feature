@@ -56,7 +56,7 @@
 <script setup>
     // Importing necessary modules
     import { computed, ref, onMounted, onUnmounted } from "vue";
-    import { useAppStore } from '@/stores/language.js';
+    import { useLanguageStore } from '@/stores/language.js';
     import { useBlogStore } from "@/stores/blog";
 
     // Initializing state
@@ -65,7 +65,7 @@
     const blogsOnTrending = ref(null);
 
     // Access the current language from the store
-    const appStore = useAppStore();
+    const appStore = useLanguageStore();
     const currentLanguage = computed(() => appStore.getCurrentLanguage);
 
     // Access the blog store to get trending blogs
