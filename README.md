@@ -6,7 +6,7 @@ This repository will help as a basis for the development and implementation of f
 ## Clone the repository:
 ```bash
 git clone https://github.com/carlos18bp/base_feature.git
-cd base_feature
+cd backend/base_feature
 ```
 
 ## Find and change base_feature occurrences to your repository name:

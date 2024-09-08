@@ -8,8 +8,8 @@
     import { computed } from "vue";
     import Header from "@/components/layouts/Header.vue";
     import Footer from "@/components/layouts/Footer.vue";
-    import { useAppStore } from '@/stores/language.js';
+    import { useLanguageStore } from '@/stores/language.js';
 
-    const appStore = useAppStore();
-    const currentLanguage = computed(() => appStore.getCurrentLanguage);
+    const languageStore = useLanguageStore();
+    const currentLanguage = computed(() => languageStore.getCurrentLanguage);
 </script>

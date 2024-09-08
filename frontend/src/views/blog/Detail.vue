@@ -28,13 +28,13 @@
     import Header from "@/components/layouts/Header.vue";
     import Footer from "@/components/layouts/Footer.vue";
     import BlogCarousel from "@/components/blog/BlogCarousel.vue";
-    import { useAppStore } from '@/stores/language.js';
+    import { useLanguageStore } from '@/stores/language.js';
     import { useBlogStore } from "@/stores/blog";
     import { useRoute } from "vue-router";
 
     const route = useRoute();
-    const appStore = useAppStore();
-    const currentLanguage = computed(() => appStore.getCurrentLanguage);
+    const languageStore = useLanguageStore();
+    const currentLanguage = computed(() => languageStore.getCurrentLanguage);
 
     const blogStore = useBlogStore();
     const blog = reactive({});

@@ -177,7 +177,7 @@
 <script setup>
     import { computed, reactive, ref, watchEffect, onMounted } from "vue";
     import { LockClosedIcon } from "@heroicons/vue/24/outline";
-    import { useAppStore } from "@/stores/language.js";
+    import { useLanguageStore } from "@/stores/language.js";
     import { useProductStore } from "@/stores/product";
     import Swal from 'sweetalert2';
     import { useRouter } from 'vue-router';
@@ -189,8 +189,8 @@
     const total = computed(() => productStore.totalCartPrice + shippingCost.value);
 
     // Reactive references for language
-    const appStore = useAppStore();
-    const currentLanguage = computed(() => appStore.getCurrentLanguage);
+    const languageStore = useLanguageStore();
+    const currentLanguage = computed(() => languageStore.getCurrentLanguage);
 
     const router = useRouter();
 
@@ -236,7 +236,7 @@
      * @param {string} lang - Language to set
      */
     const handleLanguage = (lang) => {
-        appStore.setCurrentLanguage(lang);
+        languageStore.setCurrentLanguage(lang);
     };
 
     /**

@@ -107,26 +107,24 @@
 </template>
 
 <script setup>
-    import { computed, onMounted, ref, watch, watchEffect } from 'vue';
+    import { computed, onMounted, ref } from 'vue';
     import { useRoute } from 'vue-router';
     import Swal from 'sweetalert2';
     import {
-        Disclosure, DisclosureButton, DisclosurePanel,
         Tab, TabGroup, TabList, TabPanel, TabPanels,
     } from '@headlessui/vue';
-    import { StarIcon } from '@heroicons/vue/20/solid';
     import { MinusSmallIcon, PlusSmallIcon } from '@heroicons/vue/24/outline';
     import Header from "@/components/layouts/Header.vue";
     import Footer from "@/components/layouts/Footer.vue";
     import ProductCarousel from "@/components/product/ProductCarousel.vue";
-    import { useAppStore } from '@/stores/language.js';
+    import { useLanguageStore } from '@/stores/language.js';
     import { useProductStore } from '@/stores/product';
     import { initModals } from 'flowbite';
 
     // Initialize stores and references
-    const appStore = useAppStore();
+    const languageStore = useLanguageStore();
     const productStore = useProductStore();
-    const currentLanguage = computed(() => appStore.getCurrentLanguage);
+    const currentLanguage = computed(() => languageStore.getCurrentLanguage);
 
     const productQuantity = ref(1);
     const selected = '';

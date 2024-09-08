@@ -91,14 +91,14 @@
 <script setup>
     import { computed, onMounted, ref, watch, watchEffect } from "vue";
     import { ArrowLongLeftIcon, ArrowLongRightIcon } from "@heroicons/vue/20/solid";
-    import { useAppStore } from '@/stores/language.js';
+    import { useLanguageStore } from '@/stores/language.js';
     import { useProductStore } from "@/stores/product";
     import CategoryFilter from "@/components/product/CategoryFilter.vue";
     import Footer from "@/components/layouts/Footer.vue";
     import Header from "@/components/layouts/Header.vue";
 
-    const appStore = useAppStore();
-    const currentLanguage = computed(() => appStore.getCurrentLanguage);
+    const languageStore = useLanguageStore();
+    const currentLanguage = computed(() => languageStore.getCurrentLanguage);
     const productStore = useProductStore();
 
     const filteredProducts = computed(() => productStore.filteredProducts);
