@@ -4,9 +4,9 @@
 
 This repository serves as a foundation for rapid implementation of future projects using Django backend and Vue 3 frontend, with RESTful architecture and JWT authentication.
 
-[![Django](https://img.shields.io/badge/Django-4.2+-092E20?style=flat&logo=django)](https://www.djangoproject.com/)
-[![Vue.js](https://img.shields.io/badge/Vue.js-3.0+-4FC08D?style=flat&logo=vue.js)](https://vuejs.org/)
-[![Vite](https://img.shields.io/badge/Vite-5.0+-646CFF?style=flat&logo=vite)](https://vitejs.dev/)
+[![Django](https://img.shields.io/badge/Django-6.0+-092E20?style=flat&logo=django)](https://www.djangoproject.com/)
+[![Vue.js](https://img.shields.io/badge/Vue.js-3.5+-4FC08D?style=flat&logo=vue.js)](https://vuejs.org/)
+[![Vite](https://img.shields.io/badge/Vite-6.0+-646CFF?style=flat&logo=vite)](https://vitejs.dev/)
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat&logo=python)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -23,6 +23,7 @@ This repository serves as a foundation for rapid implementation of future projec
 - [Testing](#-testing)
 - [Documentation](#-documentation)
 - [Reference Projects](#-reference-projects)
+- [Customization](#-customization)
 - [Contributing](#-contributing)
 
 ---
@@ -30,35 +31,50 @@ This repository serves as a foundation for rapid implementation of future projec
 ## ✨ Features
 
 ### Backend (Django)
-- ✅ **Django REST Framework** - Complete RESTful API
+- ✅ **Django REST Framework** - Complete RESTful API with function-based views
 - ✅ **JWT Authentication** - Simple JWT for tokens
-- ✅ **Custom User Model** - User with email as identifier
+- ✅ **Google OAuth** - Sign in with Google (`google-auth` + `google-auth-oauthlib`)
+- ✅ **Custom User Model** - User with email as identifier and role-based permissions
+- ✅ **Auth Service Layer** - Centralized authentication logic (`services/auth_service.py`)
 - ✅ **Complete CRUD** - Blog, Product, Sale, User
 - ✅ **Customized Django Admin** - Organized by sections
-- ✅ **File Management** - django-attachments for images and files
-- ✅ **Fake Data Generation** - Management commands for test data
-- ✅ **Complete Tests** - Pytest for models, serializers, and views
+- ✅ **File Management** - `django-attachments` for images and files
+- ✅ **Image Thumbnails** - `easy-thumbnails` for automatic resizing
+- ✅ **Automatic File Cleanup** - `django-cleanup` removes orphan files
+- ✅ **Fake Data Generation** - Management commands with Faker + factory-boy
+- ✅ **Complete Tests** - Pytest for models, serializers, views, services, admin, forms, and commands
+- ✅ **Linting** - Ruff for fast Python linting
+- ✅ **Coverage Reporting** - Custom terminal coverage report with top-N focus files
 - ✅ **CORS Configured** - Ready for local development
+- ✅ **Environment Management** - `python-dotenv` with split settings (dev / prod)
 
 ### Frontend (Vue)
 - ✅ **Vue 3 + Composition API** - With script setup
 - ✅ **Vite** - Fast and modern build tool
-- ✅ **Pinia** - State management
-- ✅ **Vue Router** - SPA navigation
-- ✅ **Axios** - HTTP client with interceptors
-- ✅ **TailwindCSS** - Utility-first styling
-- ✅ **i18n** - Multi-language internationalization
+- ✅ **Pinia** - State management with `pinia-plugin-persistedstate`
+- ✅ **Vue Router** - SPA navigation with auth guards
+- ✅ **Axios** - HTTP client with interceptors and token refresh
+- ✅ **TailwindCSS 4** - Utility-first styling
+- ✅ **Headless UI + Heroicons** - Accessible UI primitives and icons
+- ✅ **Bootstrap Icons + Flowbite** - Additional icon set and UI components
+- ✅ **SweetAlert2** - Beautiful notification dialogs
+- ✅ **vue-i18n** - Multi-language internationalization (en/es)
 - ✅ **GSAP** - Smooth animations
-- ✅ **Jest** - Unit and integration tests
-- ✅ **Playwright** - E2E tests
+- ✅ **Google Login** - `vue3-google-login` integration
+- ✅ **Composables** - `useAuth`, `useNotification`
+- ✅ **Helpers & Utils** - Formatters, validators, notification helpers
+- ✅ **Jest** - Unit and component tests
+- ✅ **Playwright** - Modular E2E tests with flow coverage reporter
 - ✅ **Reusable Components** - Carousels, filters, shopping cart
 
 ### DevOps & Tooling
-- ✅ **Git Configuration** - Complete .gitignore, .gitattributes
-- ✅ **EditorConfig** - Consistent code standards
-- ✅ **Prettier** - Automatic code formatting
-- ✅ **Environment Variables** - Documented .env.example files
-- ✅ **Documentation** - Complete configuration guides
+- ✅ **Git Configuration** - Complete `.gitignore`, `.gitattributes`
+- ✅ **Pre-commit Hook** - Test quality gate on staged test files
+- ✅ **ESLint** - JavaScript linting
+- ✅ **Ruff** - Python linting
+- ✅ **Environment Variables** - Documented `.env.example` files (backend + frontend)
+- ✅ **CI Workflow** - GitHub Actions test quality gate
+- ✅ **Documentation** - Complete architecture, testing, and quality standards
 
 ---
 
@@ -68,26 +84,43 @@ This repository serves as a foundation for rapid implementation of future projec
 | Technology | Version | Description |
 |------------|---------|-------------|
 | Python | 3.10+ | Programming language |
-| Django | 4.2+ | Web framework |
-| Django REST Framework | 3.14+ | REST API toolkit |
-| Simple JWT | 5.3+ | JWT authentication |
-| django-cors-headers | 4.3+ | CORS middleware |
+| Django | 6.0+ | Web framework |
+| Django REST Framework | 3.16+ | REST API toolkit |
+| Simple JWT | 5.5+ | JWT authentication |
+| django-cors-headers | 4.9+ | CORS middleware |
 | django-attachments | Custom | File management |
-| Faker | Latest | Fake data generation |
-| Pytest | Latest | Testing framework |
+| django-cleanup | 9.0+ | Automatic orphan file removal |
+| easy-thumbnails | 2.10+ | Image thumbnail generation |
+| google-auth | 2.48+ | Google OAuth verification |
+| python-dotenv | 1.2+ | Environment variable management |
+| Faker | 40.5+ | Fake data generation |
+| factory-boy | 3.3+ | Test factories |
+| freezegun | 1.5+ | Time mocking for tests |
+| Pytest | 9.0+ | Testing framework |
+| pytest-cov | 7.0+ | Coverage plugin |
+| Ruff | 0.15+ | Python linter |
 
 ### Frontend
 | Technology | Version | Description |
 |------------|---------|-------------|
-| Vue.js | 3.4+ | Progressive framework |
-| Vite | 5.0+ | Build tool |
-| Pinia | 2.1+ | State management |
-| Vue Router | 4.2+ | Routing |
-| Axios | 1.6+ | HTTP client |
-| TailwindCSS | 3.4+ | CSS framework |
-| GSAP | 3.12+ | Animations |
+| Vue.js | 3.5+ | Progressive framework |
+| Vite | 6.4+ | Build tool |
+| Pinia | 3.0+ | State management |
+| pinia-plugin-persistedstate | 4.7+ | Persisted state |
+| Vue Router | 5.0+ | Routing |
+| vue-i18n | 11.2+ | Internationalization |
+| Axios | 1.13+ | HTTP client |
+| TailwindCSS | 4.2+ | CSS framework |
+| Headless UI | 1.7+ | Accessible UI primitives |
+| Heroicons | 2.2+ | SVG icons |
+| Bootstrap Icons | 1.13+ | Icon set |
+| Flowbite | 4.0+ | UI components |
+| SweetAlert2 | 11.26+ | Notification dialogs |
+| GSAP | 3.14+ | Animations |
+| vue3-google-login | 2.0+ | Google OAuth |
+| ESLint | 9.39+ | JavaScript linting |
 | Jest | 29.7+ | Unit testing |
-| Playwright | 1.40+ | E2E testing |
+| Playwright | 1.58+ | E2E testing |
 
 ---
 
@@ -95,69 +128,119 @@ This repository serves as a foundation for rapid implementation of future projec
 
 ```
 base_django_vue_feature/
-├── backend/                          # Django Backend
-│   ├── base_feature_app/            # Main app
-│   │   ├── models/                  # Blog, Product, Sale, User
-│   │   ├── serializers/             # List, Detail, CreateUpdate
-│   │   ├── views/                   # CRUD ViewSets
-│   │   ├── urls/                    # URL routing by model
-│   │   ├── forms/                   # Django forms
-│   │   ├── tests/                   # Tests (models, serializers, views)
-│   │   └── management/commands/     # create_fake_data, delete_fake_data
-│   ├── base_feature_project/        # Settings and configuration
-│   ├── django_attachments/          # File management app
-│   ├── requirements.txt             # Python dependencies
-│   ├── pytest.ini                   # Pytest configuration
-│   └── .env.example                 # Environment variables (example)
+├── backend/                              # Django Backend
+│   ├── base_feature_app/                # Main app
+│   │   ├── models/                      # Blog, Product, Sale, User
+│   │   ├── serializers/                 # List, Detail, CreateUpdate per model
+│   │   ├── views/                       # Function-based CRUD views + auth
+│   │   ├── urls/                        # URL routing by model
+│   │   ├── forms/                       # Django forms (blog, product, user)
+│   │   ├── services/                    # Business logic (auth_service)
+│   │   ├── permissions/                 # Role-based permissions
+│   │   ├── exceptions.py               # Custom exception classes
+│   │   ├── tests/                       # Tests
+│   │   │   ├── models/                  # Model tests
+│   │   │   ├── serializers/             # Serializer tests
+│   │   │   ├── views/                   # View/endpoint tests
+│   │   │   ├── services/               # Service tests
+│   │   │   ├── admin/                   # Admin tests
+│   │   │   ├── forms/                   # Form tests
+│   │   │   ├── management/             # Management command tests
+│   │   │   ├── utils/                   # Utility & settings tests
+│   │   │   ├── conftest.py              # App-level fixtures
+│   │   │   └── factories.py            # factory-boy factories
+│   │   └── management/commands/         # create_fake_data, delete_fake_data, etc.
+│   ├── base_feature_project/            # Settings and configuration
+│   │   ├── settings.py                  # Base settings (shared)
+│   │   ├── settings_dev.py              # Development overrides
+│   │   ├── settings_prod.py             # Production overrides
+│   │   ├── urls.py                      # Root URL configuration
+│   │   ├── wsgi.py / asgi.py            # Server entry points
+│   │   └── __init__.py
+│   ├── django_attachments/              # File management app
+│   ├── conftest.py                      # Root pytest config (coverage report)
+│   ├── .coveragerc                      # Coverage configuration
+│   ├── pytest.ini                       # Pytest configuration
+│   ├── requirements.txt                 # Python dependencies
+│   └── .env.example                     # Environment variables (example)
 │
-├── frontend/                         # Vue Frontend
+├── frontend/                             # Vue Frontend
 │   ├── src/
-│   │   ├── components/              # Vue components
-│   │   │   ├── blog/                # BlogCarousel, BlogPresentation
-│   │   │   ├── product/             # ProductCarousel, ShoppingCart, etc.
-│   │   │   └── layouts/             # Header, Footer, SearchBar
-│   │   ├── views/                   # Pages/Views
-│   │   │   ├── auth/                # SignIn
-│   │   │   ├── blog/                # List, Detail
-│   │   │   ├── product/             # Catalog, Detail, Checkout
-│   │   │   ├── Home.vue
-│   │   │   ├── Dashboard.vue
-│   │   │   └── Backoffice.vue
-│   │   ├── stores/                  # Pinia stores
-│   │   │   ├── auth.js              # Authentication
-│   │   │   ├── blog.js              # Blog state
-│   │   │   ├── product.js           # Product + Cart state
-│   │   │   └── language.js          # i18n state
-│   │   ├── services/http/           # API clients
-│   │   ├── router/                  # Vue Router
-│   │   ├── i18n/                    # Translations
-│   │   └── mixins/                  # Global mixins
-│   ├── test/                        # Tests
-│   │   ├── components/              # Component tests
-│   │   ├── stores/                  # Store tests
-│   │   └── e2e/                     # Playwright tests
-│   ├── package.json                 # npm dependencies
-│   ├── jest.config.cjs              # Jest configuration
-│   ├── playwright.config.mjs        # Playwright configuration
-│   └── .env.example                 # Environment variables (example)
+│   │   ├── components/                  # Vue components
+│   │   │   ├── blog/                    # BlogCarousel, BlogPresentation
+│   │   │   ├── product/                 # ProductCarousel, ShoppingCart, etc.
+│   │   │   └── layouts/                 # Header, Footer, SearchBar
+│   │   ├── views/                       # Pages/Views
+│   │   │   ├── auth/                    # SignIn, SignUp
+│   │   │   ├── blog/                    # List, Detail
+│   │   │   ├── product/                 # Catalog, Detail, Checkout
+│   │   │   ├── Home.vue, Dashboard.vue, Backoffice.vue
+│   │   │   ├── AboutUs.vue, Contact.vue
+│   │   │   └── NotFound.vue             # 404 page
+│   │   ├── stores/                      # Pinia stores
+│   │   │   ├── auth.js                  # Authentication + token management
+│   │   │   ├── blog.js                  # Blog state
+│   │   │   ├── product.js               # Product + Cart state
+│   │   │   ├── language.js              # Language state
+│   │   │   ├── i18n.js                  # vue-i18n integration store
+│   │   │   └── services/request_http.js # HTTP request helpers
+│   │   ├── services/http/               # API client + token utilities
+│   │   ├── composables/                 # useAuth, useNotification
+│   │   ├── helpers/                     # googleLogin, notification
+│   │   ├── utils/                       # format, validators
+│   │   ├── shared/                      # constants
+│   │   ├── router/                      # Vue Router
+│   │   ├── i18n/                        # Translations
+│   │   └── mixins/                      # Global mixins
+│   ├── test/                            # Unit & component tests (Jest)
+│   │   ├── components/                  # Component tests
+│   │   ├── stores/                      # Store tests
+│   │   ├── composables/                 # Composable tests
+│   │   ├── helpers/                     # Helper tests
+│   │   ├── views/                       # View tests
+│   │   ├── services/http/               # HTTP service tests
+│   │   ├── router/                      # Router tests
+│   │   ├── mixins/                      # Mixin tests
+│   │   ├── utils/                       # Utility tests
+│   │   └── e2e/                         # Legacy E2E tests
+│   ├── e2e/                             # Modular E2E tests (Playwright)
+│   │   ├── auth/                        # Login, logout, register, redirects
+│   │   ├── blog/                        # Blog list, detail
+│   │   ├── shopping/                    # Cart, catalog, checkout, product detail
+│   │   ├── navigation/                  # Search, cart overlay, 404
+│   │   ├── home/                        # Home carousels
+│   │   ├── static/                      # Static pages
+│   │   ├── helpers/                     # Auth helpers, flow tags, test utils
+│   │   ├── reporters/                   # Flow coverage reporter
+│   │   └── flow-definitions.json        # E2E flow definitions
+│   ├── scripts/                         # Coverage & module helpers
+│   ├── package.json                     # npm dependencies
+│   ├── jest.config.cjs                  # Jest configuration
+│   ├── playwright.config.mjs            # Playwright configuration
+│   └── .env.example                     # Environment variables (example)
 │
-├── scripts/                          # Test & quality tooling
-│   ├── run-tests-all-suites.py     # Global test runner (sequential by default; backend + unit + E2E)
-│   ├── test_quality_gate.py        # Test quality gate CLI
-│   └── quality/                    # Quality gate analyzers
+├── scripts/                              # Test & quality tooling
+│   ├── run-tests-all-suites.py          # Global test runner (backend + unit + E2E)
+│   ├── test_quality_gate.py             # Test quality gate CLI
+│   └── quality/                         # Quality gate analyzer modules
 │
-├── docs/                            # Project documentation
-│   ├── BACKEND_AND_FRONTEND_COVERAGE_REPORT_STANDARD.md
+├── docs/                                 # Project documentation
 │   ├── DJANGO_VUE_ARCHITECTURE_STANDARD.md
-│   ├── E2E_FLOW_COVERAGE_REPORT_STANDARD.md
 │   ├── TESTING_QUALITY_STANDARDS.md
-│   └── TEST_QUALITY_GATE_REFERENCE.md
+│   ├── BACKEND_AND_FRONTEND_COVERAGE_REPORT_STANDARD.md
+│   ├── E2E_FLOW_COVERAGE_REPORT_STANDARD.md
+│   ├── TEST_QUALITY_GATE_REFERENCE.md
+│   ├── GLOBAL_RULES_GUIDELINES.md
+│   └── USER_FLOW_MAP.md
 │
-├── .gitignore                       # Git ignore rules
-├── .gitattributes                   # Git attributes (line endings)
-├── .editorconfig                    # Editor config
-├── .prettierrc                      # Prettier config
-└── README.md                        # This file
+├── .github/workflows/                    # CI pipelines
+│   └── test-quality-gate.yml            # Quality gate GitHub Action
+├── .pre-commit-config.yaml              # Pre-commit hooks
+├── .gitignore                            # Git ignore rules
+├── .gitattributes                        # Git attributes (line endings)
+├── test-reports/                         # Test runner logs & resume metadata
+├── test-results/                         # Quality gate reports
+└── README.md                             # This file
 ```
 
 ---
@@ -173,8 +256,8 @@ base_django_vue_feature/
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/carlos18bp/base_feature.git
-cd base_feature
+git clone https://github.com/carlos18bp/base_django_vue_feature.git
+cd base_django_vue_feature
 ```
 
 ### 2. Backend Setup
@@ -201,8 +284,14 @@ python manage.py migrate
 # Create superuser
 python manage.py createsuperuser
 
-# Create test data (optional)
+# Create test data with defaults (optional)
+python manage.py create_fake_data
+
+# Create test data with custom counts (optional)
 python manage.py create_fake_data --users 10 --blogs 20 --products 50 --sales 30
+
+# Delete test data (optional — protects superusers)
+python manage.py delete_fake_data --confirm
 
 # Start server
 python manage.py runserver
@@ -261,7 +350,7 @@ DJANGO_CSRF_TRUSTED_ORIGINS=http://127.0.0.1:5173,http://localhost:5173
 DJANGO_DB_ENGINE=django.db.backends.sqlite3
 DJANGO_DB_NAME=db.sqlite3
 
-# Production settings_prod database variables
+# Production database (when using settings_prod)
 # DB_NAME=your_db_name
 # DB_USER=your_db_user
 # DB_PASSWORD=your_db_password
@@ -271,6 +360,17 @@ DJANGO_DB_NAME=db.sqlite3
 # JWT
 DJANGO_JWT_ACCESS_MINUTES=15
 DJANGO_JWT_REFRESH_DAYS=7
+
+# Google OAuth (optional)
+DJANGO_GOOGLE_OAUTH_CLIENT_ID=your_google_client_id_here.apps.googleusercontent.com
+
+# Email (optional)
+# EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+# EMAIL_HOST=smtp.gmail.com
+# EMAIL_PORT=587
+# EMAIL_USE_TLS=true
+# EMAIL_HOST_USER=your-email@gmail.com
+# EMAIL_HOST_PASSWORD=your-app-password
 ```
 
 **Generate new SECRET_KEY:**
@@ -283,54 +383,56 @@ python -c "from django.core.management.utils import get_random_secret_key; print
 
 | Model | Description | Main Fields |
 |-------|-------------|------------|
-| **User** | Custom user | email, first_name, last_name, phone, role |
-| **Blog** | Blog entries | title, description, image, created_at |
-| **Product** | Products | title, description, price, category, subcategory, gallery |
-| **Sale** | Sales | customer, total_price, created_at |
-| **SoldProduct** | Sold products | sale, product, quantity, unit_price |
+| **User** | Custom user (email as identifier) | email, first_name, last_name, phone, role, is_active, date_joined |
+| **Blog** | Blog entries | title, description, category, image, created_at, updated_at |
+| **Product** | Products | title, category, sub_category, description, price, gallery, created_at, updated_at |
+| **Sale** | Sales | email, address, city, state, postal_code, sold_products (M2M), created_at |
+| **SoldProduct** | Products in a sale | product (FK), quantity, created_at, updated_at |
 
 ### API Endpoints
 
-#### Authentication (JWT)
+#### Authentication
 ```
-POST   /api/token/              # Get tokens (access + refresh)
-POST   /api/token/refresh/      # Refresh token
+POST   /api/token/                       # Get JWT tokens (access + refresh)
+POST   /api/token/refresh/               # Refresh JWT token
+POST   /api/sign_in/                     # Sign in (email + password)
+POST   /api/sign_up/                     # Register new user
+POST   /api/google_login/                # Sign in with Google OAuth
+GET    /api/validate_token/              # Validate current token (auth)
 ```
 
 #### Blog
 ```
-GET    /api/blogs-data/         # List blogs
-POST   /api/blogs/              # Create blog (auth)
-GET    /api/blogs/<id>/         # Blog detail
-PUT    /api/blogs/<id>/         # Update blog (auth)
-DELETE /api/blogs/<id>/         # Delete blog (auth)
+GET    /api/blogs/                       # List blogs
+POST   /api/blogs/create/                # Create blog (auth)
+GET    /api/blogs/<id>/                  # Blog detail
+PUT    /api/blogs/<id>/update/           # Update blog (auth)
+DELETE /api/blogs/<id>/delete/           # Delete blog (auth)
 ```
 
 #### Product
 ```
-GET    /api/products-data/      # List products
-POST   /api/products/           # Create product (auth)
-GET    /api/products/<id>/      # Product detail
-PUT    /api/products/<id>/      # Update product (auth)
-DELETE /api/products/<id>/      # Delete product (auth)
+GET    /api/products/                    # List products
+POST   /api/products/create/             # Create product (auth)
+GET    /api/products/<id>/               # Product detail
+PUT    /api/products/<id>/update/        # Update product (auth)
+DELETE /api/products/<id>/delete/        # Delete product (auth)
 ```
 
 #### Sale
 ```
-GET    /api/sales/              # List sales (auth)
-POST   /api/sales/              # Create sale
-GET    /api/sales/<id>/         # Sale detail (auth)
-PUT    /api/sales/<id>/         # Update sale (auth)
-DELETE /api/sales/<id>/         # Delete sale (auth)
+POST   /api/create-sale/                 # Create sale (public checkout)
+GET    /api/sales/                       # List sales (auth)
+GET    /api/sales/<id>/                  # Sale detail (auth)
 ```
 
 #### User
 ```
-GET    /api/users/              # List users (admin)
-POST   /api/users/              # Create user
-GET    /api/users/<id>/         # User detail (auth)
-PUT    /api/users/<id>/         # Update user (auth)
-DELETE /api/users/<id>/         # Delete user (auth)
+GET    /api/users/                       # List users (auth)
+POST   /api/users/create/                # Create user
+GET    /api/users/<id>/                  # User detail (auth)
+PUT    /api/users/<id>/update/           # Update user (auth)
+DELETE /api/users/<id>/delete/           # Delete user (auth)
 ```
 
 ### Management Commands
@@ -338,21 +440,27 @@ DELETE /api/users/<id>/         # Delete user (auth)
 #### Create Fake Data
 
 ```bash
-# Create all data
+# Create all data with defaults (10 each)
+python manage.py create_fake_data
+
+# Create all data with a single count for every model
+python manage.py create_fake_data 20
+
+# Custom counts per model
 python manage.py create_fake_data --users 10 --blogs 20 --products 50 --sales 30
 
 # Only some models
 python manage.py create_fake_data --blogs 10
 python manage.py create_fake_data --products 20 --sales 10
 
-# Individual options
-python manage.py create_blogs 20
-python manage.py create_products 50
-python manage.py create_sales 30
-python manage.py create_users 10
+# Individual commands
+python manage.py create_fake_blogs 20
+python manage.py create_fake_products 50
+python manage.py create_fake_sales 30
+python manage.py create_fake_users 10
 ```
 
-**Note:** The `create_users` command never deletes superusers or staff.
+**Note:** The `create_fake_users` command never deletes superusers or staff.
 
 #### Delete Fake Data
 
@@ -389,50 +497,64 @@ VITE_API_PREFIX=/api
 VITE_APP_NAME="Base Django Vue Feature"
 VITE_APP_VERSION=1.0.0
 VITE_DEFAULT_LANG=en
+
+# Google OAuth (optional)
+VITE_GOOGLE_CLIENT_ID=your_google_client_id_here.apps.googleusercontent.com
+
+# Feature Flags (optional)
+VITE_ENABLE_ANALYTICS=false
+VITE_ENABLE_DEBUG_MODE=true
 ```
 
-**Note:** In Vite, variables must start with `VITE_` to be accessible.
+**Note:** In Vite, variables must start with `VITE_` to be accessible. Changes require a dev server restart.
 
 ### Store Structure (Pinia)
 
 #### Auth Store (`stores/auth.js`)
 ```javascript
 // State
-{ accessToken, refreshToken }
+{ user, token, accessToken, refreshToken }
 
 // Actions
-signIn(email, password)
-signOut()
+login(data)                    // Set tokens + user from response
+signIn({ email, password })    // Authenticate via API
+logout() / signOut()           // Clear tokens + user
+validateToken()                // Verify token with backend
+checkAuth()                    // Full auth check
 
 // Getters
-isAuthenticated
+isAuthenticated                // Boolean: token + user.id present
+
+// Persisted via pinia-plugin-persistedstate
 ```
 
 #### Blog Store (`stores/blog.js`)
 ```javascript
 // State
-{ blogs: [] }
+{ blogs: [], dataLoaded: false }
 
 // Actions
-fetchBlogs()
+fetchBlogs()                   // Fetch once, skip if loaded
 
 // Getters
-blogById(id)
+blogById(id)                   // Find blog by ID
 ```
 
 #### Product Store (`stores/product.js`)
 ```javascript
 // State
-{ products: [], cart: [] }
+{ products: [], categories: [], filteredProducts: [], cartProducts: [], dataLoaded: false }
 
 // Actions
-fetchProducts()
-addProductToCart(product, quantity)
-removeProductFromCart(productId)
-createSale(customer)
+fetchProducts()                // Fetch + extract categories
+addProductToCart(product, qty)  // Add/increment cart item
+removeProductFromCart(product)  // Decrement/remove cart item
+productBySubCategory()         // Filter by checked sub-categories
+createSale(form)               // Submit checkout
 
 // Getters
 productById(id)
+productsByName(name)
 totalCartProducts
 totalCartPrice
 ```
@@ -443,7 +565,23 @@ totalCartPrice
 { currentLanguage: 'en' }
 
 // Actions
-setLanguage(lang)
+setCurrentLanguage(lang)
+
+// Getters
+getCurrentLanguage
+```
+
+#### i18n Store (`stores/i18n.js`)
+```javascript
+// State
+{ locale: 'en' }
+
+// Actions
+setLocale(newLocale)           // Switch locale, persist, sync vue-i18n
+
+// Getters
+currentLocale
+supportedLocales               // ['en', 'es']
 ```
 
 ### Main Components
@@ -470,39 +608,54 @@ setLanguage(lang)
 |-------|-----------|-------------|
 | `/` | Home | Home page |
 | `/blogs` | blog/List | Blog list |
-| `/blog/:id` | blog/Detail | Blog detail |
-| `/products` | product/Catalog | Product catalog |
-| `/product/:id` | product/Detail | Product detail |
+| `/blog/:blog_id` | blog/Detail | Blog detail |
+| `/catalog` | product/Catalog | Product catalog |
+| `/product/:product_id` | product/Detail | Product detail |
 | `/checkout` | product/Checkout | Checkout |
-| `/signin` | auth/SignIn | Sign in |
+| `/sign_in` | auth/SignIn | Sign in (guest only) |
+| `/sign_up` | auth/SignUp | Sign up (guest only) |
 | `/dashboard` | Dashboard | Dashboard (auth) |
 | `/backoffice` | Backoffice | Backoffice (auth) |
-| `/about` | AboutUs | About us |
+| `/about_us` | AboutUs | About us |
 | `/contact` | Contact | Contact |
+| `/:pathMatch(.*)*` | NotFound | 404 page |
 
 ### NPM Scripts
 
 ```bash
 # Development
-npm run dev              # Development server
+npm run dev                # Development server
 
 # Build
-npm run build            # Production build
-npm run preview          # Preview build
+npm run build              # Production build
+npm run preview            # Preview build
 
-# Testing
-npm run test             # Tests with Jest
-npm run test:watch       # Tests in watch mode
-npm run test:coverage    # Tests with coverage
+# Unit Testing (Jest)
+npm run test               # Run all unit tests
+npm run test:coverage      # Unit tests with coverage report
 
-# E2E
-npm run e2e              # Playwright tests
-npm run e2e:ui           # Playwright with UI
-npm run e2e:coverage     # Playwright + V8 coverage report
+# E2E Testing (Playwright)
+npm run e2e                # Run all E2E tests
+npm run e2e:ui             # Playwright with interactive UI
+npm run e2e:headed         # Run tests in headed browser
+npm run e2e:coverage       # E2E + user flow coverage report
+npm run e2e:report         # Show last HTML report
 
-# Linting & Formatting
-npm run lint             # Run ESLint
-npm run format           # Format with Prettier
+# E2E — viewport filters
+npm run e2e:desktop        # Desktop Chrome only
+npm run e2e:mobile         # Mobile Chrome (Pixel 5) only
+npm run e2e:tablet         # Tablet (iPad Mini) only
+
+# E2E — module helpers
+npm run e2e:modules        # List available E2E modules
+npm run e2e:module -- auth # Run a single module
+npm run e2e:coverage:module -- auth  # Module-scoped coverage
+
+# Cleanup
+npm run e2e:clean          # Remove test-results, playwright-report, e2e-results
+
+# Linting
+npm run lint               # Run ESLint
 ```
 
 ---
@@ -584,29 +737,54 @@ pytest -v
 
 #### Test Coverage
 
-- ✅ **Models**: User, Blog, Product, Sale, SoldProduct
-- ✅ **Serializers**: List, Detail, CreateUpdate for all models
-- ✅ **Views**: CRUD endpoints, JWT, public endpoints
+- ✅ **Models**: User, Blog, Product, Sale, SoldProduct, cascade deletes
+- ✅ **Serializers**: List, Detail, CreateUpdate for all models + media serializers
+- ✅ **Views**: CRUD endpoints, auth endpoints, JWT, public endpoints, permissions
+- ✅ **Services**: Auth service (sign in, sign up, Google login)
+- ✅ **Admin**: Admin site registration and configuration
+- ✅ **Forms**: Blog, Product, User forms
+- ✅ **Management**: Fake data creation and deletion commands
+- ✅ **Utils**: Email script, exceptions, settings modules, global test runner
 
 #### Test Structure
 
 ```
 backend/base_feature_app/tests/
-├── conftest.py                      # Shared fixtures
+├── conftest.py                       # App-level fixtures
+├── factories.py                      # factory-boy factories
 ├── models/
 │   ├── test_user_model.py
 │   ├── test_blog_model.py
 │   ├── test_product_model.py
-│   └── test_sale_model.py
+│   ├── test_sale_model.py
+│   └── test_models_delete.py
 ├── serializers/
 │   ├── test_user_serializers.py
 │   ├── test_blog_serializers.py
 │   ├── test_product_serializers.py
-│   └── test_sale_serializer.py
-└── views/
-    ├── test_crud_endpoints.py
-    ├── test_jwt_endpoints.py
-    └── test_public_endpoints.py
+│   ├── test_sale_serializer.py
+│   └── test_media_serializers.py
+├── views/
+│   ├── test_auth_endpoints.py
+│   ├── test_crud_endpoints.py
+│   ├── test_crud_endpoints_extended.py
+│   ├── test_crud_permissions.py
+│   ├── test_jwt_endpoints.py
+│   ├── test_public_endpoints.py
+│   └── test_urls.py
+├── services/
+│   └── test_auth_service.py
+├── admin/
+│   └── test_admin.py
+├── forms/
+│   └── test_forms.py
+├── management/
+│   └── test_commands.py
+└── utils/
+    ├── test_email_script.py
+    ├── test_exceptions.py
+    ├── test_run_tests_all_suites.py
+    └── test_settings_modules.py
 ```
 
 ### Frontend (Jest + Playwright)
@@ -622,19 +800,22 @@ npm run test
 # With coverage
 npm run test:coverage
 
-# Watch mode
-npm run test:watch
-
 # Specific tests
-npm test -- stores/auth.test.js
-npm test -- components/ShoppingCart.test.js
+npm test -- test/stores/auth.test.js
+npm test -- test/components/ShoppingCart.test.js
 ```
 
-#### Test Coverage
+#### Unit Test Coverage
 
-- ✅ **Stores**: auth, blog, product, language
-- ✅ **Components**: ShoppingCart, CartProduct, HelloWorld
-- ✅ **E2E**: Smoke tests with Playwright
+- ✅ **Stores**: auth, blog, product, language, i18n, services/request_http
+- ✅ **Components**: ShoppingCart, CartProduct, BlogCarousel, ProductCarousel
+- ✅ **Views**: Home, Dashboard, SignIn
+- ✅ **Composables**: useAuth, useNotification
+- ✅ **Helpers**: googleLogin, notification
+- ✅ **Services**: HTTP client, tokens
+- ✅ **Router**: Route definitions, auth guards
+- ✅ **Mixins**: globalMixin
+- ✅ **Utils**: format, validators
 
 #### E2E Tests (Playwright)
 
@@ -644,10 +825,10 @@ cd frontend
 # Install browsers (first time)
 npx playwright install
 
-# Run tests (all viewports: desktop + mobile + tablet)
+# Run all E2E tests
 npm run e2e
 
-# Run tests + flow coverage report (all viewports)
+# Run tests + flow coverage report
 npm run e2e:coverage
 
 # List available E2E modules
@@ -657,10 +838,7 @@ npm run e2e:modules
 npm run e2e:module -- auth
 npm run e2e:module -- --module auth --clean
 
-# Module-scoped coverage (example: auth)
-clear && npm run e2e:clean && npm run e2e:coverage -- --grep @module:auth
-
-# Helper alias for module-scoped coverage
+# Module-scoped coverage
 npm run e2e:coverage:module -- auth
 npm run e2e:coverage:module -- --module auth --clean
 
@@ -672,9 +850,6 @@ npm run e2e:tablet           # Tablet (iPad Mini) only
 # Combine viewport filter with a specific spec
 npm run e2e:desktop -- e2e/auth/auth-login.spec.js
 
-# Coverage with viewport filter
-E2E_COVERAGE=1 npm run e2e:mobile -- e2e/auth/auth-login.spec.js
-
 # With interactive UI
 npm run e2e:ui
 
@@ -684,30 +859,91 @@ npm run e2e:headed
 
 **Note:** `--grep @module:<name>` only runs tests tagged with that module. When you run a subset, the flow coverage report will still list other modules/flows as missing because they were not executed.
 
-**Note:** E2E tests automatically start the Vite server. Keep backend running to avoid proxy errors.
+**Note:** E2E tests automatically start both Vite and Django dev servers. Keep backend available to avoid proxy errors.
 
-#### Test Structure
+#### Unit Test Structure
 
 ```
 frontend/test/
+├── HelloWorld.test.js
 ├── components/
+│   ├── BlogCarousel.test.js
 │   ├── CartProduct.test.js
-│   ├── ShoppingCart.test.js
-│   └── HelloWorld.test.js
+│   ├── ProductCarousel.test.js
+│   └── ShoppingCart.test.js
 ├── stores/
 │   ├── auth.test.js
 │   ├── blog.test.js
 │   ├── product.test.js
-│   └── language.test.js
-└── e2e/
-    ├── navigation.spec.js
+│   ├── language.test.js
+│   ├── i18n.test.js
+│   └── services/request_http.test.js
+├── composables/
+│   ├── useAuth.test.js
+│   └── useNotification.test.js
+├── helpers/
+│   ├── googleLogin.test.js
+│   └── notification.test.js
+├── views/
+│   ├── Home.test.js
+│   ├── Dashboard.test.js
+│   └── SignIn.test.js
+├── services/http/
+│   ├── client.test.js
+│   └── tokens.test.js
+├── router/
+│   └── router.test.js
+├── mixins/
+│   └── globalMixin.test.js
+├── utils/
+│   ├── format.test.js
+│   └── validators.test.js
+└── e2e/                             # Legacy E2E tests
+    ├── auth.spec.js
     ├── blog.spec.js
     ├── product.spec.js
-    ├── auth.spec.js
+    ├── navigation.spec.js
+    ├── home.spec.js
+    ├── header.spec.js
     ├── static-pages.spec.js
     ├── responsive.spec.js
-    ├── helpers.js
-    └── README.md
+    └── helpers.js
+```
+
+#### E2E Test Structure (Modular)
+
+```
+frontend/e2e/
+├── auth/
+│   ├── auth-login.spec.js
+│   ├── auth-logout.spec.js
+│   ├── auth-register.spec.js
+│   ├── auth-protected-redirect.spec.js
+│   └── auth-guest-redirect.spec.js
+├── blog/
+│   ├── blog-list.spec.js
+│   └── blog-detail.spec.js
+├── shopping/
+│   ├── shopping-catalog.spec.js
+│   ├── shopping-product-detail.spec.js
+│   ├── shopping-cart.spec.js
+│   └── shopping-checkout.spec.js
+├── navigation/
+│   ├── navigation-search.spec.js
+│   ├── navigation-cart-overlay.spec.js
+│   └── navigation-not-found.spec.js
+├── home/
+│   └── home-carousels.spec.js
+├── static/
+│   └── static-pages.spec.js
+├── helpers/
+│   ├── auth.js
+│   ├── flow-tags.js
+│   └── test.js
+├── reporters/
+│   └── flow-coverage-reporter.mjs
+├── flow-definitions.json
+└── README.md
 ```
 
 ---
@@ -743,10 +979,18 @@ The project includes complete documentation:
 |------|---------|
 | `.gitignore` | Files to ignore in Git (complete and organized) |
 | `.gitattributes` | Line endings and diff configuration |
-| `.editorconfig` | Code standards for editors |
-| `.prettierrc` | Prettier configuration for formatting |
+| `.pre-commit-config.yaml` | Pre-commit hooks (test quality gate on staged tests) |
+| `.github/workflows/test-quality-gate.yml` | GitHub Actions CI workflow |
 | `backend/.env.example` | Environment variables template (backend) |
+| `backend/.coveragerc` | Coverage configuration |
+| `backend/pytest.ini` | Pytest configuration |
 | `frontend/.env.example` | Environment variables template (frontend) |
+| `frontend/.eslintrc.cjs` | ESLint configuration |
+| `frontend/jest.config.cjs` | Jest configuration |
+| `frontend/playwright.config.mjs` | Playwright configuration |
+| `frontend/tailwind.config.js` | TailwindCSS configuration |
+| `frontend/postcss.config.js` | PostCSS configuration |
+| `frontend/vite.config.js` | Vite configuration |
 
 ---
 
@@ -756,10 +1000,9 @@ Real implementation examples using this base:
 
 ### E-commerce
 - [🕯️ Candle Project](https://github.com/carlos18bp/candle_project) - Artisanal candles store
-- [💎 Jewel Project](https://github.com/carlos18bp/jewel_project) - Jewelry store
 
-### Rental
-- [👗 Dress Rental Project](https://github.com/carlos18bp/dress_rental_project) - Dress rental system
+### Internal tool
+- [⚖️ G&M Project](https://github.com/carlos18bp/gym_projectt) - Law firm management system
 
 ### Features
 - [🔐 Sign In/Sign On Feature](https://github.com/carlos18bp/signin_signon_feature) - Complete authentication system with registration
@@ -797,7 +1040,7 @@ mv backend/base_feature_app backend/your_app
 
 1. Create model in `backend/base_feature_app/models/`
 2. Create serializers (List, Detail, CreateUpdate)
-3. Create viewset in `views/`
+3. Create views in `views/`
 4. Add URLs in `urls/`
 5. Register in admin (`admin.py`)
 6. Create fake data command if needed
@@ -809,7 +1052,7 @@ mv backend/base_feature_app backend/your_app
 2. Add route in `router/index.js`
 3. Update Pinia store if needed
 4. Create reusable components in `components/`
-5. Write tests
+5. Write unit and e2e tests
 
 ---
 
@@ -825,10 +1068,19 @@ Contributions are welcome! If you find a bug or have a suggestion:
 
 ### Code Standards
 
-- **Backend**: Follow PEP 8 (use `flake8` or `black`)
-- **Frontend**: Follow ESLint and Prettier configuration
-- **Tests**: Write tests for new functionality
-- **Commits**: Descriptive messages in English
+- **Global & Architecture**: Follow the guidelines and architecture described in
+  [docs/GLOBAL_RULES_GUIDELINES.md](docs/GLOBAL_RULES_GUIDELINES.md) and
+  [docs/DJANGO_VUE_ARCHITECTURE_STANDARD.md](docs/DJANGO_VUE_ARCHITECTURE_STANDARD.md).
+- **Backend**: Follow PEP 8 (enforced by `ruff`) along with the standards above.
+- **Frontend**: Follow ESLint configuration along with the standards above.
+- **Tests & Quality**: Apply the standards defined in
+  [docs/TESTING_QUALITY_STANDARDS.md](docs/TESTING_QUALITY_STANDARDS.md),
+  [docs/TEST_QUALITY_GATE_REFERENCE.md](docs/TEST_QUALITY_GATE_REFERENCE.md), and the coverage reports in
+  [docs/BACKEND_AND_FRONTEND_COVERAGE_REPORT_STANDARD.md](docs/BACKEND_AND_FRONTEND_COVERAGE_REPORT_STANDARD.md) and
+  [docs/E2E_FLOW_COVERAGE_REPORT_STANDARD.md](docs/E2E_FLOW_COVERAGE_REPORT_STANDARD.md).
+- **User Flows**: Align changes with the flow map in
+  [docs/USER_FLOW_MAP.md](docs/USER_FLOW_MAP.md).
+- **Commits**: Descriptive messages in English.
 
 ---
 
@@ -852,33 +1104,6 @@ This project is under the MIT License. See `LICENSE` file for more details.
 - Vue.js team for Vue 3 and the ecosystem
 - Vite for the incredible developer experience
 - All contributors of the libraries used
-
----
-
-## 📞 Support
-
-If you have questions or need help:
-
-1. Check the [documentation](#-documentation)
-2. Search in [existing issues](https://github.com/carlos18bp/base_feature/issues)
-3. Create a [new issue](https://github.com/carlos18bp/base_feature/issues/new)
-
----
-
-## 🗺️ Roadmap
-
-Planned future improvements:
-
-- [ ] Docker configuration
-- [ ] CI/CD pipeline (GitHub Actions)
-- [ ] PostgreSQL support
-- [ ] Redis caching
-- [ ] Celery for async tasks
-- [ ] Websockets (Django Channels)
-- [ ] PWA support
-- [ ] Multi-tenant architecture
-- [ ] GraphQL API (optional)
-- [ ] Deployment guides (AWS, DigitalOcean, Heroku)
 
 ---
 
