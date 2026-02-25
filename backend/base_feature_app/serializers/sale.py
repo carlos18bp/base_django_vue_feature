@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from base_feature_app.models import Sale, SoldProduct, Product
-from base_feature_app.serializers import ProductSerializer
+from base_feature_app.serializers.product import ProductSerializer
 
 class SoldProductSerializer(serializers.ModelSerializer):
     product_id = serializers.IntegerField(write_only=True)

@@ -1,6 +1,6 @@
 <template>
     <!-- Carousel container for trending products -->
-    <div v-if="productsOnTrending" class="carousel-container py-16">
+    <div v-if="productsOnTrending && productsOnTrending.length" class="carousel-container py-16">
         <div class="text-center mb-8">
             <h2 class="text-3xl font-semibold">TRENDING NOW</h2>
             <p class="text-xl font-medium text-gray-500">
@@ -14,17 +14,17 @@
             <!-- Previous button for carousel -->
             <button
                 class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black text-white rounded-full shadow size-6 flex items-center justify-center z-10"
-                @click="prev">
+                @click="prev" data-testid="product-carousel-prev">
                 <span class="block text-sm leading-none">&lsaquo;</span>
             </button>
             <!-- Carousel items container -->
             <div class="overflow-hidden">
-                <ul class="flex transition-transform duration-500 ease-in-out"
+                <ul class="flex transition-transform duration-500 ease-in-out" data-testid="product-carousel-list"
                     :style="{ transform: `translateX(-${(currentIndex * 100) / 5}%)` }">
                     <!-- Loop through trending products and display them in the carousel -->
-                    <router-link :to="{ name: 'product', params: { product_ref: product.ref } }"
+                    <router-link :to="{ name: 'product', params: { product_id: product.id } }"
                         v-for="product in productsOnTrending" :key="product.id"
-                        class="flex-none w-full sm:w-1/2 lg:w-1/5 px-2 cursor-pointer">
+                        class="flex-none w-full sm:w-1/2 lg:w-1/5 px-2 cursor-pointer" data-testid="product-carousel-item">
                         <div class="shadow">
                             <img :src="product.gallery_urls[0]" :alt="product.title"
                                 class="w-full object-cover mb-4" />
@@ -44,7 +44,7 @@
             <!-- Next button for carousel -->
             <button
                 class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black text-white rounded-full shadow size-6 flex items-center justify-center z-10"
-                @click="next">
+                @click="next" data-testid="product-carousel-next">
                 <span class="block text-sm leading-none">&rsaquo;</span>
             </button>
         </div>
@@ -73,7 +73,9 @@
     onMounted(async () => {
         await productStore.fetchProducts();
         productsOnTrending.value = productStore.products;
-        startCarousel();
+        if (productsOnTrending.value.length) {
+            startCarousel();
+        }
     });
 
     // Stop the carousel when the component is unmounted
@@ -85,6 +87,7 @@
      * Move to the next set of products in the carousel
      */
     const next = () => {
+        if (!productsOnTrending.value?.length) return;
         if (currentIndex.value < Math.ceil(productsOnTrending.value.length / 5) - 1) {
             currentIndex.value++;
         } else {
@@ -96,6 +99,7 @@
      * Move to the previous set of products in the carousel
      */
     const prev = () => {
+        if (!productsOnTrending.value?.length) return;
         if (currentIndex.value > 0) {
             currentIndex.value--;
         } else {

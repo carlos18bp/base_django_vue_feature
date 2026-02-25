@@ -14,11 +14,17 @@ class Blog(models.Model):
     :vartype category: str
     :ivar image: image by blog.
     :vartype image: Image
+    :ivar created_at: created at timestamp.
+    :vartype created_at: datetime
+    :ivar updated_at: updated at timestamp.
+    :vartype updated_at: datetime
     """
 
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=40)
     description = models.TextField()
     category = models.CharField(max_length=40)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     image = SingleImageField(related_name='blog_image', on_delete=models.CASCADE)
 
     def __str__(self):

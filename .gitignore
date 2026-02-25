@@ -1,7 +1,274 @@
+# ============================================================================
+# GITIGNORE - Django + Vue Project
+# ============================================================================
+
+# ============================================================================
+# PYTHON / DJANGO (Backend)
+# ============================================================================
+
+# Python compiled files
+*.py[cod]
+*$py.class
+*.so
+__pycache__/
+**/__pycache__/
+*.pyc
+
+# Django
 backend/db.sqlite3
-backend/__pycache__/
-backend/**/__pycache__/
-backend/*.pyc
+backend/db.sqlite3-journal
+backend/*.log
+backend/local_settings.py
+
+# Django media files (uploaded content)
 backend/media/
 !backend/media/temp/
-backend/*env/
+!backend/media/.gitkeep
+
+# Django static files (collected)
+backend/staticfiles/
+backend/static_root/
+
+# Python virtual environments
+backend/venv/
+backend/env/
+backend/ENV/
+backend/.venv/
+*env/
+
+# Pip
+backend/pip-log.txt
+backend/pip-delete-this-directory.txt
+
+# Django migrations (optional - descomentar si no quieres versionar migraciones)
+# backend/**/migrations/*.py
+# !backend/**/migrations/__init__.py
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Django test / coverage
+backend/.coverage
+backend/.coveragerc
+backend/htmlcov/
+backend/.pytest_cache/
+backend/.tox/
+backend/coverage.xml
+backend/*.cover
+backend/.hypothesis/
+
+# ============================================================================
+# NODE / VUE / VITE (Frontend)
+# ============================================================================
+
+# Dependencies
+frontend/node_modules/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# Build outputs
+frontend/dist/
+frontend/dist-ssr/
+frontend/build/
+
+# Vite
+frontend/.vite/
+frontend/vite.config.js.timestamp-*
+frontend/vite.config.ts.timestamp-*
+
+# Testing
+frontend/coverage/
+frontend/.nyc_output/
+frontend/test-results/
+frontend/playwright-report/
+frontend/playwright/.cache/
+frontend/coverage-e2e/
+frontend/e2e-results/
+
+# ============================================================================
+# ENVIRONMENT VARIABLES & SECRETS
+# ============================================================================
+
+# Environment files
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env
+*.env
+
+# Secrets
+secrets.json
+credentials.json
+*.pem
+*.key
+*.cert
+
+# ============================================================================
+# IDEs & EDITORS
+# ============================================================================
+
+# VSCode
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json.example
+*.code-workspace
+
+# Cursor
+.cursor/
+
+# PyCharm / IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+.vim/
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ============================================================================
+# OPERATING SYSTEM
+# ============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.directory
+.Trash-*
+
+# ============================================================================
+# LOGS & DATABASES
+# ============================================================================
+
+# Logs
+*.log
+logs/
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+*.sql
+
+# ============================================================================
+# TEMPORARY & CACHE FILES
+# ============================================================================
+
+# General temp files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+
+# Cache directories
+.cache/
+*.cache
+.sass-cache/
+.npm/
+.eslintcache
+.stylelintcache
+
+# ============================================================================
+# BUILD & PACKAGE MANAGERS
+# ============================================================================
+
+# Package manager lock files (optional - comentar si quieres versionarlos)
+# frontend/package-lock.json
+# frontend/yarn.lock
+# frontend/pnpm-lock.yaml
+
+# ============================================================================
+# DOCKER (si usas Docker)
+# ============================================================================
+
+# Docker
+# docker-compose.override.yml
+# .dockerignore
+
+# ============================================================================
+# CI/CD & DEPLOYMENT
+# ============================================================================
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Ansible
+*.retry
+
+# ============================================================================
+# DOCUMENTATION & NOTES
+# ============================================================================
+
+# Personal notes
+TODO.txt
+NOTES.md
+.notes/
+
+# ============================================================================
+# PROJECT SPECIFIC
+# ============================================================================
+
+# Test results (generated)
+test-reports/
+test-results/
+
+# Backup files
+*.backup
+backup/
+
+# Uploaded test files
+backend/media/uploads/test_*
+
+# Frontend source maps (optional)
+# frontend/**/*.map
+
+# ============================================================================
+# KEEP THESE FILES
+# ============================================================================
+
+# Explicitly keep certain files/folders
+!.gitkeep
+!.env.example
+!README.md
+!requirements.txt
+!package.json
+
+# ============================================================================
+# END OF GITIGNORE
+# ============================================================================

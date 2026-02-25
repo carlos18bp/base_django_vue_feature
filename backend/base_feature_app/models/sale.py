@@ -7,6 +7,8 @@ class SoldProduct(models.Model):
     """
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     quantity = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f'{self.product.title} (Qty: {self.quantity})'
@@ -21,6 +23,8 @@ class Sale(models.Model):
     state = models.CharField(max_length=100)
     postal_code = models.CharField(max_length=20)
     sold_products = models.ManyToManyField(SoldProduct)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.email

@@ -1,6 +1,4 @@
 <template>
-    <Header></Header>
-
     <div class="relative px-8">
         <div>
             <main class="mx-auto xl:max-w-7xl">
@@ -84,8 +82,6 @@
             </main>
         </div>
     </div>
-
-    <Footer></Footer>
 </template>
 
 <script setup>
@@ -94,8 +90,6 @@
     import { useLanguageStore } from '@/stores/language.js';
     import { useProductStore } from "@/stores/product";
     import CategoryFilter from "@/components/product/CategoryFilter.vue";
-    import Footer from "@/components/layouts/Footer.vue";
-    import Header from "@/components/layouts/Header.vue";
 
     const languageStore = useLanguageStore();
     const currentLanguage = computed(() => languageStore.getCurrentLanguage);

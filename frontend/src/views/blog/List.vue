@@ -1,5 +1,4 @@
 <template>
-    <Header></Header>
     <div v-if="blogs.length" class="flex flex-col m-8 md:px-16">
         <div class="flex pb-12">
             <div class="w-full md:w-1/2 mt-4 -m-8 md:-m-0 md:mt-0">
@@ -63,13 +62,10 @@
             </nav>
         </div>
     </div>
-    <Footer></Footer>
 </template>
 
 <script setup>
     import { computed, onMounted, ref, reactive, watch, watchEffect } from "vue";
-    import Header from "@/components/layouts/Header.vue";
-    import Footer from "@/components/layouts/Footer.vue";
     import BlogPresentation from "@/components/blog/BlogPresentation.vue";
     import { ArrowLongLeftIcon, ArrowLongRightIcon } from "@heroicons/vue/20/solid";
     import { useLanguageStore } from '@/stores/language.js';

@@ -25,7 +25,7 @@ class BlogSerializer(serializers.ModelSerializer):
         if not request:
             return None
         if obj.image:
-            attachment = obj.image.attachment_set.first()
+            attachment = obj.image.attachment_set.order_by('rank', 'id').first()
             if attachment:
-                return request.build_absolute_uri(obj.image.attachment_set.all()[0].file.url)
+                return request.build_absolute_uri(attachment.file.url)
         return None

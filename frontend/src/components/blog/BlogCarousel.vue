@@ -1,6 +1,6 @@
 <template>
     <!-- Carousel container for trending blogs -->
-    <div v-if="blogsOnTrending" class="carousel-container p-16">
+    <div v-if="blogsOnTrending && blogsOnTrending.length" class="carousel-container p-16">
         <div class="text-center mb-8">
             <h2 class="text-3xl font-semibold">TRENDING NOW</h2>
             <p class="text-xl font-medium text-gray-500">
@@ -14,18 +14,18 @@
             <!-- Previous button for carousel -->
             <button
                 class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black text-white rounded-full shadow size-6 flex items-center justify-center z-10"
-                @click="prev">
+                @click="prev" data-testid="blog-carousel-prev">
                 <span class="sr-only">Previous</span>
                 <span class="block text-sm leading-none">&lsaquo;</span>
             </button>
             <!-- Carousel items container -->
             <div class="overflow-hidden">
-                <ul class="flex transition-transform duration-500 ease-in-out"
+                <ul class="flex transition-transform duration-500 ease-in-out" data-testid="blog-carousel-list"
                     :style="{ transform: `translateX(-${(currentIndex * 100) / 5}%)` }">
                     <!-- Loop through trending blogs and display them in the carousel -->
                     <router-link :to="{ name: 'blog', params: { blog_id: blog.id } }"
                         v-for="blog in blogsOnTrending" :key="blog.id"
-                        class="flex-none w-full sm:w-1/2 lg:w-1/5 px-2 cursor-pointer">
+                        class="flex-none w-full sm:w-1/2 lg:w-1/5 px-2 cursor-pointer" data-testid="blog-carousel-item">
                         <div class="shadow">
                             <img :src="blog.image_url" :alt="blog.title"
                                 class="w-full object-cover mb-4" />
@@ -45,7 +45,7 @@
             <!-- Next button for carousel -->
             <button
                 class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black text-white rounded-full shadow size-6 flex items-center justify-center z-10"
-                @click="next">
+                @click="next" data-testid="blog-carousel-next">
                 <span class="sr-only">Next</span>
                 <span class="block text-sm leading-none">&rsaquo;</span>
             </button>
@@ -75,7 +75,9 @@
     onMounted(async () => {
         await blogStore.fetchBlogs();
         blogsOnTrending.value = blogStore.blogs;
-        startCarousel();
+        if (blogsOnTrending.value.length) {
+            startCarousel();
+        }
     });
 
     // Stop the carousel when the component is unmounted
@@ -87,6 +89,7 @@
      * Move to the next set of blogs in the carousel
      */
     const next = () => {
+        if (!blogsOnTrending.value?.length) return;
         if (currentIndex.value < Math.ceil(blogsOnTrending.value.length / 5) - 1) {
             currentIndex.value++;
         } else {
@@ -98,6 +101,7 @@
      * Move to the previous set of blogs in the carousel
      */
     const prev = () => {
+        if (!blogsOnTrending.value?.length) return;
         if (currentIndex.value > 0) {
             currentIndex.value--;
         } else {

@@ -30,6 +30,7 @@
                         </label>
                         <input type="email" v-model="form.email"
                             class="w-full p-3 border border-gray-500 rounded-lg bg-transparent"
+                            data-testid="checkout-email"
                             required />
                     </div>
 
@@ -42,6 +43,7 @@
                         </label>
                         <input type="text" v-model="form.cardNumber"
                             class="w-full p-3 border border-gray-500 rounded-lg bg-transparent"
+                            data-testid="checkout-card-number"
                             required />
                     </div>
                     <div class="mt-4 grid grid-cols-4 gap-4">
@@ -51,12 +53,14 @@
                             </label>
                             <input type="text" v-model="form.expirationDate"
                                 class="w-full p-3 border border-gray-500 rounded-lg bg-transparent"
+                                data-testid="checkout-expiry"
                                 required />
                         </div>
                         <div class="col-span-1">
                             <label class="block text-gray-500 mb-2 font-semibold text-lg">CVC</label>
                             <input type="text" v-model="form.cvc"
                                 class="w-full p-3 border border-gray-500 rounded-lg bg-transparent"
+                                data-testid="checkout-cvc"
                                 required />
                         </div>
                     </div>
@@ -70,6 +74,7 @@
                         </label>
                         <input type="text" v-model="form.address"
                             class="w-full p-3 border border-gray-500 rounded-lg bg-transparent"
+                            data-testid="checkout-address"
                             required />
                     </div>
                     <div class="mt-4 grid grid-cols-3 gap-4">
@@ -79,6 +84,7 @@
                             </label>
                             <input type="text" v-model="form.city"
                                 class="w-full p-3 border border-gray-500 rounded-lg bg-transparent"
+                                data-testid="checkout-city"
                                 required />
                         </div>
                         <div>
@@ -87,6 +93,7 @@
                             </label>
                             <input type="text" v-model="form.state"
                                 class="w-full p-3 border border-gray-500 rounded-lg bg-transparent"
+                                data-testid="checkout-state"
                                 required />
                         </div>
                         <div>
@@ -95,6 +102,7 @@
                             </label>
                             <input type="text" v-model="form.postalCode"
                                 class="w-full p-3 border border-gray-500 rounded-lg bg-transparent"
+                                data-testid="checkout-postal-code"
                                 required />
                         </div>
                     </div>
@@ -137,7 +145,7 @@
                             </p>
                             <!-- Remove Product Button -->
                             <div class="flex items-end">
-                                <a @click="removeProduct(product.id)" class="font-semibold text-lg">
+                                <a @click="removeProduct(product)" class="font-semibold text-lg">
                                     Remove
                                 </a>
                             </div>
@@ -256,8 +264,8 @@
      * Remove product from cart
      * @param {Number} productId - The ID of the product to remove
      */
-    const removeProduct = (productId) => {
-        productStore.removeProductFromCart(productId);
+    const removeProduct = (product) => {
+        productStore.removeProductFromCart(product);
     };
 </script>
 

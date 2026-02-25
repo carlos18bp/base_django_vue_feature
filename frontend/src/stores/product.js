@@ -1,183 +1,205 @@
+import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import { create_request, get_request } from "./services/request_http";
 
-export const useProductStore = defineStore("productStore", {
-  state: () => ({
-    products: [],
-    categories: [],
-    filteredProducts: [],
-    cartProducts: [],
-    dataLoaded: false,
-  }),
-  getters: {
-    /**
-     * Get product by ID.
-     * @param {object} state - State.
-     * @returns {function} - Function to find product by ID.
-     */
-    productById: (state) => (productId) =>
-      state.products.find((product) => product.id === productId),
+const normalizeMediaUrl = (url) => {
+  if (!url || typeof url !== 'string') return url;
+  const mediaIndex = url.indexOf('/media/');
+  if (mediaIndex === -1) return url;
+  return url.slice(mediaIndex);
+};
 
-    /**
-     * Filter products by name and language
-     * @param {Object} state - The current state of the store
-     * @return {Function} - A function that takes a product name and language,
-     *                      and returns a filtered list of products that match
-     *                      the name in the specified language and have stock available
-     */
-    productsByName: (state) => (name) => {
-      const lowerCaseName = name.toLowerCase();
-      return state.products.filter((product) => {
-        const productName = product.title.toLowerCase()
-        return productName.includes(lowerCaseName);
-      });
-    },
-    /**
-     * Calculate total number of products in the cart.
-     * @param {object} state - State.
-     * @returns {number} - Total number of products in the cart.
-     */
-    totalCartProducts: (state) =>
-      state.cartProducts.reduce(
-        (total, product) => total + product.quantity,
-        0
-      ),
+export const useProductStore = defineStore("productStore", () => {
+  const products = ref([]);
+  const categories = ref([]);
+  const filteredProducts = ref([]);
+  const cartProducts = ref([]);
+  const dataLoaded = ref(false);
 
-    /**
-     * Calculate total price of products in the cart.
-     * @param {object} state - State.
-     * @returns {number} - Total price of products in the cart.
-     */
-    totalCartPrice: (state) =>
-      state.cartProducts.reduce(
-        (total, product) =>
-          total + parseFloat(product.price) * product.quantity,
-        0
-      ),
-  },
-  actions: {
-    /**
-     * Fetches the list of products from the backend.
-     */
-    async fetchProducts() {
-      if (this.dataLoaded) return;
+  /**
+   * Get product by ID.
+   * @param {number} productId - Product ID.
+   * @returns {object|undefined} - Product object or undefined.
+   */
+  const productById = computed(() => (productId) =>
+    products.value.find((product) => product.id === productId)
+  );
 
-      try {
-        const response = await get_request("products-data/");
-        this.products = Array.isArray(response.data) ? response.data : [];
-        this.dataLoaded = true;
-        this.filteredProducts = this.products;
-        this.fetchUniqueCategoriesAndSubCategories();
-      } catch (error) {
-        console.error("Failed to fetch products:", error);
-      }
-    },
-    /**
-     * Add product to the cart
-     * @param {Object} addProduct - The product to add to the cart
-     */
-    addProductToCart(addProduct, quantity) {
-      const existingProduct = this.cartProducts.find(
-        (product) => product.id === addProduct.id
+  /**
+   * Filter products by name.
+   * @param {string} name - Search term.
+   * @returns {Array} - Matching products.
+   */
+  const productsByName = computed(() => (name) => {
+    const lowerCaseName = name.toLowerCase();
+    return products.value.filter((product) =>
+      product.title.toLowerCase().includes(lowerCaseName)
+    );
+  });
+
+  /**
+   * Calculate total number of products in the cart.
+   * @returns {number} - Total quantity.
+   */
+  const totalCartProducts = computed(() =>
+    cartProducts.value.reduce((total, product) => total + product.quantity, 0)
+  );
+
+  /**
+   * Calculate total price of products in the cart.
+   * @returns {number} - Total price.
+   */
+  const totalCartPrice = computed(() =>
+    cartProducts.value.reduce(
+      (total, product) => total + parseFloat(product.price) * product.quantity,
+      0
+    )
+  );
+
+  /**
+   * Fetches the list of products from the backend.
+   */
+  async function fetchProducts() {
+    if (dataLoaded.value) return;
+
+    try {
+      const response = await get_request("products/");
+      products.value = Array.isArray(response.data)
+        ? response.data.map((p) => ({
+            ...p,
+            gallery_urls: Array.isArray(p.gallery_urls)
+              ? p.gallery_urls.map(normalizeMediaUrl)
+              : [],
+          }))
+        : [];
+      dataLoaded.value = true;
+      filteredProducts.value = products.value;
+      fetchUniqueCategoriesAndSubCategories();
+    } catch (error) {
+      console.error("Failed to fetch products:", error);
+    }
+  }
+
+  /**
+   * Add product to the cart.
+   * @param {Object} addProduct - The product to add.
+   * @param {number} quantity - Quantity to add.
+   */
+  function addProductToCart(addProduct, quantity) {
+    const existingProduct = cartProducts.value.find(
+      (product) => product.id === addProduct.id
+    );
+
+    if (existingProduct) {
+      existingProduct.quantity += quantity ? quantity : 1;
+    } else {
+      cartProducts.value.push({ ...addProduct, quantity: quantity ? quantity : 1 });
+    }
+    localStorage.setItem("cartProducts", JSON.stringify(cartProducts.value));
+  }
+
+  /**
+   * Remove product from the cart.
+   * @param {Object} removeProduct - The product to remove.
+   */
+  function removeProductFromCart(removeProduct) {
+    const removeProductFound = cartProducts.value.find(
+      (product) => product === removeProduct
+    );
+
+    if (removeProductFound.quantity > 1) {
+      removeProductFound.quantity -= 1;
+    } else {
+      cartProducts.value = cartProducts.value.filter(
+        (product) => product !== removeProductFound
       );
+    }
+    localStorage.setItem("cartProducts", JSON.stringify(cartProducts.value));
+  }
 
-      if (existingProduct) {
-        existingProduct.quantity += quantity ? quantity : 1;
-      } else {
-        this.cartProducts.push({
-          ...addProduct,
-          quantity: quantity ? quantity : 1,
+  /**
+   * Filter products by sub-category.
+   */
+  function productBySubCategory() {
+    const isChecked = (subCategory) => subCategory.checked;
+
+    filteredProducts.value = products.value.filter((product) =>
+      categories.value.some((category) =>
+        category.subCategories.some(
+          (subCategory) =>
+            isChecked(subCategory) && product.sub_category === subCategory.name
+        )
+      )
+    );
+
+    if (filteredProducts.value.length === 0)
+      filteredProducts.value = products.value;
+  }
+
+  /**
+   * Fetch unique categories and subCategories from products.
+   */
+  async function fetchUniqueCategoriesAndSubCategories() {
+    if (!dataLoaded.value) await fetchProducts();
+
+    const categoryMap = new Map();
+
+    products.value.forEach((product) => {
+      if (!categoryMap.has(product.category)) {
+        categoryMap.set(product.category, {
+          name: product.category,
+          subCategories: [],
         });
       }
-      localStorage.setItem("cartProducts", JSON.stringify(this.cartProducts));
-    },
-    /**
-     * Remove product from the cart
-     * @param {Number} removeProductId - The ID of the product to remove from the cart
-     */
-    removeProductFromCart(removeProduct) {
-      const removeProductFound = this.cartProducts.find(
-        (product) => product === removeProduct
-      );
+      categoryMap
+        .get(product.category)
+        .subCategories.push({ name: product.sub_category, checked: false });
+    });
 
-      if (removeProductFound.quantity > 1) {
-        removeProductFound.quantity -= 1;
-      } else {
-        this.cartProducts = this.cartProducts.filter(
-          (product) => product !== removeProductFound
-        );
-      }
-      localStorage.setItem("cartProducts", JSON.stringify(this.cartProducts));
-    },
-    /**
-     * Filter products by sub-category.
-     */
-    productBySubCategory() {
-      const isChecked = (subCategory) => subCategory.checked;
+    categories.value = Array.from(categoryMap.values()).map((category) => ({
+      ...category,
+      subCategories: Array.from(
+        new Set(category.subCategories.map((sub) => JSON.stringify(sub)))
+      ).map((sub) => JSON.parse(sub)),
+    }));
+  }
 
-      this.filteredProducts = this.products.filter((product) => {
-        return this.categories.some((category) =>
-          category.subCategories.some(
-            (subCategory) =>
-              isChecked(subCategory) &&
-              product.sub_category === subCategory.name
-          )
-        );
+  /**
+   * Create a new sale.
+   * @param {Object} form - The form data for the sale.
+   * @returns {number|undefined} - The response status.
+   */
+  async function createSale(form) {
+    try {
+      const response = await create_request("create-sale/", {
+        email: form.email,
+        address: form.address,
+        city: form.city,
+        state: form.state,
+        postal_code: form.postalCode,
+        sold_products: form.soldProducts,
       });
+      return response.status;
+    } catch (error) {
+      console.error("Error creating sale:", error);
+    }
+  }
 
-      if (this.filteredProducts.length === 0)
-        this.filteredProducts = this.products;
-    },
-
-    /**
-     * Fetch unique categories and subCategories from products.
-     */
-    async fetchUniqueCategoriesAndSubCategories() {
-      if (!this.dataLoaded) await this.fetchProductsData();
-
-      const categoryMap = new Map();
-
-      this.products.forEach((product) => {
-        // Process English categories and sub-categories
-        if (!categoryMap.has(product.category)) {
-          categoryMap.set(product.category, {
-            name: product.category,
-            subCategories: [],
-          });
-        }
-        categoryMap
-          .get(product.category)
-          .subCategories.push({ name: product.sub_category, checked: false });
-      });
-
-      // Convert maps to arrays and remove duplicates
-      this.categories = Array.from(categoryMap.values()).map((category) => ({
-        ...category,
-        subCategories: Array.from(
-          new Set(category.subCategories.map((sub) => JSON.stringify(sub)))
-        ).map((sub) => JSON.parse(sub)),
-      }));
-    },
-    /**
-     * Create a new sale
-     * @param {Object} form - The form data for the sale
-     * @returns {Number} - The response status of the sale creation request
-     */
-    async createSale(form) {
-      try {
-        const response = await create_request("create-sale/", {
-          email: form.email,
-          address: form.address,
-          city: form.city,
-          state: form.state,
-          postal_code: form.postalCode,
-          sold_products: form.soldProducts,
-        });
-
-        return response.status;
-      } catch (error) {
-        console.error("Error creating sale:", error);
-      }
-    },
-  },
+  return {
+    products,
+    categories,
+    filteredProducts,
+    cartProducts,
+    dataLoaded,
+    productById,
+    productsByName,
+    totalCartProducts,
+    totalCartPrice,
+    fetchProducts,
+    addProductToCart,
+    removeProductFromCart,
+    productBySubCategory,
+    fetchUniqueCategoriesAndSubCategories,
+    createSale,
+  };
 });

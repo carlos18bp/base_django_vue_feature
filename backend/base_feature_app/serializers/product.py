@@ -20,5 +20,6 @@ class ProductSerializer(serializers.ModelSerializer):
         if not request:
             return []
         if obj.gallery:
-            return [request.build_absolute_uri(attachment.file.url) for attachment in obj.gallery.attachment_set.all()]
+            attachments = obj.gallery.attachment_set.order_by('rank', 'id')
+            return [request.build_absolute_uri(attachment.file.url) for attachment in attachments]
         return []

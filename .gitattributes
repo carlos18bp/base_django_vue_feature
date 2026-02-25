@@ -1,0 +1,158 @@
+# ============================================================================
+# GIT ATTRIBUTES
+# ============================================================================
+# This file ensures consistent line endings and proper diff handling
+
+# ============================================================================
+# AUTO LINE ENDING NORMALIZATION
+# ============================================================================
+
+# Set default behavior to automatically normalize line endings
+* text=auto
+
+# ============================================================================
+# SOURCE CODE
+# ============================================================================
+
+# Python
+*.py text eol=lf
+*.pyx text eol=lf
+*.pyi text eol=lf
+
+# JavaScript/TypeScript
+*.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.mjs text eol=lf
+*.cjs text eol=lf
+
+# Vue
+*.vue text eol=lf
+
+# HTML/CSS/SCSS
+*.html text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.sass text eol=lf
+*.less text eol=lf
+
+# JSON
+*.json text eol=lf
+*.json5 text eol=lf
+
+# YAML
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# XML
+*.xml text eol=lf
+*.svg text eol=lf
+
+# Shell scripts
+*.sh text eol=lf
+*.bash text eol=lf
+
+# ============================================================================
+# DOCUMENTATION
+# ============================================================================
+
+*.md text eol=lf
+*.txt text eol=lf
+*.rst text eol=lf
+LICENSE text eol=lf
+README text eol=lf
+
+# ============================================================================
+# CONFIGURATION FILES
+# ============================================================================
+
+*.ini text eol=lf
+*.cfg text eol=lf
+*.conf text eol=lf
+*.toml text eol=lf
+.editorconfig text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf
+.env.example text eol=lf
+
+# Docker
+Dockerfile text eol=lf
+docker-compose*.yml text eol=lf
+.dockerignore text eol=lf
+
+# ============================================================================
+# BINARY FILES
+# ============================================================================
+
+# Images
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.svg binary
+
+# Fonts
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+*.eot binary
+
+# Archives
+*.zip binary
+*.tar binary
+*.gz binary
+*.tgz binary
+*.rar binary
+*.7z binary
+
+# Databases
+*.db binary
+*.sqlite binary
+*.sqlite3 binary
+
+# Other
+*.pdf binary
+*.pyc binary
+
+# ============================================================================
+# DIFF HANDLING
+# ============================================================================
+
+# Python
+*.py diff=python
+
+# Markdown
+*.md diff=markdown
+
+# ============================================================================
+# MERGE STRATEGIES
+# ============================================================================
+
+# Lock files should not be merged
+package-lock.json merge=binary
+yarn.lock merge=binary
+pnpm-lock.yaml merge=binary
+Pipfile.lock merge=binary
+
+# ============================================================================
+# LINGUIST (GitHub Language Statistics)
+# ============================================================================
+
+# Exclude generated and vendor files from statistics
+static/* linguist-vendored
+dist/* linguist-generated
+build/* linguist-generated
+coverage/* linguist-generated
+*.min.js linguist-generated
+*.min.css linguist-generated
+
+# Documentation
+*.md linguist-documentation
+
+# ============================================================================
+# END OF GITATTRIBUTES
+# ============================================================================

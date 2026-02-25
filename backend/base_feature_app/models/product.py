@@ -26,7 +26,9 @@ class Product(models.Model):
     sub_category = models.CharField(max_length=40)    
     description = models.TextField()
 
-    price = models.IntegerField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     gallery = GalleryField(related_name='products_with_attachment', on_delete=models.CASCADE)
 
     def __str__(self):

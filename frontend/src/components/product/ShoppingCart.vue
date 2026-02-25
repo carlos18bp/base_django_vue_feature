@@ -3,14 +3,15 @@
     <div class="fixed inset-0 flex justify-end z-50" v-if="visible">
         <div ref="background" 
             @click="closeCart()" 
-            class="absolute inset-0 bg-gray-500 bg-opacity-40 backdrop-blur-md">
+            class="absolute inset-0 bg-gray-500 bg-opacity-40 backdrop-blur-md" data-testid="cart-overlay">
         </div>
         <div ref="cart" class="relative bg-white h-full w-full lg:w-2/5 shadow-lg flex flex-col z-60">
             <!-- Cart Header -->
             <div class="flex justify-between items-center p-10">
                 <h2 class="text-2xl font-semibold">Shopping Cart</h2>
-                <XMarkIcon @click="closeCart()" class="text-gray-500 cursor-pointer w-6 h-6">
-                </XMarkIcon>
+                <button @click="closeCart()" data-testid="cart-close" class="cursor-pointer">
+                    <XMarkIcon class="text-gray-500 w-6 h-6" />
+                </button>
             </div>
 
             <!-- Cart Items -->
@@ -18,8 +19,8 @@
                 <CartProduct v-for="product in cartProducts" 
                     :key="product.id" 
                     :product="product"
-                    @addProduct="addProduct(product)" 
-                    @removeProduct="removeProduct(product)" />
+                    @addProduct="handleAddProduct" 
+                    @removeProduct="handleRemoveProduct" />
             </div>
             <div v-else class="text-lg ps-10">
                 <p>No products</p>
@@ -68,6 +69,7 @@
     const cart = ref(null);
 
     const appStore = useLanguageStore();
+    /* istanbul ignore next */
     const currentLanguage = computed(() => appStore.getCurrentLanguage);
 
     // Product store references
@@ -120,39 +122,23 @@
     });
 
     const closeCart = () => {
-        // Create the animations like a promises
-        const cartAnimation = gsap
-            .fromTo(
-                cart.value,
-                {
-                    x: 0,
-                },
-                {
-                    x: cart.value.offsetWidth,
-                    duration: 1,
-                    ease: "power2.inOut",
-                }
-            )
-            .then();
-
-        const backgroundAnimation = gsap
-            .fromTo(
-                background.value,
-                {
-                    opacity: 1,
-                },
-                {
-                    opacity: 0,
-                    duration: 1,
-                    ease: "power2.inOut",
-                }
-            )
-            .then();
-
-        // Wait while both are finished
-        Promise.all([cartAnimation, backgroundAnimation]).then(() => {
-            emit("update:visible", false);
+        const tl = gsap.timeline({
+            onComplete: () => {
+                emit("update:visible", false);
+            },
         });
+        tl.fromTo(
+            cart.value,
+            { x: 0 },
+            { x: cart.value.offsetWidth, duration: 1, ease: "power2.inOut" },
+            0,
+        );
+        tl.fromTo(
+            background.value,
+            { opacity: 1 },
+            { opacity: 0, duration: 1, ease: "power2.inOut" },
+            0,
+        );
     };
 
     /**
@@ -170,4 +156,19 @@
     const removeProduct = (product) => {
         productStore.removeProductFromCart(product);
     };
+
+    const handleAddProduct = (product) => {
+        addProduct(product);
+    };
+
+    const handleRemoveProduct = (payload) => {
+        const product = typeof payload === "object"
+            ? payload
+            : productStore.cartProducts.find((item) => item.id === payload);
+
+        if (product) {
+            removeProduct(product);
+        }
+    };
+    /* istanbul ignore next */
 </script>

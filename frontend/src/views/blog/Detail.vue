@@ -1,7 +1,4 @@
 <template>
-    <!-- Header Component -->
-    <Header></Header>
-
     <!-- Blog content -->
     <div v-if="blog" class="flex flex-col px-8 m-8">
         <div class="relative flex pb-8">
@@ -19,14 +16,10 @@
     </div>
 
     <BlogCarousel :top="{ top_blog }" class="mb-16"> </BlogCarousel>
-    <!-- Footer Component -->
-    <Footer></Footer>
 </template>
 
 <script setup>
     import { computed, onMounted, ref, reactive, watch, watchEffect } from "vue";
-    import Header from "@/components/layouts/Header.vue";
-    import Footer from "@/components/layouts/Footer.vue";
     import BlogCarousel from "@/components/blog/BlogCarousel.vue";
     import { useLanguageStore } from '@/stores/language.js';
     import { useBlogStore } from "@/stores/blog";

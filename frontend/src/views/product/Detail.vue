@@ -1,7 +1,4 @@
 <template>
-    <!-- Header Component -->
-    <Header></Header>
-
     <!-- Product Section -->
     <div v-if="product" class="relative isolate px-6 lg:px-8">
         <div class="bg-white">
@@ -101,9 +98,6 @@
         </h2>
         <ProductCarousel :top="top_products"></ProductCarousel>
     </div>
-
-    <!-- Footer Component -->
-    <Footer></Footer>
 </template>
 
 <script setup>
@@ -114,8 +108,6 @@
         Tab, TabGroup, TabList, TabPanel, TabPanels,
     } from '@headlessui/vue';
     import { MinusSmallIcon, PlusSmallIcon } from '@heroicons/vue/24/outline';
-    import Header from "@/components/layouts/Header.vue";
-    import Footer from "@/components/layouts/Footer.vue";
     import ProductCarousel from "@/components/product/ProductCarousel.vue";
     import { useLanguageStore } from '@/stores/language.js';
     import { useProductStore } from '@/stores/product';
