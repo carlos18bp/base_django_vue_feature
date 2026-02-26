@@ -3641,4 +3641,132 @@ Quality Gate
   □ Score 100/100 or exceptions documented with justification
   □ Exceptions reviewed and not accumulated without reason
 ───────────────────────────────────────────────────────────────
+
+---
+
+## 8. Production Requirements
+
+All Django projects in production MUST include the following configurations.
+
+### 8.1 Settings Structure
+
+Settings must be split into separate files:
+
 ```
+backend/[project_name]/
+├── settings.py          # Base/shared settings (imported by dev/prod)
+├── settings_dev.py      # Development overrides (DEBUG=True)
+└── settings_prod.py     # Production overrides (DEBUG=False enforced)
+```
+
+**Required in settings_prod.py:**
+- `DEBUG = False` (hardcoded, never from environment)
+- `SECRET_KEY` must be set (raise error if missing)
+- `ALLOWED_HOSTS` must be set (raise error if missing)
+- Security headers enabled (HSTS, secure cookies, SSL redirect)
+
+### 8.2 Environment Variables
+
+All secrets must be loaded from environment variables:
+- `DJANGO_SECRET_KEY`
+- `DB_USER`, `DB_PASSWORD`
+- `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`
+- API keys (project-specific)
+
+A `.env.example` file must be provided with placeholders.
+
+### 8.3 Automated Backups (django-dbbackup)
+
+**Installation:**
+```bash
+pip install django-dbbackup
+```
+
+**Configuration in settings.py:**
+```python
+INSTALLED_APPS = [
+    # ...
+    'dbbackup',
+]
+
+DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_STORAGE_OPTIONS = {
+    'location': get_env('BACKUP_STORAGE_PATH', '/var/backups/[project_name]')
+}
+DBBACKUP_COMPRESS = True
+DBBACKUP_CLEANUP_KEEP = 5  # ~90 days at 20-day intervals
+```
+
+**Automation:** Use Huey periodic task (every 20 days).
+
+**Storage:** `/var/backups/[project_name]/` (outside project directory)
+
+**Retention:** 90 days
+
+### 8.4 Query Monitoring (django-silk)
+
+**Installation:**
+```bash
+pip install django-silk
+```
+
+**Configuration in settings.py (behind ENABLE_SILK flag):**
+```python
+ENABLE_SILK = get_bool_env('ENABLE_SILK', default=False)
+if ENABLE_SILK:
+    INSTALLED_APPS.append('silk')
+
+if ENABLE_SILK:
+    MIDDLEWARE.insert(1, 'silk.middleware.SilkyMiddleware')
+
+if ENABLE_SILK:
+    # Access control
+    SILKY_AUTHENTICATION = True
+    SILKY_AUTHORISATION = True
+
+    def silk_permissions(user):
+        return user.is_staff
+
+    SILKY_PERMISSIONS = silk_permissions
+
+    # Retention
+    SILKY_MAX_RECORDED_REQUESTS = 10000
+
+# Thresholds (always defined, used by weekly report task)
+SLOW_QUERY_THRESHOLD_MS = 500
+N_PLUS_ONE_THRESHOLD = 10
+```
+
+**URL:** Add `path('silk/', include('silk.urls', namespace='silk'))` to urls.py (conditional).
+
+**Garbage Collection:** Daily cleanup of data older than 7 days via management command.
+
+**Alerts:** Weekly report generated via Huey task.
+
+### 8.5 Task Queue (Huey)
+
+**Installation:**
+```bash
+pip install huey redis
+```
+
+**Configuration in settings.py:**
+```python
+from huey import RedisHuey
+
+HUEY = RedisHuey(
+    name='[project_name]',
+    url=get_env('REDIS_URL', 'redis://localhost:6379/1'),
+    immediate=not IS_PRODUCTION,
+)
+```
+
+**Scheduled Tasks:**
+
+| Task | Schedule | Description |
+|------|----------|-------------|
+| scheduled_backup | Days 1 & 21, 3:00 AM | DB and media backup |
+| silk_garbage_collection | Daily, 4:00 AM | Clean old profiling data |
+| weekly_slow_queries_report | Mondays, 8:00 AM | Performance report |
+
+**Service:** Huey must run as a systemd service in production.

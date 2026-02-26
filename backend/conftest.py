@@ -1,4 +1,6 @@
+import ast
 import os
+from pathlib import Path
 
 import coverage as coverage_module
 import pytest
@@ -18,6 +20,36 @@ def _color_for(pct):
 def _bar(pct, width):
     filled = round(pct / 100 * width)
     return "█" * filled + "·" * (width - filled)
+
+
+def _function_body_lines(node: ast.AST) -> set[int]:
+    lines: set[int] = set()
+    for stmt in getattr(node, "body", []):
+        start = getattr(stmt, "lineno", None)
+        if start is None:
+            continue
+        end = getattr(stmt, "end_lineno", start) or start
+        lines.update(range(start, end + 1))
+    return lines
+
+
+def _function_coverage_from_source(
+    source: str,
+    executed_lines: set[int],
+) -> tuple[int, int]:
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return 0, 0
+    total = 0
+    covered = 0
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            total += 1
+            body_lines = _function_body_lines(node)
+            if body_lines and body_lines.intersection(executed_lines):
+                covered += 1
+    return total, covered
 
 
 def pytest_sessionstart(session) -> None:
@@ -61,6 +93,11 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
     except Exception:
         return
 
+    total_branches = 0
+    total_missing_branches = 0
+    total_functions = 0
+    total_covered_functions = 0
+
     for filepath in measured:
         norm = filepath.replace("\\", "/")
         if "base_feature_app" not in norm or "/tests/" in norm:
@@ -83,6 +120,28 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
                     "missing_lines": list(analysis.missing),
                 }
             )
+
+            numbers = getattr(analysis, "numbers", None)
+            if numbers is not None:
+                total_branches += getattr(numbers, "n_branches", 0)
+                total_missing_branches += getattr(numbers, "n_missing_branches", 0)
+
+            executed_lines = getattr(analysis, "executed", None)
+            if executed_lines is None:
+                executed_lines = set(analysis.statements) - set(analysis.missing)
+            else:
+                executed_lines = set(executed_lines)
+            try:
+                source = Path(filepath).read_text(encoding="utf-8")
+            except OSError:
+                source = None
+            if source is not None:
+                functions_total, functions_covered = _function_coverage_from_source(
+                    source,
+                    executed_lines,
+                )
+                total_functions += functions_total
+                total_covered_functions += functions_covered
         except Exception:
             continue
 
@@ -93,7 +152,13 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
 
     total_stmts = sum(r["stmts"] for r in results)
     total_missing = sum(r["missing"] for r in results)
-    total_pct = (total_stmts - total_missing) / total_stmts * 100 if total_stmts > 0 else 0
+    covered_stmts = total_stmts - total_missing
+    covered_branches = total_branches - total_missing_branches
+    covered_functions = total_covered_functions
+    total_covered = covered_stmts + covered_branches + covered_functions
+    total_count = total_stmts + total_branches + total_functions
+    total_missing_combined = total_count - total_covered
+    total_pct = total_covered / total_count * 100 if total_count > 0 else 0
 
     top_n = sorted(
         [r for r in results if r["missing"] > 0],
@@ -106,7 +171,7 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
         import shutil
         term_w = shutil.get_terminal_size().columns
 
-    # fixed cols: 2 indent + 2 sep + 5 stmts + 2 sep + 4 miss + 2 sep + 7 pct% + 2 sep + 1 [ + MINI_W + 1 ]
+    # fixed cols: 2 indent + 2 sep + 5 count + 2 sep + 4 miss + 2 sep + 7 pct% + 2 sep + 1 [ + MINI_W + 1 ]
     _FIXED = 2 + 2 + 5 + 2 + 4 + 2 + 7 + 2 + 1 + _MINI_W + 1
     max_path_w = max(term_w - _FIXED - 2, 20)  # -2 safety margin
     actual_max = max((len(r["path"]) for r in results), default=40)
@@ -133,7 +198,7 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
     tw.write("\n")
     c = _color_for(total_pct)
     wide = _bar(total_pct, _WIDE_W)
-    tw.write(f"  {'TOTAL':<{path_w}}  {total_stmts:>5}  {total_missing:>4}  ", bold=True)
+    tw.write(f"  {'TOTAL':<{path_w}}  {total_count:>5}  {total_missing_combined:>4}  ", bold=True)
     tw.write(f"{total_pct:>6.1f}%  ", bold=True, **{c: True})
     tw.write("[", bold=True)
     tw.write(wide, bold=True, **{c: True})

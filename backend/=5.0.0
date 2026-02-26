@@ -1,0 +1,22 @@
+Collecting django-dbbackup
+  Downloading django_dbbackup-5.2.0-py3-none-any.whl.metadata (4.0 kB)
+Collecting huey
+  Using cached huey-2.6.0-py3-none-any.whl.metadata (4.3 kB)
+Collecting redis
+  Downloading redis-7.2.1-py3-none-any.whl.metadata (12 kB)
+Collecting django-silk
+  Downloading django_silk-5.4.3-py3-none-any.whl.metadata (20 kB)
+Requirement already satisfied: django>=4.2 in ./venv/lib/python3.12/site-packages (from django-dbbackup) (6.0.2)
+Requirement already satisfied: sqlparse in ./venv/lib/python3.12/site-packages (from django-silk) (0.5.5)
+Collecting gprof2dot>=2017.09.19 (from django-silk)
+  Using cached gprof2dot-2025.4.14-py3-none-any.whl.metadata (19 kB)
+Requirement already satisfied: asgiref>=3.9.1 in ./venv/lib/python3.12/site-packages (from django>=4.2->django-dbbackup) (3.11.1)
+Downloading django_dbbackup-5.2.0-py3-none-any.whl (35 kB)
+Using cached huey-2.6.0-py3-none-any.whl (76 kB)
+Downloading redis-7.2.1-py3-none-any.whl (396 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 396.1/396.1 kB 3.0 MB/s eta 0:00:00
+Downloading django_silk-5.4.3-py3-none-any.whl (1.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.9/1.9 MB 2.9 MB/s eta 0:00:00
+Using cached gprof2dot-2025.4.14-py3-none-any.whl (37 kB)
+Installing collected packages: huey, redis, gprof2dot, django-silk, django-dbbackup
+Successfully installed django-dbbackup-5.2.0 django-silk-5.4.3 gprof2dot-2025.4.14 huey-2.6.0 redis-7.2.1

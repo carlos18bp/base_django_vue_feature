@@ -1,10 +1,15 @@
 import argparse
 import builtins
 import io
+from datetime import timedelta
+from io import StringIO
+from unittest.mock import MagicMock, patch
 
 import pytest
 from django.core.management import call_command
 from django.core.management.base import CommandError
+from django.utils import timezone
+from freezegun import freeze_time
 from django_attachments.models import Attachment, Library
 
 from base_feature_app.management.commands import create_fake_blogs as create_blogs_module
@@ -243,3 +248,65 @@ def test_test_email_command_raises_error_from_script(monkeypatch):
         call_command('test_email')
 
     assert "smtp failure" in str(exc_info.value)
+
+
+@patch('silk.models.Request')
+def test_silk_garbage_collect_deletes_records_older_than_default_days(mock_request):
+    """Verifies that silk_garbage_collect deletes Silk Request records older than 7 days by default."""
+    mock_qs = MagicMock()
+    mock_qs.count.return_value = 3
+    mock_qs.delete.return_value = (3, {})
+    mock_request.objects.filter.return_value = mock_qs
+
+    out = StringIO()
+    call_command('silk_garbage_collect', stdout=out)
+
+    mock_qs.delete.assert_called_once()
+    assert 'Deleted 3 records' in out.getvalue()
+
+
+@patch('silk.models.Request')
+def test_silk_garbage_collect_dry_run_does_not_delete(mock_request):
+    """Verifies that --dry-run prints a warning and does not delete any records."""
+    mock_qs = MagicMock()
+    mock_qs.count.return_value = 5
+    mock_request.objects.filter.return_value = mock_qs
+
+    out = StringIO()
+    call_command('silk_garbage_collect', dry_run=True, stdout=out)
+
+    mock_qs.delete.assert_not_called()
+    assert 'DRY RUN' in out.getvalue()
+
+
+@freeze_time('2026-02-26 12:00:00')
+@patch('silk.models.Request')
+def test_silk_garbage_collect_uses_custom_days_for_cutoff(mock_request):
+    """Verifies that --days N computes the correct cutoff date when filtering records."""
+    mock_qs = MagicMock()
+    mock_qs.count.return_value = 2
+    mock_qs.delete.return_value = (2, {})
+    mock_request.objects.filter.return_value = mock_qs
+
+    out = StringIO()
+    call_command('silk_garbage_collect', days=14, stdout=out)
+
+    expected_cutoff = timezone.now() - timedelta(days=14)
+    mock_request.objects.filter.assert_called_once_with(start_time__lt=expected_cutoff)
+    assert 'Deleted 2 records' in out.getvalue()
+
+
+@patch('silk.models.Request')
+def test_silk_garbage_collect_reports_zero_when_no_old_records_exist(mock_request):
+    """Verifies that silk_garbage_collect reports zero deletions when no old records match the cutoff."""
+    mock_qs = MagicMock()
+    mock_qs.count.return_value = 0
+    mock_qs.delete.return_value = (0, {})
+    mock_request.objects.filter.return_value = mock_qs
+
+    out = StringIO()
+    call_command('silk_garbage_collect', stdout=out)
+
+    mock_request.objects.filter.assert_called_once()
+    assert 'Requests to delete: 0' in out.getvalue()
+    assert 'Deleted 0 records' in out.getvalue()

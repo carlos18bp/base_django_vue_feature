@@ -149,7 +149,7 @@ base_django_vue_feature/
 │   │   │   ├── utils/                   # Utility & settings tests
 │   │   │   ├── conftest.py              # App-level fixtures
 │   │   │   └── factories.py            # factory-boy factories
-│   │   └── management/commands/         # create_fake_data, delete_fake_data, etc.
+│   │   └── management/commands/         # create_fake_data, delete_fake_data, silk_garbage_collect, etc.
 │   ├── base_feature_project/            # Settings and configuration
 │   │   ├── settings.py                  # Base settings (shared)
 │   │   ├── settings_dev.py              # Development overrides
@@ -469,6 +469,45 @@ python manage.py create_fake_users 10
 python manage.py delete_fake_data --confirm
 ```
 
+#### Silk Garbage Collect
+
+Deletes `silk.models.Request` profiling records older than N days. Only meaningful when `ENABLE_SILK=true`.
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `--days N` | `int` | `7` | Retention period in days |
+| `--dry-run` | flag | `False` | Show what would be deleted without deleting |
+
+```bash
+# Delete records older than 7 days (default)
+python manage.py silk_garbage_collect
+
+# Custom retention period
+python manage.py silk_garbage_collect --days=14
+
+# Preview without deleting
+python manage.py silk_garbage_collect --dry-run
+
+# Preview with custom retention
+python manage.py silk_garbage_collect --days=3 --dry-run
+```
+
+**Example output:**
+
+```
+Silk records older than 2026-02-19 04:00:00+00:00:
+  - Requests to delete: 1243
+Deleted 1243 records
+```
+
+```
+Silk records older than 2026-02-19 04:00:00+00:00:
+  - Requests to delete: 1243
+DRY RUN: Nothing was deleted
+```
+
+> This command runs automatically every day at **4:00 AM** via the `silk_garbage_collection` Huey task (see [Task Queue](#%EF%B8%8F-task-queue)).
+
 ### Django Admin
 
 Admin is organized in logical sections:
@@ -743,7 +782,7 @@ pytest -v
 - ✅ **Services**: Auth service (sign in, sign up, Google login)
 - ✅ **Admin**: Admin site registration and configuration
 - ✅ **Forms**: Blog, Product, User forms
-- ✅ **Management**: Fake data creation and deletion commands
+- ✅ **Management**: Fake data creation, deletion, and Silk garbage collection commands
 - ✅ **Utils**: Email script, exceptions, settings modules, global test runner
 
 #### Test Structure
@@ -991,6 +1030,87 @@ The project includes complete documentation:
 | `frontend/tailwind.config.js` | TailwindCSS configuration |
 | `frontend/postcss.config.js` | PostCSS configuration |
 | `frontend/vite.config.js` | Vite configuration |
+
+---
+
+## 🔒 Environment Configuration
+
+This project uses environment variables for configuration. Copy the example file and configure your environment:
+
+```bash
+cp backend/.env.example backend/.env
+# Edit .env with your values
+```
+
+See `backend/.env.example` for all available options.
+
+**Settings are split into three files:**
+
+| File | Purpose |
+|------|---------|
+| `settings.py` | Base/shared settings |
+| `settings_dev.py` | Development overrides (SQLite, DEBUG=True, console email) |
+| `settings_prod.py` | Production overrides (MySQL, DEBUG=False, security hardening) |
+
+Select the settings module via `DJANGO_SETTINGS_MODULE` environment variable.
+
+## 💾 Backups
+
+Automated backups run every 20 days via Huey task queue (days 1 & 21, 3:00 AM). Backups are stored in `/var/backups/base_feature_project/` with retention of ~5 backups.
+
+Storage is configured via the `STORAGES['dbbackup']` key using the path from `BACKUP_STORAGE_PATH` env var.
+
+Manual backup (creates compressed backup and removes old ones):
+
+```bash
+python manage.py dbbackup --compress --clean
+python manage.py mediabackup --compress --clean
+```
+
+Manual backup without cleanup:
+
+```bash
+python manage.py dbbackup --compress
+python manage.py mediabackup --compress
+```
+
+## 📊 Performance Monitoring
+
+SQL query profiling via `django-silk`. Enable with `ENABLE_SILK=true` in `.env`.
+
+**Headless mode only** — the `/silk/` UI is not exposed. Silk records requests and SQL queries to the database; analysis is done exclusively via the weekly automated report.
+
+**What is monitored:**
+- SQL query duration (`time_taken`) per request
+- Query count per request (N+1 detection)
+
+**Weekly report** generated every Monday at 8:00 AM → `backend/logs/silk-weekly-report.log`:
+- Slow queries above `SLOW_QUERY_THRESHOLD_MS` (default: 500ms), top 50
+- Requests with more than `N_PLUS_ONE_THRESHOLD` queries (default: 10), top 20
+
+**Configurable thresholds** (in `.env`):
+```bash
+SLOW_QUERY_THRESHOLD_MS=500
+N_PLUS_ONE_THRESHOLD=10
+```
+
+Old profiling data is purged daily at 4:00 AM via `silk_garbage_collection` (7-day retention by default, configurable via `--days`).
+
+## ⚙️ Task Queue
+
+This project uses Huey with Redis for background tasks:
+
+| Task | Schedule | Description |
+|------|----------|-------------|
+| `scheduled_backup` | Days 1 & 21, 3:00 AM | DB and media backup |
+| `silk_garbage_collection` | Daily, 4:00 AM | Clean old profiling data |
+| `weekly_slow_queries_report` | Mondays, 8:00 AM | Performance report |
+
+In production, ensure the Huey service is running:
+
+```bash
+sudo systemctl status base_feature_project-huey
+```
 
 ---
 

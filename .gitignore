@@ -20,6 +20,7 @@ backend/db.sqlite3-journal
 backend/*.log
 backend/local_settings.py
 
+
 # Django media files (uploaded content)
 backend/media/
 !backend/media/temp/
@@ -40,7 +41,7 @@ backend/.venv/
 backend/pip-log.txt
 backend/pip-delete-this-directory.txt
 
-# Django migrations (optional - descomentar si no quieres versionar migraciones)
+# Django migrations (optional — uncomment to stop tracking migrations)
 # backend/**/migrations/*.py
 # !backend/**/migrations/__init__.py
 
@@ -99,6 +100,7 @@ frontend/e2e-results/
 backend/.env
 frontend/.env
 *.env
+!*.env.example
 
 # Secrets
 secrets.json
@@ -170,6 +172,9 @@ $RECYCLE.BIN/
 # Logs
 *.log
 logs/
+!backend/logs/
+backend/logs/*
+!backend/logs/.gitkeep
 *.log.*
 npm-debug.log*
 yarn-debug.log*
@@ -206,13 +211,13 @@ lerna-debug.log*
 # BUILD & PACKAGE MANAGERS
 # ============================================================================
 
-# Package manager lock files (optional - comentar si quieres versionarlos)
+# Package manager lock files (optional — uncomment to stop tracking them)
 # frontend/package-lock.json
 # frontend/yarn.lock
 # frontend/pnpm-lock.yaml
 
 # ============================================================================
-# DOCKER (si usas Docker)
+# DOCKER (if using Docker)
 # ============================================================================
 
 # Docker
@@ -251,6 +256,8 @@ test-results/
 # Backup files
 *.backup
 backup/
+backups/
+backend/backups/
 
 # Uploaded test files
 backend/media/uploads/test_*

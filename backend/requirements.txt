@@ -23,3 +23,7 @@ python-dateutil==2.9.0.post0
 six==1.17.0
 sqlparse==0.5.5
 typing_extensions==4.15.0
+django-dbbackup>=4.0.0
+huey>=2.5.0
+redis>=4.0.0
+django-silk>=5.0.0

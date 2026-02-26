@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 import os
 import shlex
@@ -17,6 +18,11 @@ from datetime import datetime, timezone
 from functools import partial
 from pathlib import Path
 from typing import Sequence
+
+try:
+    import coverage as coverage_module
+except ImportError:  # pragma: no cover - coverage module expected in backend venv
+    coverage_module = None
 
 TAIL_LINES = 40
 RESUME_FILENAME = "last-run.json"
@@ -133,6 +139,52 @@ def _format_pct(value: object) -> str:
     return str(value)
 
 
+def _format_coverage_line(
+    label: str,
+    pct: object,
+    covered: int,
+    total_count: int,
+) -> str:
+    pct_val = float(pct) if isinstance(pct, (int, float)) else 0.0
+    if pct_val >= 90:
+        pct_colored = _green(f"{_format_pct(pct)}%")
+    elif pct_val >= 70:
+        pct_colored = _yellow(f"{_format_pct(pct)}%")
+    else:
+        pct_colored = _red(f"{_format_pct(pct)}%")
+    return f"{label}: {pct_colored} ({covered}/{total_count})"
+
+
+def _function_body_lines(node: ast.AST) -> set[int]:
+    lines: set[int] = set()
+    for stmt in getattr(node, "body", []):
+        start = getattr(stmt, "lineno", None)
+        if start is None:
+            continue
+        end = getattr(stmt, "end_lineno", start) or start
+        lines.update(range(start, end + 1))
+    return lines
+
+
+def _function_coverage_from_source(
+    source: str,
+    executed_lines: set[int],
+) -> tuple[int, int]:
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return 0, 0
+    total = 0
+    covered = 0
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            total += 1
+            body_lines = _function_body_lines(node)
+            if body_lines and body_lines.intersection(executed_lines):
+                covered += 1
+    return total, covered
+
+
 def read_jest_coverage_summary(frontend_root: Path) -> list[str]:
     summary_path = frontend_root / "coverage" / "coverage-summary.json"
     if not summary_path.exists():
@@ -160,15 +212,108 @@ def read_jest_coverage_summary(frontend_root: Path) -> list[str]:
         total_count = metric.get("total")
         if pct is None or covered is None or total_count is None:
             continue
-        pct_val = float(pct) if isinstance(pct, (int, float)) else 0.0
-        if pct_val >= 90:
-            pct_colored = _green(f"{_format_pct(pct)}%")
-        elif pct_val >= 70:
-            pct_colored = _yellow(f"{_format_pct(pct)}%")
-        else:
-            pct_colored = _red(f"{_format_pct(pct)}%")
-        lines.append(f"{label}: {pct_colored} ({covered}/{total_count})")
+        lines.append(_format_coverage_line(label, pct, covered, total_count))
     return lines
+
+
+def read_backend_coverage_summary(backend_root: Path) -> list[str]:
+    coverage_path = backend_root / ".coverage"
+    if not coverage_path.exists() or coverage_module is None:
+        return []
+    try:
+        cov = coverage_module.Coverage(data_file=str(coverage_path))
+        cov.load()
+    except Exception:
+        return []
+    try:
+        measured = cov.get_data().measured_files()
+    except Exception:
+        return []
+
+    total_stmts = 0
+    total_missing = 0
+    total_branches = 0
+    total_missing_branches = 0
+    total_functions = 0
+    total_covered_functions = 0
+    for filepath in measured:
+        norm = str(filepath).replace("\\", "/")
+        if "base_feature_app" not in norm or "/tests/" in norm:
+            continue
+        try:
+            analysis = cov._analyze(filepath)
+        except Exception:
+            continue
+        stmts = len(analysis.statements)
+        if stmts == 0:
+            continue
+        missing = len(analysis.missing)
+        total_stmts += stmts
+        total_missing += missing
+
+        numbers = getattr(analysis, "numbers", None)
+        if numbers is not None:
+            total_branches += getattr(numbers, "n_branches", 0)
+            total_missing_branches += getattr(numbers, "n_missing_branches", 0)
+
+        executed_lines = getattr(analysis, "executed", None)
+        if executed_lines is None:
+            executed_lines = set(analysis.statements) - set(analysis.missing)
+        else:
+            executed_lines = set(executed_lines)
+        try:
+            source = Path(filepath).read_text(encoding="utf-8")
+        except OSError:
+            source = None
+        if source is not None:
+            functions_total, functions_covered = _function_coverage_from_source(
+                source,
+                executed_lines,
+            )
+            total_functions += functions_total
+            total_covered_functions += functions_covered
+
+    if total_stmts == 0:
+        return []
+    covered_stmts = total_stmts - total_missing
+    covered_branches = total_branches - total_missing_branches
+    covered_functions = total_covered_functions
+
+    stmt_pct = covered_stmts / total_stmts * 100
+    branch_pct = (
+        covered_branches / total_branches * 100 if total_branches else 100.0
+    )
+    functions_pct = (
+        covered_functions / total_functions * 100 if total_functions else 100.0
+    )
+    total_covered = covered_stmts + covered_branches + covered_functions
+    total_count = total_stmts + total_branches + total_functions
+    total_pct = total_covered / total_count * 100 if total_count else 0.0
+
+    return [
+        _format_coverage_line("Statements", stmt_pct, covered_stmts, total_stmts),
+        _format_coverage_line("Branches", branch_pct, covered_branches, total_branches),
+        _format_coverage_line(
+            "Functions",
+            functions_pct,
+            covered_functions,
+            total_functions,
+        ),
+        _format_coverage_line("Lines", stmt_pct, covered_stmts, total_stmts),
+        _format_coverage_line("TOTAL", total_pct, total_covered, total_count),
+    ]
+
+
+def erase_backend_coverage(backend_root: Path) -> None:
+    try:
+        subprocess.run(
+            [sys.executable, "-m", "coverage", "erase"],
+            cwd=backend_root,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    except Exception:
+        return None
 
 
 def read_flow_coverage_summary(frontend_root: Path) -> list[str]:
@@ -183,21 +328,16 @@ def read_flow_coverage_summary(frontend_root: Path) -> list[str]:
     if not isinstance(summary, dict):
         return []
 
-    totals = summary.get("totals")
-    if not isinstance(totals, dict):
-        return []
-
-    total_flows = totals.get("total")
-    covered_flows = totals.get("covered")
-    partial_flows = totals.get("partial")
-    failing_flows = totals.get("failing")
-    missing_flows = totals.get("missing")
-    coverage_percent = summary.get("coveredPercent")
+    total_flows = summary.get("total")
+    covered_flows = summary.get("covered")
+    partial_flows = summary.get("partial")
+    failing_flows = summary.get("failing")
+    missing_flows = summary.get("missing")
 
     lines: list[str] = []
-    if total_flows is not None and covered_flows is not None:
-        pct_value = _format_pct(coverage_percent) if coverage_percent is not None else "0"
-        lines.append(f"Flows covered: {covered_flows}/{total_flows} ({pct_value}%)")
+    if isinstance(total_flows, (int, float)) and isinstance(covered_flows, (int, float)):
+        pct_value = (covered_flows / total_flows * 100) if total_flows else 0.0
+        lines.append(_format_coverage_line("Flows covered", pct_value, int(covered_flows), int(total_flows)))
     if partial_flows is not None and partial_flows > 0:
         lines.append(f"Partial: {partial_flows}")
     if failing_flows is not None and failing_flows > 0:
@@ -314,9 +454,10 @@ def run_command(
     append_log: bool = False,
     log_header: str | None = None,
     quiet: bool = False,
+    show_header: bool = True,
 ) -> StepResult:
     cmd_list = [str(item) for item in command]
-    if not quiet:
+    if not quiet and show_header:
         print("\n" + "=" * 80)
         print(f"Running step: {name}")
         print(f"Command: {' '.join(cmd_list)}")
@@ -421,10 +562,13 @@ def run_backend(
     append_log: bool = False,
     run_id: str | None = None,
 ) -> StepResult:
+    if coverage:
+        erase_backend_coverage(backend_root)
     backend_cmd: list[str] = [sys.executable, "-m", "pytest", "-q"]
     if coverage:
         backend_cmd.extend([
             f"--cov={backend_root / 'base_feature_app'}",
+            "--cov-branch",
             "--cov-report=term-missing",
             "--color=yes",
         ])
@@ -437,7 +581,7 @@ def run_backend(
         if append_log and run_id
         else None
     )
-    return run_command(
+    result = run_command(
         name="backend",
         command=backend_cmd,
         cwd=backend_root,
@@ -447,6 +591,11 @@ def run_backend(
         log_header=log_header,
         quiet=quiet,
     )
+    if coverage and result.status == "ok":
+        backend_coverage = read_backend_coverage_summary(backend_root)
+        if backend_coverage:
+            result.coverage = backend_coverage
+    return result
 
 
 def run_frontend_unit(
@@ -482,6 +631,17 @@ def run_frontend_unit(
         quiet=quiet,
     )
     if coverage and result.status == "ok":
+        summary_cmd = ["node", "scripts/coverage-summary.cjs"]
+        run_command(
+            name="frontend-unit-summary",
+            command=summary_cmd,
+            cwd=frontend_root,
+            log_path=report_dir / "frontend-unit.log",
+            capture_coverage=False,
+            append_log=True,
+            quiet=quiet,
+            show_header=False,
+        )
         result.coverage = read_jest_coverage_summary(frontend_root)
     return result
 
@@ -542,8 +702,9 @@ def print_final_report(results: list[StepResult], duration: float) -> None:
             tag = _red("FAILED")
         print(f"  {result.name:<18} {tag}  ({result.duration:.2f}s)")
         if result.coverage:
+            print("    Coverage summary:")
             for line in result.coverage:
-                print(f"    {line}")
+                print(f"      {line}")
         if result.log_path:
             print(f"    {_dim(f'Log: {result.log_path}')}")
 
