@@ -33,10 +33,12 @@ function buildRouter() {
 describe('Dashboard View', () => {
   let router;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     setActivePinia(createPinia());
     jest.clearAllMocks();
     router = buildRouter();
+    await router.push('/dashboard');
+    await router.isReady();
   });
 
   test('renders Dashboard heading', () => {
@@ -65,9 +67,6 @@ describe('Dashboard View', () => {
   });
 
   test('signOut button navigates to sign_in route', async () => {
-    router.push('/dashboard');
-    await router.isReady();
-
     const wrapper = mount(Dashboard, {
       global: {
         plugins: [router, i18n],

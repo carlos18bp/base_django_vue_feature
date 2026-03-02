@@ -19,9 +19,11 @@ import { decodeCredential } from 'vue3-google-login';
 describe('loginWithGoogle', () => {
   let mockRouter;
   let mockAuthStore;
+  let consoleErrorSpy;
 
   beforeEach(() => {
     jest.clearAllMocks();
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     mockRouter = { push: jest.fn().mockResolvedValue(undefined) };
     mockAuthStore = { login: jest.fn() };
 
@@ -34,6 +36,10 @@ describe('loginWithGoogle', () => {
 
     delete window.location;
     window.location = { href: '' };
+  });
+
+  afterEach(() => {
+    consoleErrorSpy.mockRestore();
   });
 
   test('shows error notification when credential is missing', async () => {

@@ -9,14 +9,20 @@ import globalMixin from '@/mixins/globalMixin';
 
 describe('globalMixin', () => {
   let mockProductStore;
+  let consoleLogSpy;
 
   beforeEach(() => {
     setActivePinia(createPinia());
     jest.clearAllMocks();
     localStorage.clear();
+    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
     mockProductStore = { cartProducts: [] };
     useProductStore.mockReturnValue(mockProductStore);
+  });
+
+  afterEach(() => {
+    consoleLogSpy.mockRestore();
   });
 
   describe('created hook', () => {

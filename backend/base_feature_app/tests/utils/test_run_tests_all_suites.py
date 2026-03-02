@@ -25,8 +25,8 @@ def load_runner_module():
     return module
 
 
-def test_main_defaults_to_sequential_verbose(tmp_path, monkeypatch):
-    """Verify main() runs all three suites sequentially with quiet=False and append_log=False by default."""
+def test_main_defaults_to_sequential_quiet(tmp_path, monkeypatch):
+    """Verify main() runs all three suites sequentially with quiet=True and append_log=False by default."""
     runner = load_runner_module()
     calls = []
 
@@ -52,9 +52,9 @@ def test_main_defaults_to_sequential_verbose(tmp_path, monkeypatch):
 
     assert exit_code == 0
     assert calls == [
-        ("backend", False, False),
-        ("frontend-unit", False, False),
-        ("frontend-e2e", False, False),
+        ("backend", True, False),
+        ("frontend-unit", True, False),
+        ("frontend-e2e", True, False),
     ]
 
 
@@ -67,11 +67,11 @@ def test_resume_runs_failed_suites_only(tmp_path, monkeypatch):
     resume_payload = {
         "run_id": "prev",
         "generated_at": "2026-02-24T18:00:00Z",
-        "suites": [
-            {"name": "backend", "status": "ok", "returncode": 0},
-            {"name": "frontend-unit", "status": "failed", "returncode": 1},
-            {"name": "frontend-e2e", "returncode": 1},
-        ],
+        "suites": {
+            "backend": {"status": "ok", "returncode": 0},
+            "frontend-unit": {"status": "failed", "returncode": 1},
+            "frontend-e2e": {"returncode": 1},
+        },
     }
     resume_path.write_text(json.dumps(resume_payload), encoding="utf-8")
 
@@ -101,9 +101,10 @@ def test_resume_runs_failed_suites_only(tmp_path, monkeypatch):
     assert calls == ["frontend-unit", "frontend-e2e"]
 
     summary = json.loads(resume_path.read_text(encoding="utf-8"))
-    assert summary["suites"][0]["name"] == "backend"
-    assert summary["suites"][1]["name"] == "frontend-unit"
-    assert summary["suites"][2]["name"] == "frontend-e2e"
+    assert set(summary["suites"].keys()) == {"backend", "frontend-unit", "frontend-e2e"}
+    assert summary["suites"]["backend"]["status"] == "ok"
+    assert summary["suites"]["frontend-unit"]["status"] == "ok"
+    assert summary["suites"]["frontend-e2e"]["status"] == "ok"
 
 
 def test_resume_exits_when_previous_run_ok(tmp_path, monkeypatch, capsys):
@@ -115,11 +116,11 @@ def test_resume_exits_when_previous_run_ok(tmp_path, monkeypatch, capsys):
     resume_payload = {
         "run_id": "prev",
         "generated_at": "2026-02-24T18:00:00Z",
-        "suites": [
-            {"name": "backend", "status": "ok", "returncode": 0},
-            {"name": "frontend-unit", "status": "ok", "returncode": 0},
-            {"name": "frontend-e2e", "status": "ok", "returncode": 0},
-        ],
+        "suites": {
+            "backend": {"status": "ok", "returncode": 0},
+            "frontend-unit": {"status": "ok", "returncode": 0},
+            "frontend-e2e": {"status": "ok", "returncode": 0},
+        },
     }
     resume_path.write_text(json.dumps(resume_payload), encoding="utf-8")
 
@@ -135,7 +136,7 @@ def test_resume_exits_when_previous_run_ok(tmp_path, monkeypatch, capsys):
     output = capsys.readouterr().out
 
     assert exit_code == 0
-    assert "Re-run without --resume" in output
+    assert "ejecuta el comando sin --resume" in output
 
 
 def test_resume_runs_all_suites_when_summary_invalid(tmp_path, monkeypatch):
@@ -199,8 +200,8 @@ def test_run_command_overwrites_log_by_default(tmp_path, monkeypatch):
     assert result.status == "ok"
 
 
-def test_run_command_appends_log_header(tmp_path, monkeypatch):
-    """Verify run_command appends a header and new output after existing log content when append_log=True."""
+def test_run_command_appends_log_separator(tmp_path, monkeypatch):
+    """Verify run_command appends a log separator and new output after existing content when append_log=True."""
     runner = load_runner_module()
     log_path = tmp_path / "suite.log"
     log_path.write_text("OLD\n", encoding="utf-8")
@@ -217,27 +218,29 @@ def test_run_command_appends_log_header(tmp_path, monkeypatch):
         log_path=log_path,
         capture_coverage=False,
         append_log=True,
-        log_header="HEADER",
         quiet=True,
+        run_id="run-123",
     )
 
     content = log_path.read_text(encoding="utf-8")
     assert content.startswith("OLD")
-    assert "HEADER" in content
+    assert "Run ID: run-123" in content
+    assert "Suite: backend" in content
+    assert "Command: pytest" in content
     assert "line-2" in content
-    assert content.index("OLD") < content.index("HEADER") < content.index("line-2")
+    assert content.index("OLD") < content.index("Run ID: run-123") < content.index("line-2")
     assert result.status == "ok"
 
 
 def test_read_backend_summary_returns_metric_lines(tmp_path, monkeypatch):
-    """Verify backend summary aggregates non-test files under base_feature_app."""
+    """Verify backend summary aggregates non-test files under the backend app."""
     monkeypatch.setenv("NO_COLOR", "1")
     runner = load_runner_module()
     backend_root = tmp_path / "backend"
     backend_root.mkdir()
     (backend_root / ".coverage").write_text("", encoding="utf-8")
 
-    app_dir = backend_root / "base_feature_app"
+    app_dir = backend_root / runner.BACKEND_APP_NAME
     tests_dir = app_dir / "tests"
     other_dir = backend_root / "other_app"
     app_dir.mkdir()
@@ -247,31 +250,38 @@ def test_read_backend_summary_returns_metric_lines(tmp_path, monkeypatch):
     covered_file = app_dir / "views.py"
     test_file = tests_dir / "test_views.py"
     other_file = other_dir / "views.py"
-    covered_file.write_text(
-        "def first():\n"
-        "    return True\n"
-        "\n"
-        "def second():\n"
-        "    return False\n",
-        encoding="utf-8",
-    )
+    covered_file.write_text("def first():\n    return True\n", encoding="utf-8")
     test_file.write_text("", encoding="utf-8")
     other_file.write_text("", encoding="utf-8")
 
     class FakeNumbers:
-        def __init__(self, n_branches, n_missing_branches):
+        def __init__(self, n_statements, n_missing, n_branches, n_missing_branches):
+            self.n_statements = n_statements
+            self.n_missing = n_missing
             self.n_branches = n_branches
             self.n_missing_branches = n_missing_branches
 
     class FakeAnalysis:
-        def __init__(self, statements, missing, numbers):
-            self.statements = statements
-            self.missing = missing
+        def __init__(self, numbers, executed):
             self.numbers = numbers
+            self.executed = executed
+
+    class FakeRegion:
+        def __init__(self, kind, lines):
+            self.kind = kind
+            self.lines = lines
+
+    class FakeFileReporter:
+        def __init__(self, regions):
+            self._regions = regions
+
+        def code_regions(self):
+            return self._regions
 
     class FakeCoverage:
-        def __init__(self, analysis_map, measured_files):
+        def __init__(self, analysis_map, reporter_map, measured_files):
             self._analysis_map = analysis_map
+            self._reporter_map = reporter_map
             self._measured_files = measured_files
 
         def load(self):
@@ -286,18 +296,28 @@ def test_read_backend_summary_returns_metric_lines(tmp_path, monkeypatch):
         def _analyze(self, filepath):
             return self._analysis_map[str(filepath)]
 
+        def _get_file_reporter(self, filepath):
+            return self._reporter_map[str(filepath)]
+
     analysis_map = {
         str(covered_file): FakeAnalysis(
-            [1, 2, 4, 5],
-            [5],
-            FakeNumbers(n_branches=2, n_missing_branches=1),
+            FakeNumbers(n_statements=4, n_missing=1, n_branches=2, n_missing_branches=1),
+            executed={1, 2},
         ),
     }
-    measured_files = [covered_file, test_file, other_file]
+    reporter_map = {
+        str(covered_file): FakeFileReporter(
+            [
+                FakeRegion("function", [1, 2]),
+                FakeRegion("function", [4, 5]),
+            ]
+        ),
+    }
+    measured_files = [str(covered_file), str(test_file), str(other_file)]
     fake_module = types.SimpleNamespace(
-        Coverage=lambda data_file: FakeCoverage(analysis_map, measured_files)
+        Coverage=lambda data_file: FakeCoverage(analysis_map, reporter_map, measured_files)
     )
-    monkeypatch.setattr(runner, "coverage_module", fake_module)
+    monkeypatch.setitem(sys.modules, "coverage", fake_module)
 
     lines = runner.read_backend_coverage_summary(backend_root)
 
@@ -306,7 +326,7 @@ def test_read_backend_summary_returns_metric_lines(tmp_path, monkeypatch):
         "Branches: 50.00% (1/2)",
         "Functions: 50.00% (1/2)",
         "Lines: 75.00% (3/4)",
-        "TOTAL: 62.50% (5/8)",
+        "Total: 66.67%",
     ]
 
 
@@ -333,14 +353,14 @@ def test_read_flow_summary_reads_flow_counts(tmp_path, monkeypatch):
     lines = runner.read_flow_coverage_summary(frontend_root)
 
     assert lines == [
-        "Flows covered: 60.00% (3/5)",
+        "Flows covered: 3/5 (60.00%)",
         "Partial: 1",
         "Failing: 1",
     ]
 
 
 def test_print_final_report_groups_metric_lines(monkeypatch, capsys):
-    """Verify final report groups metric lines under a summary label."""
+    """Verify final report prints metric lines for a suite with summary data."""
     monkeypatch.setenv("NO_COLOR", "1")
     runner = load_runner_module()
 
@@ -360,14 +380,14 @@ def test_print_final_report_groups_metric_lines(monkeypatch, capsys):
     runner.print_final_report([result], duration=1.25)
 
     output = capsys.readouterr().out
-    assert "Coverage summary:" in output
-    assert "      Statements: 75.00% (3/4)" in output
-    assert "      Branches: 50.00% (1/2)" in output
-    assert "      Functions: 50.00% (1/2)" in output
+    assert "Final suite report" in output
+    assert "Statements: 75.00% (3/4)" in output
+    assert "Branches: 50.00% (1/2)" in output
+    assert "Functions: 50.00% (1/2)" in output
 
 
 def test_run_backend_erases_metrics_when_enabled(tmp_path, monkeypatch):
-    """Verify run_backend issues a coverage erase before running pytest when coverage is enabled."""
+    """Verify run_backend erases metrics and targets the backend app when reporting is enabled."""
     runner = load_runner_module()
     backend_root = tmp_path / "backend"
     report_dir = tmp_path / "reports"
@@ -376,22 +396,13 @@ def test_run_backend_erases_metrics_when_enabled(tmp_path, monkeypatch):
 
     erase_calls = []
 
-    def fake_run(cmd, cwd=None, stdout=None, stderr=None):
-        erase_calls.append(
-            {
-                "cmd": cmd,
-                "cwd": cwd,
-                "stdout": stdout,
-                "stderr": stderr,
-            }
-        )
+    def fake_erase(root):
+        erase_calls.append(root)
 
-        class Result:
-            returncode = 0
-
-        return Result()
+    calls = []
 
     def fake_run_command(**kwargs):
+        calls.append(kwargs)
         return runner.StepResult(
             name="backend",
             command=kwargs["command"],
@@ -400,7 +411,7 @@ def test_run_backend_erases_metrics_when_enabled(tmp_path, monkeypatch):
             status="ok",
         )
 
-    monkeypatch.setattr(runner.subprocess, "run", fake_run)
+    monkeypatch.setattr(runner, "erase_backend_coverage_data", fake_erase)
     monkeypatch.setattr(runner, "run_command", fake_run_command)
     monkeypatch.setattr(
         runner,
@@ -419,13 +430,14 @@ def test_run_backend_erases_metrics_when_enabled(tmp_path, monkeypatch):
         report_dir=report_dir,
         markers="",
         extra_args=[],
-        coverage=True,
+        show_coverage=True,
         quiet=True,
     )
 
-    assert len(erase_calls) == 1
-    assert erase_calls[0]["cmd"] == [sys.executable, "-m", "coverage", "erase"]
-    assert erase_calls[0]["cwd"] == backend_root
+    assert erase_calls == [backend_root]
+    assert len(calls) == 1
+    assert calls[0]["capture_coverage"] is True
+    assert f"--cov={backend_root / runner.BACKEND_APP_NAME}" in calls[0]["command"]
     assert result.coverage == [
         "Statements: 100.00% (1/1)",
         "Branches: 100.00% (0/0)",
@@ -439,7 +451,7 @@ def test_run_frontend_unit_triggers_summary_script_when_enabled(
     tmp_path,
     monkeypatch,
 ):
-    """Verify frontend unit summary script runs when the flag is enabled."""
+    """Verify frontend unit runner reads summary metrics when the flag is enabled."""
     runner = load_runner_module()
     frontend_root = tmp_path / "frontend"
     report_dir = tmp_path / "reports"
@@ -469,17 +481,16 @@ def test_run_frontend_unit_triggers_summary_script_when_enabled(
         frontend_root=frontend_root,
         report_dir=report_dir,
         extra_args=[],
-        coverage=True,
+        show_coverage=True,
         quiet=True,
     )
 
     assert result.coverage == ["Statements: 100.00% (1/1)"]
-    assert [call["name"] for call in calls] == [
-        "frontend-unit",
-        "frontend-unit-summary",
-    ]
+    assert len(calls) == 2
+    assert calls[0]["name"] == "frontend-unit"
     assert calls[0]["capture_coverage"] is True
+    assert "--coverage" in calls[0]["command"]
+    assert calls[1]["name"] == "frontend-unit-summary"
     assert calls[1]["command"] == ["node", "scripts/coverage-summary.cjs"]
     assert calls[1]["append_log"] is True
-    assert calls[1]["show_header"] is False
     assert calls[1]["log_path"] == report_dir / "frontend-unit.log"
