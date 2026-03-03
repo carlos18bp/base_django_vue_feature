@@ -248,6 +248,13 @@ DEFAULT_FROM_EMAIL = get_env('DJANGO_DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
 SERVER_EMAIL = get_env('DJANGO_SERVER_EMAIL', EMAIL_HOST_USER)
 
 # ==============================================================================
+# GOOGLE reCAPTCHA
+# ==============================================================================
+
+RECAPTCHA_SITE_KEY = get_env('RECAPTCHA_SITE_KEY', '')
+RECAPTCHA_SECRET_KEY = get_env('RECAPTCHA_SECRET_KEY', '')
+
+# ==============================================================================
 # DATABASE — override in settings_dev.py / settings_prod.py
 # ==============================================================================
 

@@ -109,6 +109,11 @@
             </div>
           </div>
 
+          <!-- reCAPTCHA -->
+          <div v-if="siteKey" class="flex justify-center">
+            <div ref="recaptchaContainer" />
+          </div>
+
           <!-- Submit Button -->
           <div>
             <button
@@ -174,6 +179,21 @@ const userForm = reactive({
   confirmPassword: '',
 });
 
+const siteKey = ref('');
+const captchaToken = ref(null);
+const recaptchaContainer = ref(null);
+const recaptchaWidgetId = ref(null);
+
+const renderRecaptcha = () => {
+  if (recaptchaContainer.value && siteKey.value && window.grecaptcha) {
+    recaptchaWidgetId.value = window.grecaptcha.render(recaptchaContainer.value, {
+      sitekey: siteKey.value,
+      callback: (token) => { captchaToken.value = token; },
+      'expired-callback': () => { captchaToken.value = null; },
+    });
+  }
+};
+
 const isGoogleLoginEnabled =
   typeof window === 'undefined' || window.__E2E_DISABLE_GOOGLE_LOGIN__ !== true;
 
@@ -181,6 +201,27 @@ onMounted(async () => {
   // Redirect if already authenticated
   if (authStore.token && authStore.user?.id) {
     router.push('/dashboard');
+  }
+
+  // Fetch reCAPTCHA site key
+  try {
+    const res = await api.get('google-captcha/site-key/');
+    siteKey.value = res.data.site_key || '';
+  } catch {
+    // Captcha key not available — continue without captcha
+  }
+
+  if (!siteKey.value) return;
+
+  if (window.grecaptcha?.render) {
+    renderRecaptcha();
+  } else {
+    const cbName = `__recaptchaLoad_signup`;
+    window[cbName] = () => { renderRecaptcha(); delete window[cbName]; };
+    const script = document.createElement('script');
+    script.src = `https://www.google.com/recaptcha/api.js?render=explicit&onload=${cbName}`;
+    script.async = true;
+    document.head.appendChild(script);
   }
 });
 
@@ -204,6 +245,11 @@ const handleSignUp = async () => {
     return;
   }
 
+  if (siteKey.value && !captchaToken.value) {
+    showNotification('Please complete the captcha', 'warning');
+    return;
+  }
+
   if (isLoading.value) return;
 
   isLoading.value = true;
@@ -214,6 +260,7 @@ const handleSignUp = async () => {
       password: userForm.password,
       first_name: userForm.firstName,
       last_name: userForm.lastName,
+      captcha_token: captchaToken.value,
     });
 
     authStore.login(response.data);
@@ -229,6 +276,8 @@ const handleSignUp = async () => {
       error?.message ||
       'Error creating account';
     showNotification(message, 'error');
+    recaptchaRef.value?.reset();
+    captchaToken.value = null;
   } finally {
     isLoading.value = false;
   }

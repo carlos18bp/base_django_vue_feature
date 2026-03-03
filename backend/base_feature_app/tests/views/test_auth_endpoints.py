@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import pytest
 from django.contrib.auth import get_user_model
 from django.urls import reverse
@@ -5,14 +7,16 @@ from rest_framework import status
 
 
 @pytest.mark.django_db
-def test_sign_up_requires_email_and_password(api_client):
+@patch('base_feature_app.views.auth.verify_recaptcha', return_value=True)
+def test_sign_up_requires_email_and_password(mock_captcha, api_client):
     url = reverse('sign_up')
     response = api_client.post(url, {}, format='json')
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.mark.django_db
-def test_sign_up_rejects_short_password(api_client):
+@patch('base_feature_app.views.auth.verify_recaptcha', return_value=True)
+def test_sign_up_rejects_short_password(mock_captcha, api_client):
     url = reverse('sign_up')
     response = api_client.post(
         url,
@@ -23,7 +27,8 @@ def test_sign_up_rejects_short_password(api_client):
 
 
 @pytest.mark.django_db
-def test_sign_up_rejects_existing_email(api_client):
+@patch('base_feature_app.views.auth.verify_recaptcha', return_value=True)
+def test_sign_up_rejects_existing_email(mock_captcha, api_client):
     User = get_user_model()
     User.objects.create_user(email='exists@example.com', password='pass12345')
 
@@ -37,7 +42,8 @@ def test_sign_up_rejects_existing_email(api_client):
 
 
 @pytest.mark.django_db
-def test_sign_up_success(api_client):
+@patch('base_feature_app.views.auth.verify_recaptcha', return_value=True)
+def test_sign_up_success(mock_captcha, api_client):
     """Verifies that a valid sign_up request creates a user and returns access and refresh tokens."""
     url = reverse('sign_up')
     response = api_client.post(
@@ -59,7 +65,8 @@ def test_sign_up_success(api_client):
 
 
 @pytest.mark.django_db
-def test_sign_up_returns_exception_message(api_client, monkeypatch):
+@patch('base_feature_app.views.auth.verify_recaptcha', return_value=True)
+def test_sign_up_returns_exception_message(mock_captcha, api_client, monkeypatch):
     """Verifies that sign_up returns HTTP 400 when user creation raises an unexpected exception."""
     from base_feature_app.models import User
 
@@ -78,14 +85,16 @@ def test_sign_up_returns_exception_message(api_client, monkeypatch):
 
 
 @pytest.mark.django_db
-def test_sign_in_requires_email_and_password(api_client):
+@patch('base_feature_app.views.auth.verify_recaptcha', return_value=True)
+def test_sign_in_requires_email_and_password(mock_captcha, api_client):
     url = reverse('sign_in')
     response = api_client.post(url, {}, format='json')
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.mark.django_db
-def test_sign_in_invalid_credentials(api_client):
+@patch('base_feature_app.views.auth.verify_recaptcha', return_value=True)
+def test_sign_in_invalid_credentials(mock_captcha, api_client):
     url = reverse('sign_in')
     response = api_client.post(
         url,
@@ -96,7 +105,8 @@ def test_sign_in_invalid_credentials(api_client):
 
 
 @pytest.mark.django_db
-def test_sign_in_disabled_account(api_client):
+@patch('base_feature_app.views.auth.verify_recaptcha', return_value=True)
+def test_sign_in_disabled_account(mock_captcha, api_client):
     User = get_user_model()
     user = User.objects.create_user(email='disabled@example.com', password='pass12345')
     user.is_active = False
@@ -112,7 +122,8 @@ def test_sign_in_disabled_account(api_client):
 
 
 @pytest.mark.django_db
-def test_sign_in_success(api_client):
+@patch('base_feature_app.views.auth.verify_recaptcha', return_value=True)
+def test_sign_in_success(mock_captcha, api_client):
     """Verifies that valid credentials return HTTP 200 with user info and JWT tokens."""
     User = get_user_model()
     User.objects.create_user(email='login@example.com', password='pass12345')

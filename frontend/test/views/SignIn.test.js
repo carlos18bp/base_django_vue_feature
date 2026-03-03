@@ -3,6 +3,7 @@ import { createPinia, setActivePinia } from 'pinia';
 import { createRouter, createMemoryHistory } from 'vue-router';
 
 jest.mock('@/services/http/client', () => ({
+  get: jest.fn().mockRejectedValue(new Error('no key')),
   post: jest.fn(),
 }));
 
@@ -67,6 +68,7 @@ describe('SignIn View', () => {
     router = buildRouter();
     delete window.location;
     window.location = { href: '' };
+    window.grecaptcha = { render: jest.fn(() => 0), reset: jest.fn() };
   });
 
   test('renders welcome heading', () => {
@@ -135,6 +137,7 @@ describe('SignIn View', () => {
     expect(api.post).toHaveBeenCalledWith('sign_in/', {
       email: 'user@example.com',
       password: 'secret',
+      captcha_token: null,
     });
     expect(showNotification).toHaveBeenCalledWith('Sign in successful!', 'success');
     expect(window.location.href).toBe('/dashboard');

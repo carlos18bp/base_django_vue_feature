@@ -9,6 +9,7 @@ from base_feature_app.services.auth_service import (
     authenticate_user,
     register_user,
 )
+from base_feature_app.views.captcha_views import verify_recaptcha
 
 
 def _token_response(user) -> dict:
@@ -37,6 +38,13 @@ def sign_up(request):
     """
     Register a new user with email and password.
     """
+    captcha_token = request.data.get('captcha_token', '')
+    if not verify_recaptcha(captcha_token):
+        return Response(
+            {'captcha_token': ['reCAPTCHA verification failed.']},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
     email = request.data.get('email')
     password = request.data.get('password')
 
@@ -63,6 +71,13 @@ def sign_in(request):
     """
     Sign in user with email and password.
     """
+    captcha_token = request.data.get('captcha_token', '')
+    if not verify_recaptcha(captcha_token):
+        return Response(
+            {'captcha_token': ['reCAPTCHA verification failed.']},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
     email = request.data.get('email')
     password = request.data.get('password')
 
