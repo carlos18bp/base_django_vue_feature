@@ -214,6 +214,7 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
@@ -280,29 +281,39 @@ HUEY = RedisHuey(
 # ==============================================================================
 # Storage is configured via STORAGES['dbbackup'] above (new-style API).
 
+DBBACKUP_COMPRESS = True
 DBBACKUP_FILENAME_TEMPLATE = '{datetime}.sql'
 DBBACKUP_MEDIA_FILENAME_TEMPLATE = '{datetime}.tar'
-DBBACKUP_CLEANUP_KEEP = 5
-DBBACKUP_CLEANUP_KEEP_MEDIA = 5
+DBBACKUP_CLEANUP_KEEP = 4
+DBBACKUP_CLEANUP_KEEP_MEDIA = 4
 
 # ==============================================================================
 # SILK — query profiling (enabled via ENABLE_SILK env flag)
 # ==============================================================================
 
 if ENABLE_SILK:
-    # Headless monitoring only — no UI, no Python profiling.
-    # Records SQL queries (time_taken, query count) for the weekly report task.
-    SILKY_MAX_RECORDED_REQUESTS = 10000
+    SILKY_ANALYZE_QUERIES = True
+
+    SILKY_AUTHENTICATION = True
+    SILKY_AUTHORISATION = True
+
+    def silk_permissions(user):
+        return user.is_staff
+
+    SILKY_PERMISSIONS = silk_permissions
+
+    SILKY_MAX_RECORDED_REQUESTS = 10_000
     SILKY_MAX_RECORDED_REQUESTS_CHECK_PERCENT = 10
 
     SILKY_IGNORE_PATHS = [
         '/admin/',
         '/static/',
         '/media/',
+        '/silk/',
     ]
 
-    SILKY_MAX_REQUEST_BODY_SIZE = 1024
-    SILKY_MAX_RESPONSE_BODY_SIZE = 1024
+    SILKY_MAX_REQUEST_BODY_SIZE = 0
+    SILKY_MAX_RESPONSE_BODY_SIZE = 0
 
 SLOW_QUERY_THRESHOLD_MS = int(get_env('SLOW_QUERY_THRESHOLD_MS', '500'))
 N_PLUS_ONE_THRESHOLD = int(get_env('N_PLUS_ONE_THRESHOLD', '10'))
@@ -312,6 +323,9 @@ N_PLUS_ONE_THRESHOLD = int(get_env('N_PLUS_ONE_THRESHOLD', '10'))
 # ==============================================================================
 
 LOG_LEVEL = get_env('DJANGO_LOG_LEVEL', 'INFO')
+
+_LOGS_DIR = BASE_DIR / 'logs'
+_LOGS_DIR.mkdir(exist_ok=True)
 
 LOGGING = {
     'version': 1,
@@ -334,8 +348,10 @@ LOGGING = {
         },
         'backup_file': {
             'level': 'INFO',
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
             'filename': BASE_DIR / 'logs' / 'backups.log',
+            'maxBytes': 5 * 1024 * 1024,
+            'backupCount': 3,
             'formatter': 'verbose',
         },
     },

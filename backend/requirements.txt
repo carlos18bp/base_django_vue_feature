@@ -27,3 +27,6 @@ django-dbbackup>=4.0.0
 huey>=2.5.0
 redis>=4.0.0
 django-silk>=5.0.0
+
+# Production server
+gunicorn>=23.0,<24.0

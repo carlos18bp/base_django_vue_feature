@@ -32,6 +32,10 @@ CSRF_COOKIE_SECURE = True
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # ==============================================================================
 # DATABASE — MySQL
@@ -63,3 +67,11 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 LOGGING['handlers']['backup_file']['level'] = 'WARNING'  # noqa: F405
 LOGGING['loggers']['django']['level'] = 'WARNING'  # noqa: F405
+
+LOGGING['handlers']['file'] = {  # noqa: F405
+    'level': 'WARNING',
+    'class': 'logging.FileHandler',
+    'filename': BASE_DIR / 'logs' / 'django.log',
+    'formatter': 'verbose',
+}
+LOGGING['loggers']['django']['handlers'].append('file')  # noqa: F405
