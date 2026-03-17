@@ -15,7 +15,9 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: '../backend/venv/bin/python ../backend/manage.py runserver 127.0.0.1:8001',
+      command: process.env.CI
+        ? 'python ../backend/manage.py runserver 127.0.0.1:8001'
+        : '../backend/venv/bin/python ../backend/manage.py runserver 127.0.0.1:8001',
       url: 'http://127.0.0.1:8001/admin/',
       reuseExistingServer: true,
       timeout: 120 * 1000,
