@@ -3,17 +3,19 @@ import vue from '@vitejs/plugin-vue';
 import { fileURLToPath, URL } from 'url';
 
 // https://vitejs.dev/config/
+const backendUrl = process.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000/';
+
 export default defineConfig({
   server: {
     port: 3000,
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:8000/',
+        target: backendUrl,
         changeOrigin: true,
         secure: false,
       },
       '/media': {
-        target: 'http://127.0.0.1:8000/',
+        target: backendUrl,
         changeOrigin: true,
         secure: false,
       },

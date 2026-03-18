@@ -30,14 +30,14 @@ export async function setAuthLocalStorage(page, { accessToken = 'e2e-token', ref
  * @param {string} email
  * @param {string} password
  */
-export async function login(page, email = 'admin@gmail.com', password = 'admin123') {
+export async function login(page, email = 'admin@gmail.com', password = 'password') {
   await page.goto('/sign_in');
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 
   await page.locator('input[type="email"], input[name="email"]').first().fill(email);
   await page.locator('input[type="password"], input[name="password"]').first().fill(password);
   await page.getByRole('button', { name: /(sign in|login|entrar)/i }).first().click();
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 }
 
 /**
@@ -49,6 +49,6 @@ export async function logout(page) {
   const signOutButton = page.getByRole('button', { name: /(sign out|logout|salir)/i }).first();
   if (await signOutButton.isVisible()) {
     await signOutButton.click();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   }
 }

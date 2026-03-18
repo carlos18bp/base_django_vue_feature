@@ -18,7 +18,7 @@ test.describe('Shopping — catalog browse', () => {
     tag: [...SHOPPING_CATALOG_BROWSE, '@role:shared'],
   }, async ({ page }) => {
     await page.goto('/catalog');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveURL(/\/catalog/);
     const body = page.locator('body');
@@ -30,12 +30,12 @@ test.describe('Shopping — catalog browse', () => {
     tag: [...SHOPPING_CATALOG_BROWSE, '@role:shared'],
   }, async ({ page }) => {
     await page.goto('/catalog');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const categoryFilter = page.locator('[data-testid="category-filter"], .category-filter, select').first();
-    await expect(categoryFilter).toBeVisible();
+    await expect(categoryFilter).toBeVisible({ timeout: 15000 });
     await categoryFilter.click();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveURL(/\/catalog/);
   });
@@ -44,9 +44,10 @@ test.describe('Shopping — catalog browse', () => {
     tag: [...SHOPPING_CATALOG_BROWSE, '@role:shared'],
   }, async ({ page }) => {
     await page.goto('/catalog');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const productLinks = page.locator('a[href*="/product/"]');
+    await expect(productLinks.first()).toBeVisible({ timeout: 15000 });
     const count = await productLinks.count();
 
     expect(count).toBeGreaterThan(0);

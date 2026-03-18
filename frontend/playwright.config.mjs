@@ -16,8 +16,8 @@ export default defineConfig({
   webServer: [
     {
       command: process.env.CI
-        ? 'python ../backend/manage.py runserver 127.0.0.1:8001'
-        : '../backend/venv/bin/python ../backend/manage.py runserver 127.0.0.1:8001',
+        ? 'RECAPTCHA_SECRET_KEY="" RECAPTCHA_SITE_KEY="" python ../backend/manage.py runserver 127.0.0.1:8001'
+        : 'RECAPTCHA_SECRET_KEY="" RECAPTCHA_SITE_KEY="" ../backend/venv/bin/python ../backend/manage.py runserver 127.0.0.1:8001',
       url: 'http://127.0.0.1:8001/admin/',
       reuseExistingServer: true,
       timeout: 120 * 1000,
@@ -25,7 +25,7 @@ export default defineConfig({
       stderr: 'ignore',
     },
     {
-      command: 'npm run dev -- --host 127.0.0.1 --port 5174',
+      command: 'VITE_BACKEND_URL=http://127.0.0.1:8001 npm run dev -- --host 127.0.0.1 --port 5174',
       url: 'http://127.0.0.1:5174',
       reuseExistingServer: true,
       timeout: 120 * 1000,

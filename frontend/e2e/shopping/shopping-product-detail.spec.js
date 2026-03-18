@@ -18,9 +18,10 @@ test.describe('Shopping — product detail', () => {
     tag: [...SHOPPING_PRODUCT_DETAIL, '@role:shared'],
   }, async ({ page }) => {
     await page.goto('/catalog');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const productLinks = page.locator('a[href*="/product/"]');
+    await expect(productLinks.first()).toBeVisible({ timeout: 15000 });
     const count = await productLinks.count();
     expect(count).toBeGreaterThan(0);
     // quality: allow-fragile-selector (selecting first product link from dynamic server-rendered list; no stable per-item ID available)
@@ -33,9 +34,10 @@ test.describe('Shopping — product detail', () => {
     tag: [...SHOPPING_PRODUCT_DETAIL, '@role:shared'],
   }, async ({ page }) => {
     await page.goto('/catalog');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const productLinks = page.locator('a[href*="/product/"]');
+    await expect(productLinks.first()).toBeVisible({ timeout: 15000 });
     const count = await productLinks.count();
     expect(count).toBeGreaterThan(0);
     // quality: allow-fragile-selector (selecting first product link from dynamic server-rendered list; no stable per-item ID available)

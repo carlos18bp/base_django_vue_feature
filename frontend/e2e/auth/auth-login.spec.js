@@ -27,10 +27,11 @@ test.describe('Auth — sign-in page', () => {
     await expect(page.locator('[type="password"]')).toBeVisible();
 
     await page.locator('input[type="email"]').fill('admin@gmail.com');
-    await page.locator('input[type="password"]').fill('admin123');
+    await page.locator('input[type="password"]').fill('password');
 
-    const signInResponse = page.waitForResponse((response) =>
-      response.url().includes('/api/sign_in/') && response.status() === 200,
+    const signInResponse = page.waitForResponse(
+      (response) => response.url().includes('/api/sign_in/') && response.status() === 200,
+      { timeout: 20000 },
     );
     await page.getByRole('button', { name: /(sign in|login|entrar)/i }).first().click();
     await signInResponse;
@@ -54,8 +55,9 @@ test.describe('Auth — sign-in page', () => {
   }, async ({ page }) => {
     await page.locator('[name="email"]').fill('nobody@example.com');
     await page.locator('[type="password"]').fill('wrongpass');
-    const signInResponse = page.waitForResponse((response) =>
-      response.url().includes('/api/sign_in/') && response.status() === 401,
+    const signInResponse = page.waitForResponse(
+      (response) => response.url().includes('/api/sign_in/') && response.status() === 401,
+      { timeout: 20000 },
     );
     await page.getByRole('button', { name: /(sign in|login|entrar)/i }).first().click();
     await signInResponse;

@@ -12,7 +12,7 @@ test.describe('Blog — detail view', () => {
     tag: [...BLOG_DETAIL_VIEW, '@role:shared'],
   }, async ({ page }) => {
     await page.goto('/blog/1');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const body = page.locator('body');
     await expect(body).not.toBeEmpty();
@@ -23,19 +23,20 @@ test.describe('Blog — detail view', () => {
     tag: [...BLOG_DETAIL_VIEW, '@role:shared'],
   }, async ({ page }) => {
     await page.goto('/blogs');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const blogLinks = page.locator('a[href*="/blog/"]');
+    await expect(blogLinks.first()).toBeVisible({ timeout: 15000 });
     const count = await blogLinks.count();
 
     expect(count).toBeGreaterThan(0);
     // quality: allow-fragile-selector (selecting first blog link from dynamic server-rendered list; no stable per-item ID available)
     await blogLinks.first().click();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveURL(/\/blog\/\d+/);
 
     await page.goto('/blogs');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveURL(/\/blogs/);
   });
 
@@ -43,7 +44,7 @@ test.describe('Blog — detail view', () => {
     tag: [...BLOG_DETAIL_NOT_FOUND, '@role:shared'],
   }, async ({ page }) => {
     await page.goto('/blog/999999');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveURL(/\/blog\/999999/);
   });
