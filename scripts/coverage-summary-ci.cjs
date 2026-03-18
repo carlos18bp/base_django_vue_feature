@@ -248,7 +248,7 @@ function parseFrontendTestResults() {
 }
 
 function parseE2ETestResults() {
-  const data = readJson(path.join(ARTIFACTS_DIR, 'frontend-e2e', 'playwright-results.json'));
+  const data = readJson(path.join(ARTIFACTS_DIR, 'frontend-e2e', 'results.json'));
   if (!data) return { available: false, passed: 0, failed: 0, failures: [] };
 
   const failures = [];
