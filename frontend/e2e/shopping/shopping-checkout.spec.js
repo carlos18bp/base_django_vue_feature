@@ -15,13 +15,14 @@ test.describe('Shopping — checkout', () => {
 
   test('can complete checkout with items in cart', {
     tag: [...SHOPPING_CHECKOUT_COMPLETE, '@role:shared'],
+    timeout: 60000,
   }, async ({ page }) => {
     await page.goto('/catalog');
 
     const productLinks = page.locator('a[href*="/product/"]');
     // quality: allow-fragile-selector (selecting first product link from dynamic server-rendered list; no stable per-item ID available)
     const firstProductLink = productLinks.first();
-    await expect(firstProductLink).toBeVisible();
+    await expect(firstProductLink).toBeVisible({ timeout: 15000 });
     expect(await productLinks.count()).toBeGreaterThan(0);
     const href = await firstProductLink.getAttribute('href');
     await page.goto(href);

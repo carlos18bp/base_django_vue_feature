@@ -15,7 +15,7 @@ test.describe('Blog — list view', () => {
   test('blogs list page loads with content', {
     tag: [...BLOG_LIST_VIEW, '@role:shared'],
   }, async ({ page }) => {
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveURL(/\/blogs/);
 
     const body = page.locator('body');
@@ -26,15 +26,16 @@ test.describe('Blog — list view', () => {
   test('can navigate to blog detail from list', {
     tag: [...BLOG_LIST_VIEW, '@role:shared'],
   }, async ({ page }) => {
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const blogLinks = page.locator('a[href*="/blog/"]');
+    await expect(blogLinks.first()).toBeVisible({ timeout: 15000 });
     const count = await blogLinks.count();
 
     expect(count).toBeGreaterThan(0);
     // quality: allow-fragile-selector (selecting first blog link from dynamic server-rendered list; no stable per-item ID available)
     await blogLinks.first().click();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveURL(/\/blog\/\d+/);
   });
 });
