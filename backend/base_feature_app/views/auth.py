@@ -2,34 +2,14 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
 
 from base_feature_app.services.auth_service import (
     authenticate_google_user,
     authenticate_user,
     register_user,
 )
+from base_feature_app.utils.auth_utils import generate_auth_tokens
 from base_feature_app.views.captcha_views import verify_recaptcha
-
-
-def _token_response(user) -> dict:
-    """
-    Build token payload dict for a given user.
-
-    :param user: Authenticated User instance.
-    :returns: Dict with user info and JWT tokens.
-    """
-    refresh = RefreshToken.for_user(user)
-    return {
-        'user': {
-            'id': user.id,
-            'email': user.email,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-        },
-        'access': str(refresh.access_token),
-        'refresh': str(refresh),
-    }
 
 
 @api_view(['POST'])
@@ -58,7 +38,7 @@ def sign_up(request):
             first_name=request.data.get('first_name', ''),
             last_name=request.data.get('last_name', ''),
         )
-        return Response(_token_response(user), status=status.HTTP_201_CREATED)
+        return Response(generate_auth_tokens(user), status=status.HTTP_201_CREATED)
     except ValueError as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
@@ -92,7 +72,7 @@ def sign_in(request):
     if user is None:
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
-    return Response(_token_response(user), status=status.HTTP_200_OK)
+    return Response(generate_auth_tokens(user), status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -121,7 +101,7 @@ def google_login(request):
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-    payload = _token_response(user)
+    payload = generate_auth_tokens(user)
     payload['created'] = created
     return Response(payload, status=status.HTTP_200_OK)
 
