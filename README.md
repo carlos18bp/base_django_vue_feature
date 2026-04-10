@@ -1120,16 +1120,9 @@ Real implementation examples built on top of this base:
 
 ### E-commerce
 - [🕯️ Candle Project](https://github.com/carlos18bp/candle_project) — Artisanal candles store with Square payments, product reviews, shopping cart, bilingual (EN/ES), and full E2E coverage
-- [💘 CrushMe](https://github.com/carlos18bp/crushme_project) — Wishlist-sharing e-commerce with dual payments (PayPal + Wompi), WooCommerce sync, offline translation, and dual auth (JWT + session)
-
-### Platform & NFC
-- [📌 TapTag](https://github.com/gustavop-dev/taptag) — NFC digital business card platform with 8 Django apps, multi-tenant user sites, product catalog, and dual HTTP clients
 
 ### Agency & Proposals
 - [💼 ProjectApp](https://github.com/gustavop-dev/projectapp) — Software agency platform with dynamic 12-section proposal system, expiration workflows, GSAP animations, and Nuxt 3 frontend
-
-### Interactive / Creative
-- [🌅 Azurita](https://github.com/gustavop-dev/azurita) — Interactive advent calendar with Vue 3 + TypeScript, GSAP animations, and lightweight SQLite setup
 
 ### Also see
 - [🚀 Base Django React Next Feature](https://github.com/carlos18bp/base_django_react_next_feature) — Companion template for Django + Next.js + React projects (TypeScript, Zustand, next-intl)
