@@ -3,7 +3,7 @@ trigger: manual
 description: Project intelligence and lessons learned. Reference for project-specific patterns, preferences, and key insights discovered during development.
 ---
 
-# Lessons Learned — ProjectApp
+# Lessons Learned — Base Django Vue Feature
 
 This file captures important patterns, preferences, and project intelligence that help work more effectively with this codebase. Updated as new insights are discovered.
 
@@ -25,7 +25,6 @@ This file captures important patterns, preferences, and project intelligence tha
 ### Service Layer Pattern
 - Business logic lives in `content/services/`, not in views
 - Views are thin FBV wrappers that call service methods
-- Services: `ProposalService`, `ProposalEmailService`, `ProposalPdfService`, `EmailTemplateRegistry`
 
 ---
 
@@ -34,7 +33,6 @@ This file captures important patterns, preferences, and project intelligence tha
 ### Backend: Function-Based Views (FBV)
 - **All** DRF views use `@api_view` decorators, not class-based views
 - Never convert to CBV unless explicitly requested
-- Views file for proposals is very large (123K) — be careful with edits
 
 ### Frontend: Pinia Options API
 - **All** Pinia stores use Options API pattern: `{ state, getters, actions }`
@@ -82,15 +80,15 @@ venv/bin/python <command>
 
 ---
 
-## 4. Production Deployment
+## 4. Staging Deployment
 
 ### Build Flow
 1. Frontend: `npm run build:django` → generates `backend/static/frontend/`
 2. Backend: `python manage.py collectstatic` → copies to `backend/staticfiles/`
-3. Restart: `sudo systemctl restart projectapp && sudo systemctl restart projectapp-huey`
+3. Restart: `sudo systemctl restart base_django_vue_feature_staging && sudo systemctl restart base_django_vue_feature-staging-huey`
 
 ### Django Serves Nuxt Pages
-- The `serve_nuxt` catch-all view in `projectapp/views.py` serves pre-rendered Nuxt pages
+- The `serve_nuxt` catch-all view in `base_feature_project/views.py` serves pre-rendered Nuxt pages
 - This is the LAST URL pattern — all other routes take priority
 - CDN URL for assets configurable via `NUXT_APP_CDN_URL`
 
@@ -127,10 +125,6 @@ venv/bin/python <command>
 - Updated by tracking endpoint and periodic task (`refresh_all_heat_scores`)
 - Based on: view count, section time, recency, engagement patterns
 
-### Change Log Types
-- 20+ change types in `ProposalChangeLog.ChangeType`
-- Includes: created, updated, sent, viewed, accepted, rejected, resent, expired, duplicated, commented, negotiating, reengagement, call, meeting, followup, note, calc_confirmed, calc_abandoned, auto_archived, status_change, cond_accepted, calc_followup
-
 ---
 
 ## 7. Testing Insights
@@ -144,8 +138,3 @@ venv/bin/python <command>
 - Every navigation flow must be registered in `docs/USER_FLOW_MAP.md` and `frontend/e2e/flow-definitions.json`
 - E2E tests must reflect real user integrations
 - Follow quality standards from `docs/TESTING_QUALITY_STANDARDS.md`
-
-### CI Sharding
-- Playwright E2E tests are sharded into 5 parallel jobs
-- Blob reports are merged after all shards complete
-- Test quality gate runs after all test suites pass
