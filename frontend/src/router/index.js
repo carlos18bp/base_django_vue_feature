@@ -66,6 +66,12 @@ const router = createRouter({
       meta: { title: 'Catalog' },
     },
     {
+      path: "/manual",
+      name: "manual",
+      component: () => import("@/views/manual/Manual.vue"),
+      meta: { title: 'Manual' },
+    },
+    {
       path: "/checkout",
       name: "checkout",
       component: () => import("@/views/product/Checkout.vue"),

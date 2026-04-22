@@ -20,6 +20,9 @@
                 <router-link to="/catalog" class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-600">
                     Catalog
                 </router-link>
+                <router-link to="/manual" class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-600">
+                    Manual
+                </router-link>
                 <router-link to="/about_us" class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-600">
                     About Us
                 </router-link>
@@ -110,6 +113,10 @@
                             <router-link to="/catalog" @click="mobileMenuOpen = false"
                                 class="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
                                 Catalog
+                            </router-link>
+                            <router-link to="/manual" @click="mobileMenuOpen = false"
+                                class="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                                Manual
                             </router-link>
                             <router-link to="/about_us" @click="mobileMenuOpen = false"
                                 class="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
