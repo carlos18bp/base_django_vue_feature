@@ -5,7 +5,13 @@ import { clearTokens, getAccessToken, getRefreshToken, setTokens } from '@/servi
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: JSON.parse(localStorage.getItem('user')) || null,
+    user: (() => {
+      try {
+        return JSON.parse(localStorage.getItem('user')) || null;
+      } catch {
+        return null;
+      }
+    })(),
     token: getAccessToken(),
     accessToken: getAccessToken(),
     refreshToken: getRefreshToken(),
@@ -65,6 +71,21 @@ export const useAuthStore = defineStore('auth', {
       this.logout();
     },
 
+    restoreSessionFromTokens() {
+      const access = getAccessToken();
+      const refresh = getRefreshToken();
+
+      this.token = access;
+      this.accessToken = access;
+      this.refreshToken = refresh;
+
+      if (access) {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${access}`;
+      } else {
+        delete axios.defaults.headers.common['Authorization'];
+      }
+    },
+
     /**
      * Validates the current authentication token with the server
      */
@@ -72,7 +93,11 @@ export const useAuthStore = defineStore('auth', {
       if (!this.token) return false;
 
       try {
-        await api.get('validate_token/');
+        const response = await api.get('validate_token/');
+        if (response?.data?.user) {
+          this.user = response.data.user;
+          localStorage.setItem('user', JSON.stringify(response.data.user));
+        }
         return true;
       } catch (error) {
         if (error?.response?.status === 401 || error?.response?.status === 403) {
@@ -80,6 +105,12 @@ export const useAuthStore = defineStore('auth', {
         }
         return false;
       }
+    },
+
+    async restoreSession() {
+      this.restoreSessionFromTokens();
+      if (!this.token) return false;
+      return await this.validateToken();
     },
 
     /**

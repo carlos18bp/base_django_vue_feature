@@ -117,6 +117,10 @@ def validate_token(request):
             'user': {
                 'id': request.user.id,
                 'email': request.user.email,
+                'first_name': request.user.first_name,
+                'last_name': request.user.last_name,
+                'role': request.user.role,
+                'is_staff': request.user.is_staff,
             }
         }, status=status.HTTP_200_OK)
 

@@ -1,5 +1,7 @@
 # quality: disable misplaced_file (admin tests live in admin/ subdirectory by design)
 from django.contrib.auth import get_user_model
+from django.contrib.messages.storage.fallback import FallbackStorage
+from django.core.exceptions import PermissionDenied
 from django.test import RequestFactory
 import pytest
 
@@ -9,6 +11,7 @@ from base_feature_app.admin import (
     SaleAdmin,
     BaseFeatureUserAdmin,
     BaseFeatureAdminSite,
+    admin_site,
 )
 from base_feature_app.models import Blog, Product, Sale, SoldProduct
 from django_attachments.models import Library
@@ -20,6 +23,14 @@ def _staff_request(db):  # pragma: no cover - trivial helper
     factory = RequestFactory()
     request = factory.get("/admin/")
     request.user = user
+    return request
+
+
+def _request_with_messages(user):
+    request = RequestFactory().get('/admin/')
+    request.user = user
+    request.session = {}
+    setattr(request, '_messages', FallbackStorage(request))
     return request
 
 
@@ -115,3 +126,77 @@ def test_custom_admin_site_get_app_list_includes_sections(monkeypatch, db):
     assert "blog_management" in section_names
     assert "product_management" in section_names
     assert "sales_management" in section_names
+
+
+@pytest.mark.django_db
+def test_user_admin_login_as_link_renders_admin_url():
+    User = get_user_model()
+    user = User.objects.create_user(email='target@example.com', password='pass12345')
+    admin = BaseFeatureUserAdmin(User, admin_site)
+
+    html = admin.login_as_link(user)
+
+    assert 'Login as this user' in html
+    assert f'/admin/base_feature_app/user/{user.id}/login_as/' in html
+
+
+@pytest.mark.django_db
+def test_user_admin_login_as_redirects_to_frontend(settings):
+    User = get_user_model()
+    factory = RequestFactory()
+    admin_user = User.objects.create_superuser(email='admin@example.com', password='pass12345')
+    target_user = User.objects.create_user(email='target@example.com', password='pass12345')
+    request = factory.get('/admin/')
+    request.user = admin_user
+    settings.FRONTEND_URL = 'http://localhost:3000'
+
+    admin = BaseFeatureUserAdmin(User, admin_site)
+    response = admin.login_as_user_view(request, target_user.id)
+
+    assert response.status_code == 302
+    assert response['Location'].startswith('http://localhost:3000/admin-login?')
+    assert 'access=' in response['Location']
+    assert 'refresh=' in response['Location']
+    assert 'redirect=%2F' in response['Location']
+
+
+@pytest.mark.django_db
+def test_user_admin_login_as_requires_active_superuser():
+    User = get_user_model()
+    factory = RequestFactory()
+    regular_user = User.objects.create_user(email='user@example.com', password='pass12345')
+    target_user = User.objects.create_user(email='target@example.com', password='pass12345')
+    request = factory.get('/admin/')
+    request.user = regular_user
+
+    admin = BaseFeatureUserAdmin(User, admin_site)
+
+    with pytest.raises(PermissionDenied):
+        admin.login_as_user_view(request, target_user.id)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('build_target', [
+    pytest.param(
+        lambda U: U.objects.create_superuser(email='target@example.com', password='pass12345'),
+        id='superuser',
+    ),
+    pytest.param(
+        lambda U: U.objects.create_user(
+            email='target@example.com', password='pass12345', is_active=False,
+        ),
+        id='inactive',
+    ),
+])
+def test_user_admin_login_as_blocks_ineligible_target(build_target):
+    User = get_user_model()
+    admin_user = User.objects.create_superuser(email='admin@example.com', password='pass12345')
+    target_user = build_target(User)
+    request = _request_with_messages(admin_user)
+
+    admin = BaseFeatureUserAdmin(User, admin_site)
+    response = admin.login_as_user_view(request, target_user.id)
+
+    assert response.status_code == 302
+    assert 'access=' not in response['Location']
+    assert f'/user/{target_user.id}/change/' in response['Location']

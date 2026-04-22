@@ -177,12 +177,13 @@ describe("Auth Store", () => {
       store.token = "test-token";
 
       // Provide a mocked get method for the http client
-      api.get = jest.fn().mockResolvedValue({ data: { valid: true } });
+      api.get = jest.fn().mockResolvedValue({ data: { valid: true, user: { id: 1, email: "test@example.com" } } });
 
       const result = await store.validateToken();
 
       expect(api.get).toHaveBeenCalledWith("validate_token/");
       expect(result).toBe(true);
+      expect(store.user).toEqual({ id: 1, email: "test@example.com" });
     });
 
     test("validateToken logs out on 401/403 error and returns false", async () => {
@@ -231,6 +232,31 @@ describe("Auth Store", () => {
       const validateSpy = jest.spyOn(store, "validateToken").mockResolvedValue(true);
 
       const result = await store.checkAuth();
+
+      expect(validateSpy).toHaveBeenCalled();
+      expect(result).toBe(true);
+    });
+
+    test("restoreSessionFromTokens syncs tokens and authorization header", () => {
+      tokens.getAccessToken.mockReturnValue("restored-access");
+      tokens.getRefreshToken.mockReturnValue("restored-refresh");
+      const store = useAuthStore();
+
+      store.restoreSessionFromTokens();
+
+      expect(store.token).toBe("restored-access");
+      expect(store.accessToken).toBe("restored-access");
+      expect(store.refreshToken).toBe("restored-refresh");
+      expect(axios.defaults.headers.common.Authorization).toBe("Bearer restored-access");
+    });
+
+    test("restoreSession validates token when an access token exists", async () => {
+      tokens.getAccessToken.mockReturnValue("restored-access");
+      tokens.getRefreshToken.mockReturnValue("restored-refresh");
+      const store = useAuthStore();
+      const validateSpy = jest.spyOn(store, "validateToken").mockResolvedValue(true);
+
+      const result = await store.restoreSession();
 
       expect(validateSpy).toHaveBeenCalled();
       expect(result).toBe(true);

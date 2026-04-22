@@ -24,6 +24,12 @@ const router = createRouter({
       meta: { requiresGuest: true, title: 'Sign In' },
     },
     {
+      path: "/admin-login",
+      name: "admin_login",
+      component: () => import("@/views/auth/AdminLogin.vue"),
+      meta: { title: 'Admin Login' },
+    },
+    {
       path: "/sign_up",
       name: "sign_up",
       component: () => import("@/views/auth/SignUp.vue"),

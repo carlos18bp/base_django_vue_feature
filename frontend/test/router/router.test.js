@@ -6,6 +6,7 @@ jest.mock('@/services/http/client', () => ({
 }));
 
 jest.mock('@/views/auth/SignUp.vue', () => ({ default: { template: '<div />' } }));
+jest.mock('@/views/auth/AdminLogin.vue', () => ({ default: { template: '<div />' } }));
 jest.mock('@/views/Backoffice.vue', () => ({ default: { template: '<div />' } }));
 jest.mock('@/views/blog/Detail.vue', () => ({ default: { template: '<div />' } }));
 jest.mock('@/views/blog/List.vue', () => ({ default: { template: '<div />' } }));
@@ -60,6 +61,12 @@ describe('Router — route definitions', () => {
     const route = routes.find((r) => r.name === 'sign_up');
     expect(route).toBeDefined();
     expect(route.path).toBe('/sign_up');
+  });
+
+  test('defines an admin_login route', () => {
+    const route = routes.find((r) => r.name === 'admin_login');
+    expect(route).toBeDefined();
+    expect(route.path).toBe('/admin-login');
   });
 
   test('defines a dashboard route with requiresAuth', () => {
@@ -202,6 +209,7 @@ describe('Router — beforeEach guard (actual router)', () => {
 
 describe('Router — lazy route component factories', () => {
   it.each([
+    ['admin_login', 'admin_login'],
     ['sign_up', 'sign_up'],
     ['backoffice', 'backoffice'],
     ['blog', 'blog'],
