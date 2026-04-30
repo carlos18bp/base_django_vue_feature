@@ -161,8 +161,65 @@ python3 -m venv .venv-audit
 
 ## Updates Applied
 
-This section is updated after the patch+minor pass — see commits `deps(frontend): apply patch+minor updates` and `deps(backend): apply patch+minor updates` on this branch.
+### Frontend (commit `deps(frontend): apply patch+minor updates`)
+
+| Package | From | To |
+|---|---|---|
+| @babel/preset-env | 7.29.0 | 7.29.2 |
+| @playwright/test | 1.58.2 | 1.59.1 |
+| @tailwindcss/postcss | 4.2.1 | 4.2.4 |
+| @unhead/vue | 2.1.12 | 2.1.13 |
+| @vue/test-utils | 2.4.6 | 2.4.10 |
+| autoprefixer | 10.4.24 | 10.5.0 |
+| axios | 1.13.5 | 1.15.2 |
+| eslint | 9.39.3 | 9.39.4 |
+| gsap | 3.14.2 | 3.15.0 |
+| postcss | 8.5.6 | 8.5.12 |
+| sweetalert2 | 11.26.20 | 11.26.24 |
+| tailwindcss | 4.2.1 | 4.2.4 |
+| v8-to-istanbul | 9.2.0 | 9.3.0 |
+| vite | 6.4.1 | 6.4.2 |
+| vue | 3.5.29 | 3.5.33 |
+| vue-i18n | 11.2.8 | 11.4.0 |
+| vue-router | 5.0.3 | 5.0.6 |
+| vue3-google-login | 2.0.37 | 2.0.42 |
+
+Plus transitive resolution updates from `npm audit fix` for: brace-expansion, defu, flatted, follow-redirects, picomatch, unhead, yaml, postcss, axios.
+
+After updates: `npm audit` → 0 critical / 0 high / 0 moderate / **4 low remain**, all from the `jest-environment-jsdom@29 → jsdom → http-proxy-agent → @tootallnate/once` chain that requires major bumps (jest 30) we declined to apply.
+
+### Backend (commit `deps(backend): apply patch+minor updates`)
+
+| Package | From | To |
+|---|---|---|
+| Django | 6.0.2 | 6.0.4 |
+| Faker | 40.5.1 | 40.15.0 |
+| coverage | 7.13.4 | 7.13.5 |
+| djangorestframework | 3.16.1 | 3.17.1 |
+| google-auth | 2.48.0 | 2.49.2 |
+| google-auth-oauthlib | 1.2.4 | 1.3.1 |
+| mysqlclient | 2.2.4 | 2.2.8 |
+| pillow | 12.1.1 | 12.2.0 |
+| pytest | 9.0.2 | 9.0.3 |
+| pytest-cov | 7.0.0 | 7.1.0 |
+| python-dotenv | 1.2.1 | 1.2.2 |
+| requests | 2.32.5 | 2.33.1 |
+| ruff | 0.15.2 | 0.15.12 |
+
+After updates: `pip-audit -r requirements.txt` → **No known vulnerabilities found** (all 11 advisories resolved).
+
+### Verification
+
+- `npm run build` → success (Vite 6.4.2, 24s)
+- `npm test` → 321 passed; 1 pre-existing test file (`test/views/AdminLogin.test.js`) fails to load due to babel-jest hoist guarding non-`mock`-prefixed variables (`replace`, `restoreSession`) inside `jest.mock()` factories. Same code exists on master; not introduced by these dependency updates.
+- `python manage.py check` → 0 issues
+- `pytest` → 255 passed in 113s
 
 ### Rollbacks
 
-(populated after the verify step)
+None required — every targeted patch+minor bump installed cleanly and tests/build remained green for all packages.
+
+### Notes
+
+- gunicorn `>=23.0,<24.0` constraint kept; latest 25.3.0 would be a major.
+- jest / jest-environment-jsdom / babel-jest / eslint / vite / @unhead/vue / @vitejs/plugin-vue major bumps deferred per "no major" rule. The 4 remaining low-severity advisories (jsdom chain) are blocked behind the jest 29 → 30 major.
