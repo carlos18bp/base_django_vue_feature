@@ -8,18 +8,18 @@ jest.mock('@/services/http/tokens', () => ({
   clearTokens: jest.fn(),
 }));
 
-const replace = jest.fn();
+const mockReplace = jest.fn();
 const mockRoute = { query: {} };
-const restoreSession = jest.fn().mockResolvedValue(true);
+const mockRestoreSession = jest.fn().mockResolvedValue(true);
 
 jest.mock('vue-router', () => ({
   useRoute: () => mockRoute,
-  useRouter: () => ({ replace }),
+  useRouter: () => ({ replace: mockReplace }),
 }));
 
 jest.mock('@/stores/auth', () => ({
   useAuthStore: () => ({
-    restoreSession,
+    restoreSession: mockRestoreSession,
   }),
 }));
 
@@ -44,8 +44,8 @@ describe('AdminLogin View', () => {
     await flushPromises();
 
     expect(setTokens).toHaveBeenCalledWith({ access: 'a', refresh: 'r' });
-    expect(restoreSession).toHaveBeenCalledTimes(1);
-    expect(replace).toHaveBeenCalledWith('/dashboard');
+    expect(mockRestoreSession).toHaveBeenCalledTimes(1);
+    expect(mockReplace).toHaveBeenCalledWith('/dashboard');
   });
 
   test('redirects to sign_in when tokens are missing', async () => {
@@ -55,7 +55,7 @@ describe('AdminLogin View', () => {
     await flushPromises();
 
     expect(setTokens).not.toHaveBeenCalled();
-    expect(replace).toHaveBeenCalledWith({ name: 'sign_in' });
+    expect(mockReplace).toHaveBeenCalledWith({ name: 'sign_in' });
   });
 
   test.each([
@@ -71,6 +71,6 @@ describe('AdminLogin View', () => {
     mount(AdminLogin);
     await flushPromises();
 
-    expect(replace).toHaveBeenCalledWith('/');
+    expect(mockReplace).toHaveBeenCalledWith('/');
   });
 });
