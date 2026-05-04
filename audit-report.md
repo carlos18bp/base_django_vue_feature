@@ -1,117 +1,158 @@
-# Vulnerability Audit Report — base_django_vue_feature
+# Vulnerability Audit & Dependency Update Report
 
-- Branch: `double-check-30042026`
-- Base: `origin/master` (commit `eab559a`)
-- Date: 2026-04-30
-- Scope: backend (`backend/requirements.txt`, Python 3.12, Django 6.0.x), frontend (`frontend/package.json`, Vue 3.5 + Vite 6.4)
+**Branch:** `master`
+**Date:** 2026-05-04
+**Base:** `origin/master` @ `2efd0e1`
+**Scope:** patch + minor updates only (no major version bumps)
 
-## Summary — CVEs by Severity
+## Summary
 
-### Frontend (npm audit)
-
-| Severity | Count |
-|----------|------:|
-| critical | 0 |
-| high     | 4 |
-| moderate | 7 |
-| low      | 4 |
-| **total**| **15** |
-
-### Backend (pip-audit)
-
-| Severity | Count |
-|----------|------:|
-| listed by advisory | 11 vulnerabilities across 5 packages |
-
-`pip-audit` reports advisory IDs (CVE / GHSA) without explicit severity — see CVE Details below.
+| Surface  | Vulns (initial) | Outdated (initial) | Vulns (final) |
+|----------|-----------------|--------------------|---------------|
+| Frontend | 0c/0h/0m/4l     | 4 applicable       | 0c/0h/0m/4l   |
+| Backend  | 19 total (10 pkgs, mostly venv drift + 4 new CVEs) | 1 applicable (google-auth) | 4 (pip+pygments — tool deps, not project) |
 
 ---
 
-## Outdated Packages — Frontend
+## Frontend — `npm audit` (initial)
 
-| Package | Current | Patch+Minor target | Latest | Notes |
+Source: `/tmp/base_django_vue_feature-npm-audit.json`
+
+| Package | Severity | Notes |
+|---|---|---|
+| @tootallnate/once <3.0.1 | low | Incorrect Control Flow Scoping |
+| http-proxy-agent (transitive) | low | Depends on @tootallnate/once |
+| jsdom (transitive) | low | Depends on http-proxy-agent |
+| jest-environment-jsdom | low | Depends on jsdom |
+
+**Totals:** 0 critical / 0 high / 0 moderate / **4 low**.
+
+All 4 lows require `jest-environment-jsdom` 29→30 (major) — deferred per policy.
+
+## Frontend — `npm outdated` (initial)
+
+Source: `/tmp/base_django_vue_feature-npm-outdated.json`
+
+| Package | Current | Wanted | Latest | Action |
 |---|---|---|---|---|
-| @babel/preset-env | 7.29.0 | 7.29.2 | 7.29.2 | minor |
-| @playwright/test | 1.58.2 | 1.59.1 | 1.59.1 | minor |
-| @tailwindcss/postcss | 4.2.1 | 4.2.4 | 4.2.4 | patch |
-| @unhead/vue | 2.1.12 | 2.1.13 | 3.1.0 | major to 3.x — SKIP |
-| @vitejs/plugin-vue | 5.2.4 | 5.2.4 | 6.0.6 | major to 6.x — SKIP |
-| @vue/test-utils | 2.4.6 | 2.4.10 | 2.4.10 | patch |
-| autoprefixer | 10.4.27 | 10.5.0 | 10.5.0 | minor |
-| axios | 1.13.6 | 1.15.2 | 1.15.2 | minor |
-| babel-jest | 29.7.0 | 29.7.0 | 30.3.0 | major to 30.x — SKIP |
-| eslint | 9.39.4 | 9.39.4 | 10.2.1 | major to 10.x — SKIP |
-| gsap | 3.14.2 | 3.15.0 | 3.15.0 | minor |
-| jest | 29.7.0 | 29.7.0 | 30.3.0 | major to 30.x — SKIP |
-| jest-environment-jsdom | 29.7.0 | 29.7.0 | 30.3.0 | major — SKIP |
-| postcss | 8.5.8 | 8.5.12 | 8.5.12 | patch |
-| sweetalert2 | 11.26.22 | 11.26.24 | 11.26.24 | patch |
-| tailwindcss | 4.2.1 | 4.2.4 | 4.2.4 | patch |
-| vite | 6.4.1 | 6.4.2 | 8.0.10 | bumped to latest 6.x patch — major skipped |
-| vue | 3.5.30 | 3.5.33 | 3.5.33 | patch |
-| vue-i18n | 11.3.0 | 11.4.0 | 11.4.0 | minor |
-| vue-router | 5.0.3 | 5.0.6 | 5.0.6 | patch |
-| vue3-google-login | 2.0.37 | 2.0.42 | 2.0.42 | patch |
-
-## Outdated Packages — Backend
-
-| Package | Current | Patch+Minor target | Latest | Notes |
-|---|---|---|---|---|
-| Django | 6.0.2 | 6.0.4 | 6.0.4 | patch |
-| Faker | 40.5.1 | 40.15.0 | 40.15.0 | minor |
-| coverage | 7.13.4 | 7.13.5 | 7.13.5 | patch |
-| djangorestframework | 3.16.1 | 3.17.1 | 3.17.1 | minor |
-| google-auth | 2.48.0 | 2.49.2 | 2.49.2 | minor |
-| google-auth-oauthlib | 1.2.4 | 1.3.1 | 1.3.1 | minor |
-| gunicorn | 23.0.0 | (kept `>=23.0,<24.0`) | 25.3.0 | constraint pins major — SKIP |
-| mysqlclient | 2.2.4 | 2.2.8 | 2.2.8 | patch |
-| pillow | 12.1.1 | 12.2.0 | 12.2.0 | minor |
-| pytest | 9.0.2 | 9.0.3 | 9.0.3 | patch |
-| pytest-cov | 7.0.0 | 7.1.0 | 7.1.0 | minor |
-| python-dotenv | 1.2.1 | 1.2.2 | 1.2.2 | patch |
-| requests | 2.32.5 | 2.33.1 | 2.33.1 | minor |
-| ruff | 0.15.2 | 0.15.12 | 0.15.12 | patch |
+| @babel/preset-env | 7.29.2 | 7.29.3 | 7.29.3 | apply patch |
+| @unhead/vue | 2.1.13 | 2.1.13 | 3.1.0 | skip major |
+| @vitejs/plugin-vue | 5.2.4 | 5.2.4 | 6.0.6 | skip major |
+| axios | 1.15.2 | 1.16.0 | 1.16.0 | apply minor |
+| babel-jest | 29.7.0 | 29.7.0 | 30.3.0 | skip major |
+| eslint | 9.39.4 | 9.39.4 | 10.3.0 | skip major |
+| jest | 29.7.0 | 29.7.0 | 30.3.0 | skip major |
+| jest-environment-jsdom | 29.7.0 | 29.7.0 | 30.3.0 | skip major |
+| postcss | 8.5.12 | 8.5.13 | 8.5.13 | apply patch |
+| vite | 6.4.2 | 6.4.2 | 8.0.10 | skip major (already at latest 6.x) |
+| vue3-google-login | 2.0.42 | 2.1.3 | 2.1.3 | apply minor |
 
 ---
 
-## CVE Details
+## Backend — `pip-audit` (initial)
+
+Source: `/tmp/base_django_vue_feature-pip-audit.json`
+
+**Note:** The venv was not synced with `requirements.txt` (which was already at patched versions from the 2026-04-30 audit). The 19 initial findings break down as:
+- 14 = stale venv (packages already fixed in requirements.txt: Django, pillow, pytest, python-dotenv, requests + 2 google-auth ones)
+- 5 = new since last audit
+
+| Package | Version | Advisory | Fix | Category |
+|---|---|---|---|---|
+| cryptography | 46.0.5 | CVE-2026-34073 | 46.0.6 | **new CVE** |
+| cryptography | 46.0.5 | CVE-2026-39892 | 46.0.7 | **new CVE** |
+| django | 6.0.2 | CVE-2026-25674/73/33033/34/4292/4277/3902 (7) | 6.0.4 | venv drift (already in reqs) |
+| pillow | 12.1.1 | CVE-2026-40192 | 12.2.0 | venv drift (already in reqs) |
+| pip | 24.0 | CVE-2025-8869 | 25.3 | tool dep |
+| pip | 24.0 | CVE-2026-1703 | 26.0 | tool dep |
+| pip | 24.0 | CVE-2026-3219 | — | tool dep |
+| pyasn1 | 0.6.2 | CVE-2026-30922 | 0.6.3 | **new CVE** |
+| pygments | 2.19.2 | CVE-2026-4539 | 2.20.0 | tool dep (pip-audit) |
+| pyjwt | 2.11.0 | CVE-2026-32597 | 2.12.0 | **new CVE** |
+| pytest | 9.0.2 | CVE-2025-71176 | 9.0.3 | venv drift (already in reqs) |
+| python-dotenv | 1.2.1 | CVE-2026-28684 | 1.2.2 | venv drift (already in reqs) |
+| requests | 2.32.5 | CVE-2026-25645 | 2.33.0 | venv drift (already in reqs) |
+
+## Backend — `pip list --outdated` (initial)
+
+Packages in `requirements.txt` with new versions since last audit:
+
+| Package | In requirements.txt | Latest | Action |
+|---|---|---|---|
+| google-auth | ==2.49.2 | 2.50.0 | apply minor |
+| huey | >=2.5.0 | 3.0.0 | skip major (2→3) |
+
+Transitive deps needing explicit pins for CVE fixes:
+- `cryptography`: 46.0.5 → 46.0.7 (patch, 2 CVEs)
+- `PyJWT`: 2.11.0 → 2.12.1 (minor, CVE-2026-32597)
+- `pyasn1`: 0.6.2 → 0.6.3 (patch, CVE-2026-30922)
+
+---
+
+## Plan
 
 ### Frontend
-
-| Package | Severity | Advisory / Title | Fix |
-|---|---|---|---|
-| @tootallnate/once (transitive) | low | Incorrect Control Flow Scoping | requires jest-environment-jsdom 30.x (major) |
-| @unhead/vue | moderate | Unhead `hasDangerousProtocol()` bypass via leading-zero padded HTML entities in `useHeadSafe()` | non-major fix available |
-| axios | moderate | NO_PROXY Hostname Normalization Bypass leading to SSRF; Unrestricted Cloud Metadata Exfiltration via Header Injection Chain | 1.15.2 |
-| brace-expansion (transitive) | moderate | Zero-step sequence causes process hang and memory exhaustion (DoS) | non-major fix available |
-| defu (transitive) | high | Prototype pollution via `__proto__` key in defaults argument | non-major fix available |
-| flatted (transitive) | high | Prototype Pollution via `parse()` in NodeJS flatted | non-major fix available |
-| follow-redirects (transitive) | moderate | Leaks Custom Authentication Headers to Cross-Domain Redirect Targets | non-major fix available |
-| http-proxy-agent / jsdom (transitive) | low | jsdom chain via @tootallnate/once | requires jest 30.x (major) |
-| jest-environment-jsdom | low | jsdom chain | requires major bump — SKIP |
-| picomatch (transitive) | high | Method Injection in POSIX Character Classes causes incorrect Glob Matching | non-major fix available |
-| postcss | moderate | XSS via Unescaped `</style>` in CSS Stringify Output | 8.5.12 |
-| unhead (transitive) | moderate | hasDangerousProtocol bypass | non-major fix available |
-| vite | high | Path Traversal in Optimized Deps `.map` Handling; Arbitrary File Read via Vite Dev Server WebSocket | 6.4.x patch |
-| yaml (transitive) | moderate | Stack Overflow via deeply nested YAML collections | non-major fix available |
+- `@babel/preset-env` ^7.29.2 → ^7.29.3
+- `axios` ^1.15.2 → ^1.16.0
+- `postcss` ^8.5.12 → ^8.5.13
+- `vue3-google-login` ^2.0.42 → ^2.1.3
 
 ### Backend
+- `google-auth` ==2.49.2 → ==2.50.0
+- Add `cryptography==46.0.7` (fix CVE-2026-34073, CVE-2026-39892)
+- Add `PyJWT==2.12.1` (fix CVE-2026-32597)
+- Add `pyasn1==0.6.3` (fix CVE-2026-30922)
+- `gunicorn` constraint `>=23.0,<24.0` kept (latest 25.x is a major)
+- `huey` not bumped (2→3 is a major)
 
-| Package | Version | Advisory | Fix versions |
+---
+
+## Updates Applied
+
+### Frontend (commit `deps(frontend): apply patch+minor updates`)
+
+| Package | From | To |
+|---|---|---|
+| @babel/preset-env | ^7.29.2 | ^7.29.3 |
+| axios | ^1.15.2 | ^1.16.0 |
+| postcss | ^8.5.12 | ^8.5.13 |
+| vue3-google-login | ^2.0.42 | ^2.1.3 |
+
+Final `npm audit`: **0 critical / 0 high / 0 moderate / 4 low** (jest chain, major bump required).
+
+Remaining outdated (majors skipped intentionally): `@unhead/vue` 2→3, `@vitejs/plugin-vue` 5→6, `babel-jest/jest/jest-environment-jsdom` 29→30, `eslint` 9→10, `vite` 6→8.
+
+### Backend (commit `deps(backend): apply patch+minor updates`)
+
+| Package | From | To | Notes |
 |---|---|---|---|
-| Django | 6.0.2 | CVE-2026-25674 (BIT-django-2026-25674) | 4.2.29, 5.2.12, 6.0.3 |
-| Django | 6.0.2 | CVE-2026-25673 (GHSA-8p8v-wh79-9r56) | 4.2.29, 5.2.12, 6.0.3 |
-| Django | 6.0.2 | CVE-2026-33033 (GHSA-5mf9-h53q-7mhq) | 4.2.30, 5.2.13, 6.0.4 |
-| Django | 6.0.2 | CVE-2026-33034 (GHSA-933h-hp56-hf7m) | 4.2.30, 5.2.13, 6.0.4 |
-| Django | 6.0.2 | CVE-2026-4292 (GHSA-mmwr-2jhp-mc7j) | 4.2.30, 5.2.13, 6.0.4 |
-| Django | 6.0.2 | CVE-2026-4277 (GHSA-pwjp-ccjc-ghwg) | 4.2.30, 5.2.13, 6.0.4 |
-| Django | 6.0.2 | CVE-2026-3902 (GHSA-mvfq-ggxm-9mc5) | 4.2.30, 5.2.13, 6.0.4 |
-| python-dotenv | 1.2.1 | CVE-2026-28684 (GHSA-mf9w-mj56-hr94) | 1.2.2 |
-| pillow | 12.1.1 | CVE-2026-40192 (GHSA-whj4-6x5x-4v2j) | 12.2.0 |
-| pytest | 9.0.2 | CVE-2025-71176 (GHSA-6w46-j5rx-g56g) | 9.0.3 |
-| requests | 2.32.5 | CVE-2026-25645 (GHSA-gc5v-m9x4-r6x2) | 2.33.0 |
+| google-auth | 2.49.2 | 2.50.0 | minor |
+| cryptography | — | 46.0.7 | new explicit pin; fixes CVE-2026-34073, CVE-2026-39892 |
+| PyJWT | — | 2.12.1 | new explicit pin; fixes CVE-2026-32597 |
+| pyasn1 | — | 0.6.3 | new explicit pin; fixes CVE-2026-30922 |
 
-All backend CVEs are resolvable via patch+minor updates within the existing pinned major versions.
+`pip-audit` final: **4 remaining** — all in packages that are not project dependencies:
+- `pip 24.0`: CVE-2025-8869, CVE-2026-1703, CVE-2026-3219 (package manager, not in requirements.txt)
+- `pygments 2.19.2`: CVE-2026-4539 (transitive dep of pip-audit tool itself, not in requirements.txt)
+
+---
+
+## Rollbacks
+
+Ninguno.
+
+---
+
+## Verification Results
+
+### Frontend
+- `npm audit`: 0 critical / 0 high / 0 moderate / 4 low (unchanged — jest chain).
+- `npm run build`: ✅ success (Vite 6.4.2, 14s).
+
+### Backend
+- `python manage.py check`: ✅ System check identified no issues (0 silenced).
+- `pytest --collect-only`: ✅ 255 tests collected.
+- Slice: `pytest base_feature_app/tests/test_admin.py -v`: ✅ 7 passed in 11.18s.
 
 ---
 
@@ -126,100 +167,8 @@ All backend CVEs are resolvable via patch+minor updates within the existing pinn
 - `jest-environment-jsdom` 29.x → 30.x
 - `vite` 6.x → 8.x
 
-The chain `jest-environment-jsdom → jsdom → http-proxy-agent → @tootallnate/once` requires a major jest ecosystem bump (29 → 30) to clear; therefore those four low-severity advisories remain.
+The chain `jest-environment-jsdom → jsdom → http-proxy-agent → @tootallnate/once` requires a major jest ecosystem bump (29→30) to clear; those four low-severity advisories remain.
 
 ### Backend
 - `gunicorn` 23.x → 25.x (constraint in requirements is `>=23.0,<24.0`)
-
----
-
-## Reproducibility Commands
-
-```bash
-# Setup
-cd /home/dev-env/repos/base_django_vue_feature
-git fetch origin
-git checkout origin/master
-git checkout -b double-check-30042026
-
-# Frontend
-cd frontend
-npm install
-npm audit --json > /tmp/base_django_vue_feature-npm-audit.json
-npm outdated --json > /tmp/base_django_vue_feature-npm-outdated.json
-
-# Backend
-cd ../backend
-python3 -m venv .venv-audit
-.venv-audit/bin/pip install --upgrade pip pip-audit
-.venv-audit/bin/pip install -r requirements.txt
-.venv-audit/bin/pip-audit -r requirements.txt --format json > /tmp/base_django_vue_feature-pip-audit.json
-.venv-audit/bin/pip list --outdated --format json > /tmp/base_django_vue_feature-pip-outdated.json
-```
-
----
-
-## Updates Applied
-
-### Frontend (commit `deps(frontend): apply patch+minor updates`)
-
-| Package | From | To |
-|---|---|---|
-| @babel/preset-env | 7.29.0 | 7.29.2 |
-| @playwright/test | 1.58.2 | 1.59.1 |
-| @tailwindcss/postcss | 4.2.1 | 4.2.4 |
-| @unhead/vue | 2.1.12 | 2.1.13 |
-| @vue/test-utils | 2.4.6 | 2.4.10 |
-| autoprefixer | 10.4.24 | 10.5.0 |
-| axios | 1.13.5 | 1.15.2 |
-| eslint | 9.39.3 | 9.39.4 |
-| gsap | 3.14.2 | 3.15.0 |
-| postcss | 8.5.6 | 8.5.12 |
-| sweetalert2 | 11.26.20 | 11.26.24 |
-| tailwindcss | 4.2.1 | 4.2.4 |
-| v8-to-istanbul | 9.2.0 | 9.3.0 |
-| vite | 6.4.1 | 6.4.2 |
-| vue | 3.5.29 | 3.5.33 |
-| vue-i18n | 11.2.8 | 11.4.0 |
-| vue-router | 5.0.3 | 5.0.6 |
-| vue3-google-login | 2.0.37 | 2.0.42 |
-
-Plus transitive resolution updates from `npm audit fix` for: brace-expansion, defu, flatted, follow-redirects, picomatch, unhead, yaml, postcss, axios.
-
-After updates: `npm audit` → 0 critical / 0 high / 0 moderate / **4 low remain**, all from the `jest-environment-jsdom@29 → jsdom → http-proxy-agent → @tootallnate/once` chain that requires major bumps (jest 30) we declined to apply.
-
-### Backend (commit `deps(backend): apply patch+minor updates`)
-
-| Package | From | To |
-|---|---|---|
-| Django | 6.0.2 | 6.0.4 |
-| Faker | 40.5.1 | 40.15.0 |
-| coverage | 7.13.4 | 7.13.5 |
-| djangorestframework | 3.16.1 | 3.17.1 |
-| google-auth | 2.48.0 | 2.49.2 |
-| google-auth-oauthlib | 1.2.4 | 1.3.1 |
-| mysqlclient | 2.2.4 | 2.2.8 |
-| pillow | 12.1.1 | 12.2.0 |
-| pytest | 9.0.2 | 9.0.3 |
-| pytest-cov | 7.0.0 | 7.1.0 |
-| python-dotenv | 1.2.1 | 1.2.2 |
-| requests | 2.32.5 | 2.33.1 |
-| ruff | 0.15.2 | 0.15.12 |
-
-After updates: `pip-audit -r requirements.txt` → **No known vulnerabilities found** (all 11 advisories resolved).
-
-### Verification
-
-- `npm run build` → success (Vite 6.4.2, 24s)
-- `npm test` → 321 passed; 1 pre-existing test file (`test/views/AdminLogin.test.js`) fails to load due to babel-jest hoist guarding non-`mock`-prefixed variables (`replace`, `restoreSession`) inside `jest.mock()` factories. Same code exists on master; not introduced by these dependency updates.
-- `python manage.py check` → 0 issues
-- `pytest` → 255 passed in 113s
-
-### Rollbacks
-
-None required — every targeted patch+minor bump installed cleanly and tests/build remained green for all packages.
-
-### Notes
-
-- gunicorn `>=23.0,<24.0` constraint kept; latest 25.3.0 would be a major.
-- jest / jest-environment-jsdom / babel-jest / eslint / vite / @unhead/vue / @vitejs/plugin-vue major bumps deferred per "no major" rule. The 4 remaining low-severity advisories (jsdom chain) are blocked behind the jest 29 → 30 major.
+- `huey` 2.x → 3.x
