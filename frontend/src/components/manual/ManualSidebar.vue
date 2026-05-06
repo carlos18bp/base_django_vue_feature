@@ -3,7 +3,7 @@
   <div class="lg:hidden mb-4">
     <button
       type="button"
-      class="flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800 transition-colors"
+      class="flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
       :aria-expanded="mobileOpen"
       @click="mobileOpen = !mobileOpen"
     >
@@ -12,13 +12,13 @@
     </button>
     <div
       v-if="mobileOpen"
-      class="mt-2 rounded-2xl border border-gray-200 bg-white p-3 shadow-lg"
+      class="mt-2 rounded-2xl border border-border bg-card p-3 shadow-lg"
     >
       <nav :aria-label="$t('manual.sidebar.title')" class="flex flex-col gap-1">
         <div v-for="section in sections" :key="section.id" class="flex flex-col">
           <button
             type="button"
-            class="group flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold text-gray-900 transition-colors hover:bg-gray-50"
+            class="group flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold text-foreground transition-colors hover:bg-muted"
             :aria-expanded="!isCollapsed(section.id)"
             :aria-controls="`manual-section-m-${section.id}`"
             @click="toggle(section.id)"
@@ -40,7 +40,7 @@
             <li v-for="process in section.processes" :key="process.id">
               <a
                 :href="'#' + process.id"
-                class="block rounded-md border-l-2 border-transparent pl-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 hover:border-gray-900"
+                class="block rounded-md border-l-2 border-transparent pl-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground hover:border-foreground"
                 @click="mobileOpen = false"
               >
                 {{ process.title[locale] }}
@@ -55,16 +55,16 @@
   <!-- Desktop -->
   <aside class="hidden lg:block w-72 flex-shrink-0">
     <div
-      class="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto rounded-2xl border border-gray-200 bg-white p-4"
+      class="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto rounded-2xl border border-border bg-card p-4"
     >
-      <h2 class="mb-3 px-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
+      <h2 class="mb-3 px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
         {{ $t('manual.sidebar.title') }}
       </h2>
       <nav :aria-label="$t('manual.sidebar.title')" class="flex flex-col gap-1">
         <div v-for="section in sections" :key="section.id" class="flex flex-col">
           <button
             type="button"
-            class="group flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold text-gray-900 transition-colors hover:bg-gray-50"
+            class="group flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold text-foreground transition-colors hover:bg-muted"
             :aria-expanded="!isCollapsed(section.id)"
             :aria-controls="`manual-section-${section.id}`"
             @click="toggle(section.id)"
@@ -86,7 +86,7 @@
             <li v-for="process in section.processes" :key="process.id">
               <a
                 :href="'#' + process.id"
-                class="block rounded-md border-l-2 border-transparent pl-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 hover:border-gray-900"
+                class="block rounded-md border-l-2 border-transparent pl-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground hover:border-foreground"
               >
                 {{ process.title[locale] }}
               </a>

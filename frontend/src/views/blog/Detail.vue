@@ -6,7 +6,7 @@
                 <img :src="blog.image_url" class="object-cover w-full h-full"/>
             </div>
 
-            <div class="bg-white absolute bottom-0 -left-px p-8 pt-4 flex flex-col">
+            <div class="bg-card text-card-foreground absolute bottom-0 -left-px p-8 pt-4 flex flex-col">
                 <h1 v-if="currentLanguage === 'en'" class="font-bold text-4xl tracking-wider">{{ blog.title }}</h1>
             </div>
         </div>

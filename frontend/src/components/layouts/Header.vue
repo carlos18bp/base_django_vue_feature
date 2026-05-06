@@ -1,32 +1,32 @@
 <template>
-    <header class="bg-white shadow-sm sticky top-0 z-50">
+    <header class="bg-card shadow-sm sticky top-0 z-50">
         <!-- Navbar for large screens -->
         <nav class="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8" aria-label="Global">
             <!-- Logo/Brand -->
             <div class="flex lg:flex-1">
-                <router-link to="/" class="text-xl font-bold text-gray-900">
+                <router-link to="/" class="text-xl font-bold text-foreground">
                     Base Project
                 </router-link>
             </div>
 
             <!-- Desktop Navigation Links -->
             <div class="hidden lg:flex lg:gap-x-8">
-                <router-link to="/" class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-600">
+                <router-link to="/" class="text-sm font-semibold leading-6 text-foreground hover:text-muted-foreground">
                     Home
                 </router-link>
-                <router-link to="/blogs" class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-600">
+                <router-link to="/blogs" class="text-sm font-semibold leading-6 text-foreground hover:text-muted-foreground">
                     Blogs
                 </router-link>
-                <router-link to="/catalog" class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-600">
+                <router-link to="/catalog" class="text-sm font-semibold leading-6 text-foreground hover:text-muted-foreground">
                     Catalog
                 </router-link>
-                <router-link to="/manual" class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-600">
+                <router-link to="/manual" class="text-sm font-semibold leading-6 text-foreground hover:text-muted-foreground">
                     Manual
                 </router-link>
-                <router-link to="/about_us" class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-600">
+                <router-link to="/about_us" class="text-sm font-semibold leading-6 text-foreground hover:text-muted-foreground">
                     About Us
                 </router-link>
-                <router-link to="/contact" class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-600">
+                <router-link to="/contact" class="text-sm font-semibold leading-6 text-foreground hover:text-muted-foreground">
                     Contact
                 </router-link>
             </div>
@@ -34,37 +34,40 @@
             <!-- Right side actions -->
             <div class="hidden lg:flex lg:flex-1 lg:justify-end lg:gap-x-4 items-center">
                 <!-- Search icon -->
-                <button @click="showSearchBar = true" class="p-2 hover:bg-gray-100 rounded-full" data-testid="header-search">
-                    <MagnifyingGlassIcon class="h-6 w-6 text-gray-900" />
+                <button @click="showSearchBar = true" class="p-2 hover:bg-accent rounded-full" data-testid="header-search">
+                    <MagnifyingGlassIcon class="h-6 w-6 text-foreground" />
                 </button>
 
                 <!-- Shopping cart -->
-                <button @click="showShoppingCart = true" class="relative p-2 hover:bg-gray-100 rounded-full" data-testid="header-cart">
-                    <ShoppingBagIcon class="h-6 w-6 text-gray-900" />
+                <button @click="showShoppingCart = true" class="relative p-2 hover:bg-accent rounded-full" data-testid="header-cart">
+                    <ShoppingBagIcon class="h-6 w-6 text-foreground" />
                     <span v-if="totalCartProducts > 0"
-                        class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                        class="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
                         {{ totalCartProducts }}
                     </span>
                 </button>
 
+                <!-- Theme toggle -->
+                <ThemeToggle />
+
                 <!-- Auth buttons -->
                 <template v-if="isAuthenticated">
                     <router-link to="/dashboard"
-                        class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-600">
+                        class="text-sm font-semibold leading-6 text-foreground hover:text-muted-foreground">
                         Dashboard
                     </router-link>
                     <button @click="handleSignOut" data-testid="header-sign-out"
-                        class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-600">
+                        class="text-sm font-semibold leading-6 text-foreground hover:text-muted-foreground">
                         Sign Out
                     </button>
                 </template>
                 <template v-else>
                     <router-link to="/sign_in"
-                        class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-600">
+                        class="text-sm font-semibold leading-6 text-foreground hover:text-muted-foreground">
                         Sign In
                     </router-link>
                     <router-link to="/sign_up"
-                        class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">
+                        class="rounded-md bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90">
                         Sign Up
                     </router-link>
                 </template>
@@ -73,7 +76,7 @@
             <!-- Mobile menu button -->
             <div class="flex lg:hidden">
                 <button type="button" @click="mobileMenuOpen = true"
-                    class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700">
+                    class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                     <span class="sr-only">Open main menu</span>
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -87,12 +90,12 @@
         <div v-if="mobileMenuOpen" class="lg:hidden" role="dialog" aria-modal="true">
             <div class="fixed inset-0 z-50"></div>
             <div
-                class="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
+                class="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-card px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-border">
                 <div class="flex items-center justify-between">
-                    <router-link to="/" class="text-xl font-bold text-gray-900" @click="mobileMenuOpen = false">
+                    <router-link to="/" class="text-xl font-bold text-foreground" @click="mobileMenuOpen = false">
                         Base Project
                     </router-link>
-                    <button type="button" @click="mobileMenuOpen = false" class="-m-2.5 rounded-md p-2.5 text-gray-700">
+                    <button type="button" @click="mobileMenuOpen = false" class="-m-2.5 rounded-md p-2.5 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                         <span class="sr-only">Close menu</span>
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -100,51 +103,51 @@
                     </button>
                 </div>
                 <div class="mt-6 flow-root">
-                    <div class="-my-6 divide-y divide-gray-500/10">
+                    <div class="-my-6 divide-y divide-border">
                         <div class="space-y-2 py-6">
                             <router-link to="/" @click="mobileMenuOpen = false"
-                                class="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                                class="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-foreground hover:bg-muted">
                                 Home
                             </router-link>
                             <router-link to="/blogs" @click="mobileMenuOpen = false"
-                                class="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                                class="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-foreground hover:bg-muted">
                                 Blogs
                             </router-link>
                             <router-link to="/catalog" @click="mobileMenuOpen = false"
-                                class="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                                class="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-foreground hover:bg-muted">
                                 Catalog
                             </router-link>
                             <router-link to="/manual" @click="mobileMenuOpen = false"
-                                class="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                                class="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-foreground hover:bg-muted">
                                 Manual
                             </router-link>
                             <router-link to="/about_us" @click="mobileMenuOpen = false"
-                                class="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                                class="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-foreground hover:bg-muted">
                                 About Us
                             </router-link>
                             <router-link to="/contact" @click="mobileMenuOpen = false"
-                                class="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                                class="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-foreground hover:bg-muted">
                                 Contact
                             </router-link>
                         </div>
                         <div class="py-6">
                             <template v-if="isAuthenticated">
                                 <router-link to="/dashboard" @click="mobileMenuOpen = false"
-                                    class="block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                                    class="block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-foreground hover:bg-muted">
                                     Dashboard
                                 </router-link>
                                 <button @click="handleSignOut" data-testid="mobile-sign-out"
-                                    class="block w-full text-left rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                                    class="block w-full text-left rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-foreground hover:bg-muted">
                                     Sign Out
                                 </button>
                             </template>
                             <template v-else>
                                 <router-link to="/sign_in" @click="mobileMenuOpen = false"
-                                    class="block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                                    class="block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-foreground hover:bg-muted">
                                     Sign In
                                 </router-link>
                                 <router-link to="/sign_up" @click="mobileMenuOpen = false"
-                                    class="block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                                    class="block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-foreground hover:bg-muted">
                                     Sign Up
                                 </router-link>
                             </template>
@@ -170,6 +173,7 @@
     import { MagnifyingGlassIcon, ShoppingBagIcon } from '@heroicons/vue/24/outline';
     import SearchBar from "@/components/layouts/SearchBar.vue";
     import ShoppingCart from "@/components/product/ShoppingCart.vue";
+    import ThemeToggle from "@/components/layouts/ThemeToggle.vue";
     import { useAuthStore } from "@/stores/auth";
     import { useProductStore } from "@/stores/product";
 

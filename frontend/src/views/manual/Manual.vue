@@ -5,13 +5,13 @@
 
       <div class="min-w-0 flex-1">
         <header class="mb-6">
-          <p class="text-sm uppercase tracking-wider text-indigo-600">
+          <p class="text-sm uppercase tracking-wider text-primary">
             {{ $t('manual.eyebrow') }}
           </p>
-          <h1 class="mt-1 text-3xl lg:text-4xl font-semibold text-gray-900">
+          <h1 class="mt-1 text-3xl lg:text-4xl font-semibold text-foreground">
             {{ $t('manual.title') }}
           </h1>
-          <p class="mt-3 max-w-3xl text-gray-600">
+          <p class="mt-3 max-w-3xl text-muted-foreground">
             {{ $t('manual.subtitle') }}
           </p>
         </header>
@@ -27,13 +27,13 @@
             :key="section.id"
             class="scroll-mt-24"
           >
-            <header class="mb-4 flex items-center gap-3 border-b border-gray-200 pb-3">
+            <header class="mb-4 flex items-center gap-3 border-b border-border pb-3">
               <span
-                class="h-9 w-9 rounded-xl bg-gray-100 text-gray-900 flex items-center justify-center"
+                class="h-9 w-9 rounded-xl bg-muted text-foreground flex items-center justify-center"
               >
                 <component :is="section.icon" class="h-5 w-5" />
               </span>
-              <h2 class="text-xl font-semibold text-gray-900">
+              <h2 class="text-xl font-semibold text-foreground">
                 {{ section.title[manualLocale] }}
               </h2>
             </header>

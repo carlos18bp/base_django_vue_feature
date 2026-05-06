@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-[calc(100vh-64px)] flex items-center justify-center bg-gray-50 text-gray-600">
+  <div class="min-h-[calc(100vh-64px)] flex items-center justify-center bg-muted text-muted-foreground">
     Signing in...
   </div>
 </template>

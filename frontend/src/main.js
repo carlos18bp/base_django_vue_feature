@@ -8,6 +8,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css'; // Import bootstrap icons
 import globalMixin from '@/mixins/globalMixin';
 import i18n from '@/i18n';
 import vue3GoogleLogin from 'vue3-google-login';
+import { useThemeStore } from '@/stores/theme';
 
 const initializeApp = () => {
   const app = createApp(App); // Create a new Vue application instance
@@ -33,6 +34,7 @@ const initializeApp = () => {
   }
 
   app.use(pinia); // Use Pinia for state management in the app
+  useThemeStore().init();
   app.use(router); // Use the router instance in the app
   app.use(i18n);
 

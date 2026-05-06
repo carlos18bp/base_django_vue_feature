@@ -4,18 +4,18 @@
             <h1 class="text-4xl font-bold tracking-tight">
                 Base Django + Vue Feature Template
             </h1>
-            <p class="mt-3 text-gray-600">
+            <p class="mt-3 text-muted-foreground">
                 Example project with Django REST Framework, JWT auth, django_attachments, and a Vue 3 frontend.
             </p>
 
             <div class="mt-6 flex flex-wrap gap-3">
-                <RouterLink class="bg-black text-white rounded px-4 py-2" :to="{ name: 'catalog' }">
+                <RouterLink class="bg-primary text-primary-foreground rounded px-4 py-2 hover:bg-primary/90" :to="{ name: 'catalog' }">
                     Browse Catalog
                 </RouterLink>
-                <RouterLink class="border border-black rounded px-4 py-2" :to="{ name: 'blogs' }">
+                <RouterLink class="border border-border rounded px-4 py-2 hover:bg-accent hover:text-accent-foreground" :to="{ name: 'blogs' }">
                     Read Blogs
                 </RouterLink>
-                <RouterLink class="border border-black rounded px-4 py-2" :to="{ name: 'dashboard' }">
+                <RouterLink class="border border-border rounded px-4 py-2 hover:bg-accent hover:text-accent-foreground" :to="{ name: 'dashboard' }">
                     Dashboard (JWT)
                 </RouterLink>
             </div>

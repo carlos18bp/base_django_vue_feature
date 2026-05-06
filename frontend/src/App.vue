@@ -1,14 +1,16 @@
 <template>
-    <!-- Global Header for all pages -->
-    <Header />
-    
-    <!-- Main content area -->
-    <main class="min-h-screen">
-        <RouterView />
-    </main>
-    
-    <!-- Global Footer for all pages -->
-    <Footer />
+    <StagingGate>
+        <!-- Global Header for all pages -->
+        <Header />
+
+        <!-- Main content area -->
+        <main class="min-h-screen">
+            <RouterView />
+        </main>
+
+        <!-- Global Footer for all pages -->
+        <Footer />
+    </StagingGate>
 </template>
 
 <script setup>
@@ -16,6 +18,7 @@
     import { RouterView } from "vue-router";
     import Header from "@/components/layouts/Header.vue";
     import Footer from "@/components/layouts/Footer.vue";
+    import StagingGate from "@/components/staging/StagingGate.vue";
     import { useBlogStore } from "@/stores/blog";
     import { useProductStore } from '@/stores/product';
 

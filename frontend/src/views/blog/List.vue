@@ -31,9 +31,9 @@
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12 pb-8">
                 <BlogPresentation v-for="blog in paginatedBlogs" :blog="blog"></BlogPresentation>
             </div>
-            <nav class="flex items-center justify-between border-t border-gray-200 px-4 sm:px-0">
+            <nav class="flex items-center justify-between border-t border-border px-4 sm:px-0">
                 <!-- Previous page button -->
-                <a class="cursor-pointer inline-flex items-center border-t-2 border-transparent pr-1 pt-4 text-sm font-medium text-gray-500 hover:border-slate-900 hover:text-slate-900"
+                <a class="cursor-pointer inline-flex items-center border-t-2 border-transparent pr-1 pt-4 text-sm font-medium text-muted-foreground hover:border-foreground hover:text-foreground"
                     @click="goToPage(currentPage - 1)" :disabled="currentPage === 1">
                     <ArrowLongLeftIcon class="mr-3 h-5 w-5" aria-hidden="true" />
                     previous
@@ -44,8 +44,8 @@
                     <template v-for="page in totalPages" :key="page">
                         <a class="cursor-pointer inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium"
                             :class="{
-                                'border-b-slate-400': currentPage === page,
-                                'text-gray-500 hover:text-slate-900 hover:border-slate-900':
+                                'border-b-muted-foreground': currentPage === page,
+                                'text-muted-foreground hover:text-foreground hover:border-foreground':
                                     currentPage !== page,
                             }" @click="goToPage(page)">
                             {{ page }}
@@ -54,7 +54,7 @@
                 </div>
 
                 <!-- Next page button -->
-                <a class="cursor-pointer inline-flex items-center border-t-2 border-transparent pl-1 pt-4 text-sm font-medium text-gray-500 hover:border-slate-900 hover:text-slate-900"
+                <a class="cursor-pointer inline-flex items-center border-t-2 border-transparent pl-1 pt-4 text-sm font-medium text-muted-foreground hover:border-foreground hover:text-foreground"
                     @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages">
                     Next
                     <ArrowLongRightIcon class="ml-3 h-5 w-5" aria-hidden="true" />

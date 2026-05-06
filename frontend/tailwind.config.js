@@ -1,15 +1,13 @@
-import flowbite from 'flowbite/plugin'
+import flowbite from 'flowbite/plugin';
 
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
-    "./index.html",
-    "./src/**/*.{vue,js,ts,jsx,tsx}",
-    "./node_modules/flowbite/**/*.js",
+    './index.html',
+    './src/**/*.{vue,js,ts,jsx,tsx}',
+    './node_modules/flowbite/**/*.js',
   ],
-  theme: {
-    extend: {},
-  },
+  theme: { extend: {} },
   plugins: [flowbite],
-}
-
+};

@@ -3,17 +3,17 @@
     <div v-if="blogsOnTrending && blogsOnTrending.length" class="carousel-container p-16">
         <div class="text-center mb-8">
             <h2 class="text-3xl font-semibold">TRENDING NOW</h2>
-            <p class="text-xl font-medium text-gray-500">
+            <p class="text-xl font-medium text-muted-foreground">
                 Discover the trending blogs. |
                 <RouterLink :to="{ name: 'blogs'}">
-                    <span class="border-b-2 border-b-gray-500">Explore now</span>
+                    <span class="border-b-2 border-b-muted-foreground">Explore now</span>
                 </RouterLink>
             </p>
         </div>
         <div class="relative">
             <!-- Previous button for carousel -->
             <button
-                class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black text-white rounded-full shadow size-6 flex items-center justify-center z-10"
+                class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-primary text-primary-foreground rounded-full shadow size-6 flex items-center justify-center z-10"
                 @click="prev" data-testid="blog-carousel-prev">
                 <span class="sr-only">Previous</span>
                 <span class="block text-sm leading-none">&lsaquo;</span>
@@ -44,7 +44,7 @@
             </div>
             <!-- Next button for carousel -->
             <button
-                class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black text-white rounded-full shadow size-6 flex items-center justify-center z-10"
+                class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-primary text-primary-foreground rounded-full shadow size-6 flex items-center justify-center z-10"
                 @click="next" data-testid="blog-carousel-next">
                 <span class="sr-only">Next</span>
                 <span class="block text-sm leading-none">&rsaquo;</span>

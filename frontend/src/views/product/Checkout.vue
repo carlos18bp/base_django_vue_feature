@@ -25,11 +25,11 @@
                         Contact Information
                     </h2>
                     <div class="mt-4">
-                        <label class="block text-gray-500 mb-2 font-semibold text-lg">
+                        <label class="block text-muted-foreground mb-2 font-semibold text-lg">
                             Email Address
                         </label>
                         <input type="email" v-model="form.email"
-                            class="w-full p-3 border border-gray-500 rounded-lg bg-transparent"
+                            class="w-full p-3 border border-border rounded-lg bg-transparent text-foreground"
                             data-testid="checkout-email"
                             required />
                     </div>
@@ -38,28 +38,28 @@
                         Payment details
                     </h2>
                     <div class="mt-4">
-                        <label class="block text-gray-500 mb-2 font-semibold text-lg">
+                        <label class="block text-muted-foreground mb-2 font-semibold text-lg">
                             Card Number
                         </label>
                         <input type="text" v-model="form.cardNumber"
-                            class="w-full p-3 border border-gray-500 rounded-lg bg-transparent"
+                            class="w-full p-3 border border-border rounded-lg bg-transparent text-foreground"
                             data-testid="checkout-card-number"
                             required />
                     </div>
                     <div class="mt-4 grid grid-cols-4 gap-4">
                         <div class="col-span-3">
-                            <label class="block text-gray-500 mb-2 font-semibold text-lg">
+                            <label class="block text-muted-foreground mb-2 font-semibold text-lg">
                                 Expiration Date
                             </label>
                             <input type="text" v-model="form.expirationDate"
-                                class="w-full p-3 border border-gray-500 rounded-lg bg-transparent"
+                                class="w-full p-3 border border-border rounded-lg bg-transparent text-foreground"
                                 data-testid="checkout-expiry"
                                 required />
                         </div>
                         <div class="col-span-1">
-                            <label class="block text-gray-500 mb-2 font-semibold text-lg">CVC</label>
+                            <label class="block text-muted-foreground mb-2 font-semibold text-lg">CVC</label>
                             <input type="text" v-model="form.cvc"
-                                class="w-full p-3 border border-gray-500 rounded-lg bg-transparent"
+                                class="w-full p-3 border border-border rounded-lg bg-transparent text-foreground"
                                 data-testid="checkout-cvc"
                                 required />
                         </div>
@@ -69,39 +69,39 @@
                         Shipping Address
                     </h2>
                     <div class="mt-4">
-                        <label class="block text-gray-500 mb-2 font-semibold text-lg">
+                        <label class="block text-muted-foreground mb-2 font-semibold text-lg">
                             Address
                         </label>
                         <input type="text" v-model="form.address"
-                            class="w-full p-3 border border-gray-500 rounded-lg bg-transparent"
+                            class="w-full p-3 border border-border rounded-lg bg-transparent text-foreground"
                             data-testid="checkout-address"
                             required />
                     </div>
                     <div class="mt-4 grid grid-cols-3 gap-4">
                         <div>
-                            <label class="block text-gray-500 mb-2 font-semibold text-lg">
+                            <label class="block text-muted-foreground mb-2 font-semibold text-lg">
                                 City
                             </label>
                             <input type="text" v-model="form.city"
-                                class="w-full p-3 border border-gray-500 rounded-lg bg-transparent"
+                                class="w-full p-3 border border-border rounded-lg bg-transparent text-foreground"
                                 data-testid="checkout-city"
                                 required />
                         </div>
                         <div>
-                            <label class="block text-gray-500 mb-2 font-semibold text-lg">
+                            <label class="block text-muted-foreground mb-2 font-semibold text-lg">
                                 State/Province
                             </label>
                             <input type="text" v-model="form.state"
-                                class="w-full p-3 border border-gray-500 rounded-lg bg-transparent"
+                                class="w-full p-3 border border-border rounded-lg bg-transparent text-foreground"
                                 data-testid="checkout-state"
                                 required />
                         </div>
                         <div>
-                            <label class="block text-gray-500 mb-2 font-semibold text-lg">
+                            <label class="block text-muted-foreground mb-2 font-semibold text-lg">
                                 Postal Code
                             </label>
                             <input type="text" v-model="form.postalCode"
-                                class="w-full p-3 border border-gray-500 rounded-lg bg-transparent"
+                                class="w-full p-3 border border-border rounded-lg bg-transparent text-foreground"
                                 data-testid="checkout-postal-code"
                                 required />
                         </div>
@@ -109,7 +109,7 @@
 
                     <div class="flex justify-end mt-6">
                         <button type="submit"
-                            class="w-36 bg-black text-white p-3 rounded-lg hover:bg-slate-200 hover:text-black font-semibold text-lg tracking-wider">
+                            class="w-36 bg-primary text-primary-foreground p-3 rounded-lg hover:bg-primary/90 font-semibold text-lg tracking-wider">
                             Pay Now
                         </button>
                     </div>
@@ -176,7 +176,7 @@
         </div>
 
         <!-- Footer -->
-        <div class="bg-black p-4 text-start text-lg font-medium">
+        <div class="bg-primary text-primary-foreground p-4 text-start text-lg font-medium">
             © 2024 Senses Candles By Kate. All rights reserved.
         </div>
     </div>

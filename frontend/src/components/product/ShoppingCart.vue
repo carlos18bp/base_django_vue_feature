@@ -1,16 +1,16 @@
 <template>
     <!-- Shopping Cart Overlay -->
     <div class="fixed inset-0 flex justify-end z-50" v-if="visible">
-        <div ref="background" 
-            @click="closeCart()" 
-            class="absolute inset-0 bg-gray-500 bg-opacity-40 backdrop-blur-md" data-testid="cart-overlay">
+        <div ref="background"
+            @click="closeCart()"
+            class="absolute inset-0 bg-foreground/40 backdrop-blur-md" data-testid="cart-overlay">
         </div>
-        <div ref="cart" class="relative bg-white h-full w-full lg:w-2/5 shadow-lg flex flex-col z-60">
+        <div ref="cart" class="relative bg-card text-card-foreground h-full w-full lg:w-2/5 shadow-lg flex flex-col z-60">
             <!-- Cart Header -->
             <div class="flex justify-between items-center p-10">
                 <h2 class="text-2xl font-semibold">Shopping Cart</h2>
                 <button @click="closeCart()" data-testid="cart-close" class="cursor-pointer">
-                    <XMarkIcon class="text-gray-500 w-6 h-6" />
+                    <XMarkIcon class="text-muted-foreground w-6 h-6" />
                 </button>
             </div>
 
@@ -24,17 +24,17 @@
             </div>
             <div v-else class="text-lg ps-10">
                 <p>No products</p>
-                <RouterLink :to="{ name: 'catalog' }" class="cursor-pointer border-b-black">
+                <RouterLink :to="{ name: 'catalog' }" class="cursor-pointer border-b border-foreground">
                     Continue Shopping
                 </RouterLink>
             </div>
 
             <!-- Cart Footer -->
-            <div v-if="cartProducts.length" class="border-t p-4">
+            <div v-if="cartProducts.length" class="border-t border-border p-4">
                 <div class="flex justify-between items-center mb-4">
                     <div>
                         <h3 class="text-2xl font-semibold">Subtotal</h3>
-                        <p class="text-md text-gray-500 font-medium">
+                        <p class="text-md text-muted-foreground font-medium">
                             Shipping calculated at checkout.
                         </p>
                     </div>
@@ -42,12 +42,12 @@
                 </div>
                 <router-link :to="{ name: 'checkout' }">
                     <button
-                        class="w-full mt-4 bg-black text-white py-2 rounded-lg hover:bg-slate-200 hover:text-black font-medium text-xl tracking-wide">
+                        class="w-full mt-4 bg-primary text-primary-foreground py-2 rounded-lg hover:bg-primary/90 font-medium text-xl tracking-wide">
                         Checkout
                     </button>
                 </router-link>
                 <div class="text-center mt-4 text-lg">
-                    <RouterLink :to="{ name: 'catalog' }" class="cursor-pointer border-b-2 border-black">
+                    <RouterLink :to="{ name: 'catalog' }" class="cursor-pointer border-b-2 border-foreground">
                         Or Continue Shopping
                     </RouterLink>
                 </div>

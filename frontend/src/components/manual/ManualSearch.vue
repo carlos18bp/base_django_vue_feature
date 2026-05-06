@@ -1,9 +1,9 @@
 <template>
   <div class="relative">
     <label
-      class="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20"
+      class="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/20"
     >
-      <Search class="h-4 w-4 text-gray-500" aria-hidden="true" />
+      <Search class="h-4 w-4 text-muted-foreground" aria-hidden="true" />
       <input
         ref="inputRef"
         v-model="query"
@@ -11,7 +11,7 @@
         role="searchbox"
         :aria-label="$t('manual.search.placeholder')"
         :placeholder="$t('manual.search.placeholder')"
-        class="flex-1 bg-transparent text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none"
+        class="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
         @keydown.down.prevent="onArrowDown"
         @keydown.up.prevent="onArrowUp"
         @keydown.enter.prevent="onEnter"
@@ -20,14 +20,14 @@
       <button
         v-if="query"
         type="button"
-        class="text-gray-500 hover:text-gray-700"
+        class="text-muted-foreground hover:text-foreground"
         :aria-label="$t('manual.search.clear')"
         @click="clearQuery"
       >
         <X class="h-4 w-4" />
       </button>
       <kbd
-        class="hidden md:inline-flex items-center gap-0.5 rounded border border-gray-200 bg-gray-50 px-1.5 py-0.5 text-[10px] font-medium text-gray-500"
+        class="hidden md:inline-flex items-center gap-0.5 rounded border border-border bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground"
       >
         &#8984;K
       </kbd>
@@ -35,11 +35,11 @@
 
     <div
       v-if="isSearching"
-      class="absolute left-0 right-0 top-full z-40 mt-2 max-h-96 overflow-y-auto rounded-2xl border border-gray-200 bg-white p-2 shadow-xl"
+      class="absolute left-0 right-0 top-full z-40 mt-2 max-h-96 overflow-y-auto rounded-2xl border border-border bg-popover text-popover-foreground p-2 shadow-xl"
     >
       <p
         v-if="results.length === 0"
-        class="px-4 py-6 text-center text-sm text-gray-500"
+        class="px-4 py-6 text-center text-sm text-muted-foreground"
       >
         {{ $t('manual.search.noResults') }}
       </p>
@@ -50,19 +50,19 @@
             role="option"
             :aria-selected="idx === highlighted"
             class="flex w-full flex-col gap-1 rounded-xl px-3 py-2 text-left transition-colors"
-            :class="idx === highlighted ? 'bg-indigo-50' : 'hover:bg-gray-50'"
+            :class="idx === highlighted ? 'bg-accent text-accent-foreground' : 'hover:bg-muted'"
             @mouseenter="highlighted = idx"
             @click="handleSelect(hit.process.id)"
           >
-            <span class="text-sm font-medium text-gray-900">
+            <span class="text-sm font-medium text-foreground">
               {{ hit.process.title[locale] }}
             </span>
-            <span class="text-xs text-gray-600 line-clamp-2">
+            <span class="text-xs text-muted-foreground line-clamp-2">
               {{ hit.process.summary[locale] }}
             </span>
             <code
               v-if="hit.process.route"
-              class="inline-block w-fit rounded-md bg-gray-100 px-1.5 py-0.5 text-[11px] text-gray-700"
+              class="inline-block w-fit rounded-md bg-muted px-1.5 py-0.5 text-[11px] text-foreground"
             >
               {{ hit.process.route }}
             </code>
@@ -99,7 +99,7 @@ const sectionsRef = computed(() => props.sections);
 const { results, isSearching } = useManualSearch(query, localeRef, sectionsRef);
 
 const HIGHLIGHT_MS = 1600;
-const HIGHLIGHT_CLASSES = ['ring-2', 'ring-indigo-500', 'ring-offset-2', 'ring-offset-white'];
+const HIGHLIGHT_CLASSES = ['ring-2', 'ring-ring', 'ring-offset-2', 'ring-offset-background'];
 
 let highlightTimer = null;
 let highlightedEl = null;

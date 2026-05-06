@@ -1,7 +1,7 @@
 <template>
     <!-- Product Section -->
     <div v-if="product" class="relative isolate px-6 lg:px-8">
-        <div class="bg-white">
+        <div class="bg-background">
             <div class="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-6 lg:max-w-7xl lg:px-8">
                 <div class="lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8">
 
@@ -12,12 +12,12 @@
                         <div class="mx-auto mt-6 hidden w-full max-w-2xl sm:block lg:max-w-none">
                             <TabList class="grid grid-cols-4 gap-6">
                                 <Tab v-for="image in product.gallery_urls" :key="image"
-                                    class="relative flex h-24 cursor-pointer items-center justify-center rounded-md bg-white text-sm font-medium uppercase hover:bg-gray-50 transition-transform duration-300 transform hover:scale-110">
+                                    class="relative flex h-24 cursor-pointer items-center justify-center rounded-md bg-card text-sm font-medium uppercase hover:bg-muted transition-transform duration-300 transform hover:scale-110">
                                     <span class="absolute inset-0 overflow-hidden rounded-md">
                                         <img :src="image" alt="" class="h-full w-full object-cover object-center" />
                                     </span>
                                     <span
-                                        :class="[selected ? 'ring-black' : 'ring-transparent', 'pointer-events-none absolute inset-0 rounded-md ring-2 ring-offset-2']"
+                                        :class="[selected ? 'ring-foreground' : 'ring-transparent', 'pointer-events-none absolute inset-0 rounded-md ring-2 ring-offset-2']"
                                         aria-hidden="true" />
                                 </Tab>
                             </TabList>
@@ -65,15 +65,15 @@
 
                         <!-- Quantity Selector and Add to Cart Button -->
                         <div class="flex items-center gap-4 mt-12">
-                            <div class="flex items-center border rounded-full h-12">
+                            <div class="flex items-center border border-border rounded-full h-12">
                                 <button
-                                    class="px-3 py-2 hover:text-gray-800"
+                                    class="px-3 py-2 hover:text-muted-foreground"
                                     @click="decrementQuantity">
                                     <MinusSmallIcon class="h-6 w-6" aria-hidden="true" />
                                 </button>
                                 <span class="px-4 py-2 font-semibold">{{ productQuantity }}</span>
                                 <button
-                                    class="px-3 py-2 hover:text-gray-800"
+                                    class="px-3 py-2 hover:text-muted-foreground"
                                     @click="productQuantity++">
                                     <PlusSmallIcon class="w-6 h-6"/>
                                 </button>
@@ -81,7 +81,7 @@
                             </div>
 
                             <button @click="addToCart"
-                                class="px-8 py-2 w-full h-12 bg-black text-white rounded-full hover:bg-slate-300 text-md">
+                                class="px-8 py-2 w-full h-12 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 text-md">
                                 <span class="uppercase">Add to cart</span>
                             </button>
                         </div>

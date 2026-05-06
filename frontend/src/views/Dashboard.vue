@@ -4,11 +4,11 @@
     <p class="mb-4">This route is protected by a router guard (JWT required).</p>
 
     <div class="flex flex-wrap gap-3 mb-4">
-      <RouterLink class="inline-block border border-black rounded px-3 py-2" :to="{ name: 'backoffice' }">
+      <RouterLink class="inline-block border border-foreground rounded px-3 py-2" :to="{ name: 'backoffice' }">
         Backoffice
       </RouterLink>
 
-      <button class="bg-black text-white rounded px-3 py-2" @click="signOut">{{ $t('auth.sign_out') }}</button>
+      <button class="bg-primary text-primary-foreground rounded px-3 py-2 hover:bg-primary/90" @click="signOut">{{ $t('auth.sign_out') }}</button>
     </div>
   </div>
 </template>

@@ -1,23 +1,23 @@
 <template>
-  <div class="flex flex-col justify-center px-6 py-12 lg:px-8 bg-gray-50 min-h-[calc(100vh-64px)]">
+  <div class="flex flex-col justify-center px-6 py-12 lg:px-8 bg-muted min-h-[calc(100vh-64px)]">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
-      <h2 class="mt-10 text-center text-3xl font-bold tracking-tight text-gray-900">
+      <h2 class="mt-10 text-center text-3xl font-bold tracking-tight text-foreground">
         Create your account
       </h2>
-      <p class="mt-2 text-center text-sm text-gray-600">
+      <p class="mt-2 text-center text-sm text-muted-foreground">
         Already have an account?
-        <router-link to="/sign_in" class="font-semibold text-indigo-600 hover:text-indigo-500">
+        <router-link to="/sign_in" class="font-semibold text-primary hover:text-primary/90">
           Sign in
         </router-link>
       </p>
     </div>
 
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-md">
-      <div class="bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12">
+      <div class="bg-card text-card-foreground px-6 py-12 shadow sm:rounded-lg sm:px-12">
         <form class="space-y-6" @submit.prevent="handleSignUp">
           <!-- First Name -->
           <div>
-            <label for="firstName" class="block text-sm font-medium leading-6 text-gray-900">
+            <label for="firstName" class="block text-sm font-medium leading-6 text-foreground">
               First Name
             </label>
             <div class="mt-2">
@@ -27,7 +27,7 @@
                 name="firstName"
                 type="text"
                 required
-                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-3"
+                class="block w-full rounded-md border-0 py-1.5 text-foreground bg-background shadow-sm ring-1 ring-inset ring-border placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6 px-3"
                 placeholder="John"
               />
             </div>
@@ -35,7 +35,7 @@
 
           <!-- Last Name -->
           <div>
-            <label for="lastName" class="block text-sm font-medium leading-6 text-gray-900">
+            <label for="lastName" class="block text-sm font-medium leading-6 text-foreground">
               Last Name
             </label>
             <div class="mt-2">
@@ -45,7 +45,7 @@
                 name="lastName"
                 type="text"
                 required
-                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-3"
+                class="block w-full rounded-md border-0 py-1.5 text-foreground bg-background shadow-sm ring-1 ring-inset ring-border placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6 px-3"
                 placeholder="Doe"
               />
             </div>
@@ -53,7 +53,7 @@
 
           <!-- Email -->
           <div>
-            <label for="email" class="block text-sm font-medium leading-6 text-gray-900">
+            <label for="email" class="block text-sm font-medium leading-6 text-foreground">
               Email address
             </label>
             <div class="mt-2">
@@ -64,7 +64,7 @@
                 type="email"
                 autocomplete="email"
                 required
-                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-3"
+                class="block w-full rounded-md border-0 py-1.5 text-foreground bg-background shadow-sm ring-1 ring-inset ring-border placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6 px-3"
                 placeholder="you@example.com"
               />
             </div>
@@ -72,7 +72,7 @@
 
           <!-- Password -->
           <div>
-            <label for="password" class="block text-sm font-medium leading-6 text-gray-900">
+            <label for="password" class="block text-sm font-medium leading-6 text-foreground">
               Password
             </label>
             <div class="mt-2">
@@ -83,16 +83,16 @@
                 type="password"
                 autocomplete="new-password"
                 required
-                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-3"
+                class="block w-full rounded-md border-0 py-1.5 text-foreground bg-background shadow-sm ring-1 ring-inset ring-border placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6 px-3"
                 placeholder="••••••••"
               />
             </div>
-            <p class="mt-1 text-xs text-gray-500">Minimum 8 characters</p>
+            <p class="mt-1 text-xs text-muted-foreground">Minimum 8 characters</p>
           </div>
 
           <!-- Confirm Password -->
           <div>
-            <label for="confirmPassword" class="block text-sm font-medium leading-6 text-gray-900">
+            <label for="confirmPassword" class="block text-sm font-medium leading-6 text-foreground">
               Confirm Password
             </label>
             <div class="mt-2">
@@ -103,7 +103,7 @@
                 type="password"
                 autocomplete="new-password"
                 required
-                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-3"
+                class="block w-full rounded-md border-0 py-1.5 text-foreground bg-background shadow-sm ring-1 ring-inset ring-border placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6 px-3"
                 placeholder="••••••••"
               />
             </div>
@@ -119,7 +119,7 @@
             <button
               type="submit"
               :disabled="isLoading"
-              class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="flex w-full justify-center rounded-md bg-primary px-3 py-1.5 text-sm font-semibold leading-6 text-primary-foreground shadow-sm hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {{ isLoading ? 'Creating account...' : 'Sign up' }}
             </button>
@@ -130,10 +130,10 @@
           <!-- Divider -->
           <div class="relative mt-10">
             <div class="absolute inset-0 flex items-center" aria-hidden="true">
-              <div class="w-full border-t border-gray-200" />
+              <div class="w-full border-t border-border" />
             </div>
             <div class="relative flex justify-center text-sm font-medium leading-6">
-              <span class="bg-white px-6 text-gray-900">Or continue with</span>
+              <span class="bg-card px-6 text-foreground">Or continue with</span>
             </div>
           </div>
 
@@ -147,11 +147,11 @@
         </template>
 
         <!-- Terms and Privacy -->
-        <p class="mt-10 text-center text-xs leading-5 text-gray-500">
+        <p class="mt-10 text-center text-xs leading-5 text-muted-foreground">
           By signing up, you agree to our
-          <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Terms of Service</a>
+          <a href="#" class="font-semibold text-primary hover:text-primary/90">Terms of Service</a>
           and
-          <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Privacy Policy</a>
+          <a href="#" class="font-semibold text-primary hover:text-primary/90">Privacy Policy</a>
         </p>
       </div>
     </div>

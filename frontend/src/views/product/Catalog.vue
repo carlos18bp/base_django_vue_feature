@@ -7,7 +7,7 @@
                         
                         <!-- Filters -->
                         <div class="col-span-4 md:col-span-1">
-                            <h1 class="text-2xl font-bold tracking-tight text-gray-900 py-8">
+                            <h1 class="text-2xl font-bold tracking-tight text-foreground py-8">
                                 Filter by Category
                             </h1>
 
@@ -19,20 +19,20 @@
                         <!-- Product grid -->
                         <div class="col-span-4 md:col-span-3">
                             <div class="mx-auto pt-8 pb-16 max-w-7xl">
-                                <h2 class="text-2xl font-bold tracking-tight text-gray-900">
+                                <h2 class="text-2xl font-bold tracking-tight text-foreground">
                                     Project Name
                                 </h2>
 
                                 <div class="mt-6 grid gap-x-6 gap-y-10 md:grid-cols-2 xl:grid-cols-3">
                                     <div v-for="product in paginatedProducts" :key="product.id" class="group relative">
                                         <div
-                                            class="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 aspect-none group-hover:opacity-75 h-80 mb-4">
+                                            class="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-muted aspect-none group-hover:opacity-75 h-80 mb-4">
                                             <img v-if="product.gallery_urls[0]" :src="product.gallery_urls[0]"
                                                 class="object-cover object-center h-full w-full" />
                                         </div>
                                         <div class="mt- flex justify-between">
                                             <div>
-                                                <h3 v-if="currentLanguage === 'en'" class="text-sm text-gray-700">
+                                                <h3 v-if="currentLanguage === 'en'" class="text-sm text-foreground">
                                                     <RouterLink v-if="product.id"
                                                         :to="{ name: 'product', params: { product_id: product.id } }">
                                                         <span aria-hidden="true" class="absolute inset-0" />
@@ -40,16 +40,16 @@
                                                     </RouterLink>
                                                 </h3>
                                             </div>
-                                            <p class="text-sm font-medium text-gray-900">
+                                            <p class="text-sm font-medium text-foreground">
                                                 $ {{ product.price }}
                                             </p>
                                         </div>
                                     </div>
                                 </div>
 
-                                <nav class="flex items-center justify-between border-t border-gray-200 px-4 mt-8">
+                                <nav class="flex items-center justify-between border-t border-border px-4 mt-8">
                                     <!-- Previous page button -->
-                                    <a class="cursor-pointer inline-flex items-center border-t-2 border-transparent pr-1 pt-4 text-sm font-medium text-gray-500 hover:border-slate-900 hover:text-slate-900"
+                                    <a class="cursor-pointer inline-flex items-center border-t-2 border-transparent pr-1 pt-4 text-sm font-medium text-muted-foreground hover:border-foreground hover:text-foreground"
                                         @click="goToPage(currentPage - 1)" :disabled="currentPage === 1">
                                         <ArrowLongLeftIcon class="mr-3 h-5 w-5" aria-hidden="true" />
                                         Previous
@@ -60,8 +60,8 @@
                                         <template v-for="page in totalPages" :key="page">
                                             <a class="cursor-pointer inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium"
                                                 :class="{
-                                                    'border-b-slate-500': currentPage === page,
-                                                    'text-gray-500 hover:text-slate-900 hover:border-slate-900': currentPage !== page,
+                                                    'border-b-muted-foreground': currentPage === page,
+                                                    'text-muted-foreground hover:text-foreground hover:border-foreground': currentPage !== page,
                                                 }" @click="goToPage(page)">
                                                 {{ page }}
                                             </a>
@@ -69,7 +69,7 @@
                                     </div>
 
                                     <!-- Next page button -->
-                                    <a class="cursor-pointer inline-flex items-center border-t-2 border-transparent pl-1 pt-4 text-sm font-medium text-gray-500 hover:border-slate-900 hover:text-slate-900"
+                                    <a class="cursor-pointer inline-flex items-center border-t-2 border-transparent pl-1 pt-4 text-sm font-medium text-muted-foreground hover:border-foreground hover:text-foreground"
                                         @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages">
                                         Next
                                         <ArrowLongRightIcon class="ml-3 h-5 w-5" aria-hidden="true" />

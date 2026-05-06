@@ -2,16 +2,16 @@
     <!-- Modal overlay -->
     <div v-if="visible" class="w-screen h-screen">
         <!-- Close modal when clicking outside the modal content -->
-        <div ref="background" @click="closeModal" class="absolute inset-0 bg-gray-500 bg-opacity-40 backdrop-blur-md" data-testid="search-overlay"></div>
+        <div ref="background" @click="closeModal" class="absolute inset-0 bg-foreground/40 backdrop-blur-md" data-testid="search-overlay"></div>
         <!-- Modal content -->
-        <div ref="bar" class="relative z-50 bg-white shadow-lg w-full p-6">
+        <div ref="bar" class="relative z-50 bg-card text-card-foreground shadow-lg w-full p-6">
             <!-- Modal header with search input -->
-            <div class="flex items-center justify-between border-b pb-4">
+            <div class="flex items-center justify-between border-b border-border pb-4">
                 <input type="text"
-                    class="w-full p-2 text-lg border-transparent font-semibold"
+                    class="w-full p-2 text-lg border-transparent font-semibold bg-transparent text-foreground placeholder:text-muted-foreground"
                     placeholder="Search..." v-model="searchQuery" @input="onSearch(searchQuery)" />
                 <button @click="closeModal" data-testid="search-close" class="cursor-pointer me-6">
-                    <XMarkIcon class="h-6 w-6 text-gray-500" />
+                    <XMarkIcon class="h-6 w-6 text-muted-foreground" />
                 </button>
             </div>
             <!-- Modal body with search results -->

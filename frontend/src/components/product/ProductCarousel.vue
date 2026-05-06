@@ -3,17 +3,17 @@
     <div v-if="productsOnTrending && productsOnTrending.length" class="carousel-container py-16">
         <div class="text-center mb-8">
             <h2 class="text-3xl font-semibold">TRENDING NOW</h2>
-            <p class="text-xl font-medium text-gray-500">
+            <p class="text-xl font-medium text-muted-foreground">
                 Discover the trending products. Explore now |
                 <RouterLink :to="{ name: 'catalog'}">
-                    <span class="border-b-2 border-b-gray-500">SHOP NOW</span>
+                    <span class="border-b-2 border-b-muted-foreground">SHOP NOW</span>
                 </RouterLink>
             </p>
         </div>
         <div class="relative">
             <!-- Previous button for carousel -->
             <button
-                class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black text-white rounded-full shadow size-6 flex items-center justify-center z-10"
+                class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-primary text-primary-foreground rounded-full shadow size-6 flex items-center justify-center z-10"
                 @click="prev" data-testid="product-carousel-prev">
                 <span class="block text-sm leading-none">&lsaquo;</span>
             </button>
@@ -43,7 +43,7 @@
             </div>
             <!-- Next button for carousel -->
             <button
-                class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black text-white rounded-full shadow size-6 flex items-center justify-center z-10"
+                class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-primary text-primary-foreground rounded-full shadow size-6 flex items-center justify-center z-10"
                 @click="next" data-testid="product-carousel-next">
                 <span class="block text-sm leading-none">&rsaquo;</span>
             </button>

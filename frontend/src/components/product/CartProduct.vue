@@ -1,5 +1,5 @@
 <template>
-    <div v-if="product" class="flex border-b pb-4 h-40 mb-4">
+    <div v-if="product" class="flex border-b border-border pb-4 h-40 mb-4">
         <!-- Product Image -->
         <img :src="product.gallery_urls[0]" alt="Product Image" class="w-20 h-20 lg:w-40 lg:h-full rounded" />
         <div class="grid h-full relative flex-1 pl-4">
@@ -15,18 +15,18 @@
             </div>
             <div class="flex justify-between items-end">
                 <!-- Quantity -->
-                <p class="text-md text-gray-500 font-medium">
+                <p class="text-md text-muted-foreground font-medium">
                     Qty {{ product.quantity }}
                 </p>
                 <div class="flex gap-2">
                     <!-- Add Product Button -->
-                    <a @click="$emit('addProduct', product)" 
+                    <a @click="$emit('addProduct', product)"
                         class="font-medium text-md cursor-pointer">
                         Add
                     </a>
                     <!-- Remove Product Button -->
-                    <a @click="$emit('removeProduct', product.id)" 
-                        class="text-gray-500 font-medium text-md cursor-pointer">
+                    <a @click="$emit('removeProduct', product.id)"
+                        class="text-muted-foreground font-medium text-md cursor-pointer">
                         Remove
                     </a>
                 </div>

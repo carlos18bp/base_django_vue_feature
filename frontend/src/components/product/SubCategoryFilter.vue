@@ -5,8 +5,8 @@
             <div v-for="(subCategory, subCategoryIdx) in subCategories" :key="subCategoryIdx" class="flex items-center">
                 <input :id="`filter-${subCategoryIdx}`" type="checkbox" v-model="subCategory.checked"
                     @change="handleCategoryChange" data-testid="subcategory-checkbox"
-                    class="h-4 w-4 rounded border-gray-300" />
-                <label :for="`filter-${subCategoryIdx}`" class="ml-3 text-sm text-gray-600">
+                    class="h-4 w-4 rounded border-border" />
+                <label :for="`filter-${subCategoryIdx}`" class="ml-3 text-sm text-muted-foreground">
                     {{ subCategory.name }}
                 </label>
             </div>

@@ -29,6 +29,7 @@
     "@headlessui/vue": "^1.7.23",
     "@heroicons/vue": "^2.2.0",
     "@unhead/vue": "^2.1.13",
+    "@vueuse/core": "^11.3.0",
     "axios": "^1.16.0",
     "bootstrap-icons": "^1.13.1",
     "flowbite": "^4.0.1",
