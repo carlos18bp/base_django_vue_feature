@@ -21,7 +21,7 @@ class Command(BaseCommand):
             # Create user with Customer role by default
             new_user = User.objects.create_user(
                 email=email,
-                password='password123',  # Default password for fake users
+                password='password',  # Default password for fake users
                 first_name=first_name,
                 last_name=last_name,
                 phone=phone,
