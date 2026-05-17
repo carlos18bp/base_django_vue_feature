@@ -207,6 +207,13 @@ lerna-debug.log*
 .npm/
 .eslintcache
 .stylelintcache
+.ruff_cache/
+backend/.ruff_cache/
+
+# Accidental pip-install shell-redirect typos (e.g. `pip install pkg >=X.Y`
+# with a stray space, which makes the shell redirect stdout to a file named =X.Y)
+=*
+backend/=*
 
 # ============================================================================
 # BUILD & PACKAGE MANAGERS
