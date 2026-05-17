@@ -1,6 +1,6 @@
 ---
 name: pre-staging-cleanup
-description: "Pre-staging template residue cleanup — checklist por fases para auditar y eliminar residuos del template base (modelos demo, endpoints, stores Pinia, vistas, traducciones, docs) que quedaron dispersos en el proyecto antes de promover a staging."
+description: "Pre-staging template residue cleanup — checklist por fases para auditar y eliminar residuos del template base (modelos demo, endpoints, stores, vistas, traducciones, docs) que quedaron dispersos en el proyecto antes de promover a staging."
 argument-hint: "[optional: fase B1..B10, F1..F9, D1..D6, o sección 'backend'|'frontend'|'docs'|'all']"
 ---
 
@@ -8,22 +8,22 @@ argument-hint: "[optional: fase B1..B10, F1..F9, D1..D6, o sección 'backend'|'f
 
 ## Goal
 
-El proyecto fue iniciado clonando `base_django_vue_feature/`. A medida que se construyó el nuevo proyecto, **residuos del template original quedaron dispersos**: modelos demo (`Blog`, `Product`, `Sale`), endpoints, stores Pinia, vistas, traducciones y referencias en docs que ya no aportan al producto real.
+El proyecto fue iniciado clonando `base_django_react_next_feature/`. A medida que se construyó el nuevo proyecto, **residuos del template original quedaron dispersos**: modelos demo (`Blog`, `Product`, `Sale`), endpoints, stores, vistas, traducciones y referencias en docs que ya no aportan al producto real.
 
 Este skill audita el repo **por fases**, clasifica cada item del template como **residuo puro** (eliminar), **adaptado** (preservar) o **roto** (referencias colgantes), y aplica la limpieza solo con confirmación humana, una fase a la vez. Está pensado para ejecutarse cuando el proyecto está maduro y próximo a staging.
 
 ## Inputs
 
 - Argumento opcional: una fase puntual (`B1`, `F3`, `D4`, etc.) o sección (`backend`, `frontend`, `docs`, `all`). Sin argumento, el skill recorre todas las fases en orden.
-- Variante detectada: este SKILL es para **Vue 3 / Pinia / Composition API / JavaScript**.
+- Variante detectada: este SKILL es para **Next.js / React / TypeScript / Zustand**.
 
 ## Reglas obligatorias
 
 1. **Nunca eliminar sin confirmación explícita** — incluso si la clasificación dice "residuo puro".
 2. **Inventario fijo es la fuente de verdad** — la lista de items del template está embebida abajo. No inferir items en runtime.
 3. **Cada fase = un commit aislado** — facilita rollback (`git revert <sha>`).
-4. **Lista de PRESERVAR siempre** (no proponer jamás eliminar): `User`, `PasswordCode` modelos; `views/auth.py`, `urls/auth.py`, `urls/user.py`, `views/user_crud.py`, `serializers/user_*.py`; `forms/user.py`; `django_attachments/`; `views/error_handlers.py`; `src/components/layouts/Header.vue`, `Footer.vue`, `SearchBar.vue`; `src/stores/auth.js`, `i18n.js`, `language.js`, `stores/services/request_http.js`; `src/services/http/client.js`, `tokens.js`; `src/composables/useAuth.js`, `useNotification.js`; `src/views/Home.vue`, `NotFound.vue`, `auth/SignIn.vue`, `auth/SignUp.vue`.
-5. **Antes de eliminar un archivo, verificar referencias** con `grep -r "<symbol>" backend/ frontend/ --include="*.py" --include="*.vue" --include="*.js"`. Si hay referencias **fuera** de la lista de archivos demo, marcar **adaptado** y preservar.
+4. **Lista de PRESERVAR siempre** (no proponer jamás eliminar): `User`, `PasswordCode` modelos; `views/auth.py`, `urls/auth.py`, `urls/user.py`, `views/user_crud.py`, `serializers/user_*.py`; `forms/user.py`; `django_attachments/`; `components/layout/Header.tsx`, `components/layout/Footer.tsx`; `lib/stores/authStore.ts`, `lib/stores/localeStore.ts`; `lib/services/http.ts`, `lib/services/tokens.ts`; `lib/hooks/useRequireAuth.ts`; `lib/i18n/config.ts`.
+5. **Antes de eliminar un archivo, verificar referencias** con `grep -r "<symbol>" backend/ frontend/ --include="*.py" --include="*.ts" --include="*.tsx"`. Si hay referencias **fuera** de la lista de archivos demo, marcar **adaptado** y preservar.
 6. **Detectar archivos modificados** con `git log --oneline -- <file>` — más de 1 commit (el inicial) ⇒ probablemente adaptado.
 7. **Migraciones:** nunca eliminar migraciones aplicadas a producción. Para limpieza de modelos, generar nueva migración con `python manage.py makemigrations` tras eliminar el modelo.
 
@@ -67,7 +67,7 @@ Formato de tabla de hallazgos:
 - `backend/base_feature_app/views/product.py`, `views/product_crud.py`
 - `backend/base_feature_app/views/sale.py`, `views/sale_crud.py`
 - `backend/base_feature_app/views/captcha_views.py` — **solo eliminar si reCAPTCHA no se usa en el nuevo proyecto** (`grep -r RECAPTCHA backend/ frontend/`).
-- **Preservar:** `views/auth.py`, `views/user_crud.py`, `views/error_handlers.py`.
+- **Preservar:** `views/auth.py`, `views/user_crud.py`.
 
 #### Fase B4 — URLs demo
 - `backend/base_feature_app/urls/blog.py`
@@ -75,23 +75,23 @@ Formato de tabla de hallazgos:
 - `backend/base_feature_app/urls/sale.py`
 - `backend/base_feature_app/urls/captcha.py` (acompaña a B3-captcha)
 - Editar `urls/__init__.py` para quitar los `include()` de los routers eliminados.
+- Revisar `backend/base_feature_app/urls.py` (top-level del app, conflicta con el paquete `urls/` — probable dead code legacy del template).
 - Revisar `backend/base_feature_project/urls.py` para quitar `path('blog/', ...)`, `path('product/', ...)`, etc. si están registradas a nivel proyecto.
 - **Preservar:** `urls/auth.py`, `urls/user.py`.
 
 #### Fase B5 — Forms demo
 - `backend/base_feature_app/forms/blog.py`
 - `backend/base_feature_app/forms/product.py`
-- **Preservar:** `forms/user.py`, `forms/__init__.py`.
+- También revisar `forms/__init_.py` (typo) y `forms/__init__.py`.
 
 #### Fase B6 — Management commands de fake data
 - `backend/base_feature_app/management/commands/create_fake_data.py` (orquestador)
-- `backend/base_feature_app/management/commands/create_fake_blogs.py`
-- `backend/base_feature_app/management/commands/create_fake_products.py`
-- `backend/base_feature_app/management/commands/create_fake_sales.py`
-- `backend/base_feature_app/management/commands/create_fake_users.py` — revisar: si el equipo usa estos usuarios para QA en staging, **preservar y solo limpiar los de Blog/Product/Sale**.
+- `backend/base_feature_app/management/commands/create_blogs.py`
+- `backend/base_feature_app/management/commands/create_products.py`
+- `backend/base_feature_app/management/commands/create_sales.py`
+- `backend/base_feature_app/management/commands/create_users.py` — revisar: si el equipo usa estos usuarios para QA en staging, **preservar y solo limpiar los de Blog/Product/Sale**.
 - `backend/base_feature_app/management/commands/delete_fake_data.py`
-- `backend/base_feature_app/management/commands/test_email.py` — preservar si se usa para QA email; eliminar si nunca se invoca.
-- **Preservar:** `silk_garbage_collect.py` (infra de profiling).
+- `backend/base_feature_app/management/commands/README.md` — actualizar al nuevo set de comandos.
 - También revisar `backend/base_feature_project/management/` (commands a nivel proyecto, si existen).
 - **Huey tasks demo:** `backend/base_feature_project/tasks.py` puede contener tasks demo (notificaciones de blog/product/sale, cron jobs). Revisar y limpiar.
 
@@ -102,88 +102,85 @@ Formato de tabla de hallazgos:
 - Si el proyecto aún no tiene producción, considerar `migrations/0001_initial.py` reset documentado.
 
 #### Fase B8 — Tests demo
-- `backend/base_feature_app/tests/models/test_blog_model.py`, `test_product_model.py`, `test_sale_model.py`, `test_models_delete.py`
-- `backend/base_feature_app/tests/serializers/test_blog_serializers.py`, `test_product_serializers.py`, `test_sale_serializer.py`, `test_media_serializers.py` (revisar)
-- `backend/base_feature_app/tests/views/test_public_endpoints.py`, `test_crud_endpoints.py`, `test_crud_endpoints_extended.py`, `test_crud_permissions.py` (revisar caso por caso)
-- `backend/base_feature_app/tests/views/test_captcha_views.py` (acompaña B3-captcha si aplica)
-- **Preservar:** `test_auth_endpoints.py`, `test_jwt_endpoints.py`, `test_urls.py`, `test_user_serializers.py`, `tests/conftest.py`, `tests/factories.py` (puede requerir limpieza de factories Blog/Product/Sale), `tests/admin/`, `tests/forms/test_forms.py`, `tests/services/test_auth_service.py`, `tests/utils/`, `tests/management/test_commands.py`.
+- `backend/base_feature_app/tests/models/test_blog_model.py`, `test_product_model.py`, `test_sale_model.py`
+- `backend/base_feature_app/tests/serializers/test_blog_serializers.py`, `test_product_serializers.py`, `test_sale_serializer.py`
+- `backend/base_feature_app/tests/views/` — tests de endpoints demo: `test_public_endpoints.py`, `test_crud_endpoints.py`, `test_crud_detail_endpoints.py` (revisar caso por caso — pueden cubrir endpoints adaptados)
+- `backend/base_feature_app/tests/views/test_captcha_views.py` (acompaña B3-captcha)
+- **Preservar:** tests de auth, JWT, user model, password_code, admin, urls, forms (los infra).
 
 #### Fase B9 — Permissions / signals / utils demo
 - Revisar `backend/base_feature_app/permissions/roles.py` — si los roles son específicos del template (sin uso en el nuevo dominio), proponer reemplazo.
-- Revisar templates de email demo en `backend/base_feature_app/templates/`.
-- **Preservar (infra):** `backend/base_feature_app/exceptions.py` (custom exceptions usadas por `views/error_handlers.py`), `backend/base_feature_app/services/auth_service.py`, `backend/base_feature_app/utils/auth_utils.py`.
+- `backend/base_feature_app/services/email_service.py` — preservar; revisar templates de email demo en `templates/`.
 
 #### Fase B10 — Admin demo
 - Editar `backend/base_feature_app/admin.py` para quitar `admin.site.register(Blog/Product/Sale/SoldProduct)` y sus `ModelAdmin` clases.
 
 ---
 
-### FRONTEND (Vue 3 + Pinia)
+### FRONTEND (Next.js / React)
 
-#### Fase F1 — Páginas/Vistas demo (`src/views/`)
-- `frontend/src/views/blog/List.vue`, `blog/Detail.vue`
-- `frontend/src/views/product/Catalog.vue`, `product/Detail.vue`, `product/Checkout.vue`
-- `frontend/src/views/manual/Manual.vue`
-- `frontend/src/views/Backoffice.vue` (panel admin demo)
-- `frontend/src/views/AboutUs.vue`, `Contact.vue` (páginas marketing genéricas — revisar si se usan)
-- `frontend/src/views/Dashboard.vue` — **revisar antes de eliminar:** muchos proyectos extienden el dashboard.
-- `frontend/src/views/auth/AdminLogin.vue` (login alterno demo)
-- Editar `frontend/src/router/index.js` para quitar las rutas eliminadas.
-- **Preservar:** `views/Home.vue`, `views/NotFound.vue`, `views/auth/SignIn.vue`, `views/auth/SignUp.vue`.
+#### Fase F1 — Páginas/Rutas demo (App Router)
+- `frontend/app/catalog/` (catálogo de productos)
+- `frontend/app/products/[productId]/` (detalle producto)
+- `frontend/app/blogs/`, `frontend/app/blogs/[blogId]/`
+- `frontend/app/checkout/` (carrito + checkout)
+- `frontend/app/manual/` (manual interactivo del template)
+- `frontend/app/backoffice/` (panel admin demo)
+- `frontend/app/admin-login/` (login alterno demo)
+- `frontend/app/dashboard/` — **revisar antes de eliminar:** muchos proyectos extienden el dashboard.
+- **Preservar:** `app/page.tsx` (root), `app/layout.tsx`, `app/sign-in/`, `app/sign-up/`, `app/forgot-password/`.
 
 #### Fase F2 — Componentes demo
-- `frontend/src/components/HelloWorld.vue` (boilerplate de Vue)
-- `frontend/src/components/blog/BlogCarousel.vue`, `BlogPresentation.vue`
-- `frontend/src/components/product/ProductCarousel.vue`, `CategoryFilter.vue`, `SubCategoryFilter.vue`, `ShoppingCart.vue`, `CartProduct.vue`
-- `frontend/src/components/manual/ManualSearch.vue`, `ManualSidebar.vue`, `ProcessCard.vue`
-- **Preservar:** `components/layouts/Header.vue`, `Footer.vue`, `SearchBar.vue` — pero auditar el contenido (links a /blogs, /catalog, /manual deben removerse si las páginas se eliminaron).
+- `frontend/components/blog/BlogCard.tsx`, `BlogCarousel.tsx`
+- `frontend/components/product/ProductCard.tsx`, `ProductCarousel.tsx`
+- `frontend/components/manual/ManualSearch.tsx`, `ManualSidebar.tsx`, `ProcessCard.tsx`
+- **Preservar:** `components/layout/Header.tsx`, `components/layout/Footer.tsx` — pero auditar el contenido (links a /blogs, /catalog, /manual deben removerse si las páginas se eliminaron).
 
-#### Fase F3 — Stores Pinia demo
-- `frontend/src/stores/blog.js`
-- `frontend/src/stores/product.js` (incluye lógica de carrito)
-- **Preservar:** `stores/auth.js`, `stores/i18n.js`, `stores/language.js`, `stores/services/request_http.js`.
+#### Fase F3 — Stores Zustand demo
+- `frontend/lib/stores/blogStore.ts`
+- `frontend/lib/stores/productStore.ts`
+- `frontend/lib/stores/cartStore.ts` (incluye `persist` middleware — verificar que nada nuevo lo use)
+- **Preservar:** `lib/stores/authStore.ts`, `lib/stores/localeStore.ts`.
 
-#### Fase F4 — Composables demo
-- (No hay composables específicos del template más allá de los infra.)
-- **Preservar:** `composables/useAuth.js`, `composables/useNotification.js`.
+#### Fase F4 — Hooks personalizados demo
+- `frontend/lib/manual/useManualSearch.ts` (acompaña F1-manual)
+- **Preservar:** `lib/hooks/useRequireAuth.ts` (infra de protected routes).
 
 #### Fase F5 — Servicios / API clients demo
-- Revisar `frontend/src/services/http/client.js` y helpers que apunten a `/api/blogs`, `/api/products`, `/api/sales` — eliminar funciones específicas; preservar instancia axios e interceptores.
-- Revisar `frontend/src/helpers/googleLogin.js` — **eliminar si Google OAuth no se usa** en el nuevo proyecto (el template viene con Google login configurado por defecto).
-- Revisar `frontend/src/shared/constants.js` — eliminar constantes demo (`BLOG_PAGE_SIZE`, `PRODUCT_*`, `CART_*`, `MANUAL_*`, `BACKOFFICE_*`); preservar las que el nuevo proyecto reutiliza.
-- **Preservar:** `services/http/tokens.js`, `helpers/notification.js`, `utils/format.js`, `utils/validators.js`, `mixins/globalMixin.js`.
+- Revisar `frontend/lib/services/http.ts` para llamadas a `/api/blogs`, `/api/products`, `/api/sales` — eliminar funciones helper específicas de esos endpoints; preservar instancia axios e interceptores.
+- Revisar `frontend/lib/constants.ts` — eliminar constantes demo (`BLOG_PAGE_SIZE`, `PRODUCT_*`, `CART_*`, `MANUAL_*`, `BACKOFFICE_*`); preservar las que el nuevo proyecto reutiliza.
+- Revisar `frontend/proxy.ts` — apunta al backend del template; actualizar URL/host si el nuevo proyecto cambió de dominio o puerto.
+- **Preservar:** `lib/services/tokens.ts`.
 
-#### Fase F6 — Tipos / interfaces demo
-- El template usa JS plano; no hay archivos `.ts` de tipos demo.
-- Si el nuevo proyecto migró a TS, auditar manualmente cualquier interfaz `Blog`, `Product`, `Sale`.
+#### Fase F6 — Tipos TypeScript demo
+- `frontend/lib/types.ts` — eliminar interfaces `Blog`, `Product`, `Sale`, `SoldProduct` y campos demo del tipo `User` que no apliquen.
+- `frontend/lib/manual/types.ts` (acompaña F1-manual)
+- `frontend/lib/manual/content.ts` (data estática del manual)
 
 #### Fase F7 — i18n / traducciones demo
-- `frontend/src/i18n/index.js` — eliminar claves bajo `manual.*`, `blog.*`, `product.*`, `cart.*`, `checkout.*`, `backoffice.*`, `about.*`, `contact.*`.
-- Cambiar `common.app_name` si aún dice "Base Feature" o "Base Django Vue Feature".
+- Revisar `frontend/lib/i18n/config.ts` y archivos de mensajes (`messages/*.json` si existen) — eliminar claves bajo `manual.*`, `blog.*`, `product.*`, `cart.*`, `checkout.*`, `backoffice.*`.
+- Cambiar cualquier `app_name` o `title` que aún diga "Base Feature" o similar.
 
 #### Fase F8 — Assets / branding del template
-- `frontend/src/assets/vue.svg` (logo Vue default)
-- `frontend/public/vite.svg` (logo Vite default)
-- Buscar logos/imágenes con nombres como `base_feature*`, `template*`, `placeholder*` en `frontend/public/` y `frontend/src/assets/`.
-- Reemplazar `frontend/public/favicon.ico` si sigue siendo el del template.
-- **`frontend/index.html`** — actualizar `<title>`, meta `description`, `og:*`, link al favicon, referencia a `vite.svg`.
+- Buscar logos/imágenes en `frontend/public/` con nombres como `base_feature*`, `template*`, `placeholder*` o el favicon default.
+- Reemplazar `frontend/app/favicon.ico` si sigue siendo el del template.
+- Revisar `frontend/app/layout.tsx` — `metadata.title`, `metadata.description`, `openGraph` deben reflejar el nuevo proyecto, no "Base Django React Next Feature".
+- Revisar archivos `manifest.json` / `robots.txt` / `sitemap.ts` si existen — deben reflejar el dominio real.
 
 #### Fase F9 — Tests unit + E2E demo
-- Tests unit (Jest):
-  - `frontend/test/HelloWorld.test.js`
-  - `frontend/test/components/{blog,product,manual}/`
-  - `frontend/test/views/{blog,product,manual,Backoffice,AboutUs,Contact,Dashboard}*`
-  - `frontend/test/stores/{blog,product}.test.js`
-  - `frontend/test/router/` — actualizar tests de rutas tras F1.
-- Tests E2E (Playwright):
-  - `frontend/e2e/blog/blog-list.spec.js`, `blog-detail.spec.js`
-  - `frontend/e2e/shopping/shopping-catalog.spec.js`, `shopping-product-detail.spec.js`, `shopping-cart.spec.js`, `shopping-checkout.spec.js`
-  - `frontend/e2e/home/home-carousels.spec.js`
-  - `frontend/e2e/static/static-pages.spec.js`
-  - `frontend/e2e/navigation/navigation-cart-overlay.spec.js`
-  - `frontend/e2e/navigation/navigation-search.spec.js` (revisar si hay buscador en el nuevo proyecto)
-- Actualizar `frontend/e2e/flow-definitions.json` para reflejar flujos reales.
-- **Preservar:** `e2e/auth/auth-*.spec.js`, `e2e/navigation/navigation-not-found.spec.js`, `e2e/helpers/`, `e2e/reporters/`.
+- Tests unit:
+  - `frontend/components/blog/__tests__/`, `frontend/components/product/__tests__/`, `frontend/components/manual/__tests__/`
+  - `frontend/lib/stores/__tests__/blogStore.test.ts`, `productStore.test.ts`, `cartStore.test.ts`
+  - `frontend/app/{catalog,products,blogs,checkout,manual,backoffice,admin-login,dashboard}/__tests__/`
+- Tests E2E:
+  - `frontend/e2e/app/cart.spec.ts`
+  - `frontend/e2e/app/checkout.spec.ts`
+  - `frontend/e2e/app/complete-purchase.spec.ts`
+  - `frontend/e2e/app/user-flows.spec.ts` (revisar: puede cubrir flujos adaptados)
+  - `frontend/e2e/public/blogs.spec.ts`
+  - `frontend/e2e/public/products.spec.ts`
+  - `frontend/e2e/public/navigation.spec.ts` — **revisar:** verifica navegación general.
+- **Preservar:** `frontend/e2e/auth/auth.spec.ts`, `frontend/e2e/public/smoke.spec.ts`.
 
 ---
 
@@ -196,29 +193,25 @@ Formato de tabla de hallazgos:
 #### Fase D2 — CLAUDE.md / AGENTS.md / GEMINI.md
 - `CLAUDE.md` raíz, `backend/CLAUDE.md`, `frontend/CLAUDE.md`
 - Buscar y reemplazar referencias a `Blog/Product/Sale` en ejemplos de código y memory bank.
-- Actualizar la sección "Project Identity" con el nombre real del proyecto si aún dice "Base Django Vue Feature".
+- Actualizar la sección "Project Identity" con el nombre real del proyecto si aún dice "Base Django React Next Feature".
 - Si existen `tasks/active_context.md` o `tasks/tasks_plan.md`, sincronizar con el estado actual.
 
 #### Fase D3 — Docs en `/docs/`
-- `docs/USER_FLOW_MAP.md`, `docs/BACKEND_AND_FRONTEND_COVERAGE_REPORT_STANDARD.md`, `docs/E2E_FLOW_COVERAGE_REPORT_STANDARD.md`, `docs/TESTING_QUALITY_STANDARDS.md`, `docs/TEST_QUALITY_GATE_REFERENCE.md`, `docs/DJANGO_VUE_ARCHITECTURE_STANDARD.md`, `docs/GLOBAL_RULES_GUIDELINES.md`, `docs/claude-code-methodology-setup-guide.md` — `grep -ln "base_feature\|Blog\|Product\|Sale" docs/` y actualizar.
+- `docs/USER_FLOW_MAP.md`, `docs/BACKEND_AND_FRONTEND_COVERAGE_REPORT_STANDARD.md`, `docs/E2E_FLOW_COVERAGE_REPORT_STANDARD.md`, `docs/TESTING_QUALITY_STANDARDS.md`, `docs/TEST_QUALITY_GATE_REFERENCE.md`, `docs/DJANGO_REACT_ARCHITECTURE_STANDARD.md`, `docs/GLOBAL_RULES_GUIDELINES.md`, `docs/claude-code-methodology-setup-guide.md` — `grep -ln "base_feature\|Blog\|Product\|Sale" docs/` y actualizar.
 - `docs/methodology/` — memory bank: `architecture.md`, `product_requirement_docs.md`, `technical.md`, `error-documentation.md`, `lessons-learned.md` deben reflejar el dominio real, no el template. También `tasks/active_context.md`, `tasks/tasks_plan.md`.
-- `frontend/e2e/README.md` — actualizar con flujos reales.
-- `frontend/PLAYWRIGHT_CLEANUP.md` — revisar (limpieza histórica de Playwright que puede estar obsoleta).
+- Docs en frontend: `frontend/SETUP.md`, `frontend/TESTING.md` — actualizar pasos de setup, scripts npm, referencias a features demo.
 - `audit-report.md` raíz — output de auditorías previas; revisar si quedan referencias obsoletas.
 
 #### Fase D4 — `.env.example`
 - `backend/.env.example`:
   - `BACKUP_STORAGE_PATH=/var/backups/base_feature_project` → reemplazar por path real.
-  - `DJANGO_GOOGLE_OAUTH_CLIENT_ID=931303546385-...` → debe ser el ID del nuevo proyecto, no el del template.
+  - `DJANGO_GOOGLE_OAUTH_CLIENT_ID=...` → debe ser el ID del nuevo proyecto, no el del template.
   - `FRONTEND_URL` → URL del nuevo dominio.
 - `frontend/.env.example`:
-  - `VITE_API_BASE_URL` → URL del backend del nuevo proyecto.
-  - `VITE_GOOGLE_CLIENT_ID` → ID Google del nuevo proyecto.
-  - `VITE_APP_NAME="Base Django Vue Feature"` → nombre real.
-  - `VITE_APP_VERSION=1.0.0` → versión real.
+  - `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_GOOGLE_CLIENT_ID`, `NEXT_PUBLIC_APP_NAME`, `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` (si aplica).
 
 #### Fase D5 — `package.json` y `pyproject.toml`
-- `frontend/package.json` — `name: "base-django-vue-feature-frontend"`, `version`, `description`.
+- `frontend/package.json` — `name`, `version`, `description`.
 - `backend/pyproject.toml` (si existe) — metadatos del proyecto.
 
 #### Fase D6 — Workflows `.windsurf/` y skills `.claude/` / `.agents/`
@@ -230,7 +223,7 @@ Formato de tabla de hallazgos:
 - `scripts/test_quality_gate.py` y `scripts/quality/` — actualizar thresholds y rutas si cambiaron.
 - `scripts/coverage-summary-ci.cjs` — verificar paths de coverage.
 - `scripts/ci/` — workflows GitHub Actions / scripts de pipeline; actualizar nombres de jobs, branch protection, deploy targets si referencian "base_feature_*".
-- `scripts/systemd/` — unit files (`base_django_vue_feature_staging.service`, `*-huey.service`) deben renombrarse al nombre real del servicio en producción.
+- `scripts/systemd/` — unit files (`base_django_react_next_feature_staging.service`, `*-huey.service`) deben renombrarse al nombre real del servicio en producción.
 - `frontend/scripts/` — scripts de soporte del frontend; revisar referencias.
 - `.github/workflows/*.yml` (si existen) — nombres de jobs, secretos referenciados, tags de deploy.
 
@@ -244,6 +237,7 @@ Formato de tabla de hallazgos:
 | Backend migraciones | `cd backend && source venv/bin/activate && python manage.py makemigrations --check --dry-run` | Tras B1, B7 |
 | Backend tests afectados | `cd backend && source venv/bin/activate && pytest <tests-restantes> -x --ff` | Tras B8 |
 | Frontend lint | `cd frontend && npm run lint` | Tras F1–F8 |
+| Frontend typecheck | `cd frontend && npx tsc --noEmit` | Tras F3–F6 |
 | Frontend tests | `cd frontend && npm test -- <archivos-restantes>` | Tras F9 |
 | E2E (solo reportar) | `cd frontend && npx playwright test --list` | Tras F9 |
 

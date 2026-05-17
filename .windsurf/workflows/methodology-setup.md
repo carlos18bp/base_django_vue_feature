@@ -47,6 +47,7 @@ If missing, fetch from [rules_template](https://github.com/Bhartendu-Kumar/rules
 
 ## Step 3: Deep-Dive Codebase
 
+// turbo
 Run verification commands to get exact counts:
 
 ```bash
@@ -75,16 +76,17 @@ find frontend/test/ -name "*.spec.*" -o -name "*.test.*" | wc -l
 find frontend/e2e/ -name "*.spec.*" | wc -l
 
 # URL patterns
-grep -c "path(" backend/base_feature_app/urls.py
+grep -c "path(" backend/content/urls.py
+grep -c "path(" backend/accounts/urls.py 2>/dev/null
 
 # Email templates
-find backend/base_feature_app/templates/emails/ -type f | wc -l
+find backend/content/templates/emails/ -type f | wc -l
 
 # Management commands
 find backend/ -path "*/management/commands/*.py" ! -name "__init__.py" -not -path "*/venv/*" | wc -l
 
 # Service file sizes
-ls -la backend/base_feature_app/services/
+ls -la backend/content/services/
 ```
 
 ## Step 4: Create / Refresh Memory Files
