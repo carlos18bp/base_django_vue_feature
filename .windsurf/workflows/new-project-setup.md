@@ -6,11 +6,11 @@ auto_execution_mode: 2
 # New Project Setup — Bootstrap del Nuevo Proyecto sobre el Template
 
 ## Goal
-El repo `base_django_vue_feature/` se acaba de clonar para arrancar un nuevo proyecto. El cliente entrega un `.md` con el checklist de requerimientos por categorías, y los archivos madre (`CLAUDE.md`, `README.md`, `AGENTS.md`) todavía describen el template. Este workflow persiste el checklist en un release versionado y reescribe la identidad del template por la del nuevo proyecto, sin tocar lógica/endpoints/estructura. Es el simétrico al inicio del `pre-staging-cleanup` (que se ejecuta al final del ciclo).
+El repo `base_django_react_next_feature/` se acaba de clonar para arrancar un nuevo proyecto. El cliente entrega un `.md` con el checklist de requerimientos por categorías, y los archivos madre (`CLAUDE.md`, `README.md`, `AGENTS.md`) todavía describen el template. Este workflow persiste el checklist en un release versionado y reescribe la identidad del template por la del nuevo proyecto, sin tocar lógica/endpoints/estructura. Es el simétrico al inicio del `pre-staging-cleanup` (que se ejecuta al final del ciclo).
 
 ## Inputs
 - `$ARGUMENTS`: contenido **literal** del `.md` del cliente, pegado verbatim (NO un path).
-- Variante: **Nuxt 3 / Vue 3 / Pinia / JavaScript**.
+- Variante: **Next.js / React / TypeScript / Zustand**.
 
 ## Restricciones No Negociables
 1. **Checklist verbatim** — `$ARGUMENTS` se escribe SIN modificar.
@@ -51,11 +51,11 @@ Flujo único S1 → S7. Sin sub-comandos por fase.
 - Reemplazar:
   - H1 → `# <project_name> — Claude Code Configuration`.
   - `**Name**`, `**Domain**`, `**Note**` → valores del proyecto.
-  - `**Server path**`, `**Services**` → reemplazar slug del template (`base_django_vue_feature`) por `<project_slug>`.
+  - `**Server path**`, `**Services**` → reemplazar slug del template (`base_django_react_next_feature`) por `<project_slug>`.
   - `**Stack**` → **preservar intacto**.
 - Preservar SIN tocar: `General Rules`, `Security Rules`, `Memory Bank System`, `Directory Structure`, `Testing Rules`, `Lessons Learned`, `Error Documentation`, `Methodology Maintenance`.
 - Confirmación humana: diff unificado del bloque `[y/N]`.
-- Verificación: `grep -c 'Base Django Vue Feature' CLAUDE.md` debe ser `0`.
+- Verificación: `grep -c 'Base Django React Next Feature' CLAUDE.md` debe ser `0`.
 - Commit: `chore(identity): replace template identity in root CLAUDE.md`.
 
 ### Fase S4 — Reescribir `README.md` raíz
@@ -77,8 +77,8 @@ Flujo único S1 → S7. Sin sub-comandos por fase.
 - Commit: `chore(identity): bootstrap AGENTS.md as Codex configuration`.
 
 ### Fase S6 — Auditoría read-only (sin cambios)
-- Patrones: `base_django_vue_feature`, `base_feature_app`, `base_feature_project`, `931303546385-`, `/home/ryzepeck/webapps/`.
-- `grep -rln --include='*.md' --include='*.py' --include='*.ts' --include='*.vue' --include='*.js' --include='*.json' --include='*.toml' --include='*.cfg' --include='*.ini' --include='*.service' --include='*.yml' --include='*.yaml' --include='.env.example' --exclude-dir='.git' --exclude-dir='node_modules' --exclude-dir='venv' --exclude-dir='.nuxt' --exclude-dir='dist' --exclude-dir='staticfiles' '<pattern>' .`
+- Patrones: `base_django_react_next_feature`, `base_feature_app`, `base_feature_project`, `931303546385-`, `/home/ryzepeck/webapps/`.
+- `grep -rln --include='*.md' --include='*.py' --include='*.ts' --include='*.tsx' --include='*.js' --include='*.json' --include='*.toml' --include='*.cfg' --include='*.ini' --include='*.service' --include='*.yml' --include='*.yaml' --include='.env.example' --exclude-dir='.git' --exclude-dir='node_modules' --exclude-dir='venv' --exclude-dir='.next' --exclude-dir='dist' --exclude-dir='staticfiles' '<pattern>' .`
 - Tabla `| Patrón | # archivos | Ejemplos top 5 |`.
 - Sin commit. Recomendar manualmente: rename Django app, regenerar OAuth Client ID, actualizar `scripts/systemd/`, `.env.example`, `frontend/package.json`.
 
@@ -90,8 +90,8 @@ Flujo único S1 → S7. Sin sub-comandos por fase.
 | Tipo | Comando | Cuándo |
 |------|---------|--------|
 | Checklist persistido | `wc -l docs/release/NN-release-checklist.md` | Tras S1 |
-| Identidad limpia | `grep -c 'Base Django Vue Feature' CLAUDE.md` (0) | Tras S3 |
-| Stack preservado | `grep -c 'Vue\|Nuxt' CLAUDE.md` (>0) | Tras S3 |
+| Identidad limpia | `grep -c 'Base Django React Next Feature' CLAUDE.md` (0) | Tras S3 |
+| Stack preservado | `grep -c 'Next.js\|React\|TypeScript' CLAUDE.md` (>0) | Tras S3 |
 | README header | `head -n 10 README.md` | Tras S4 |
 | AGENTS.md sync | `diff CLAUDE.md AGENTS.md \| head -n 5` (solo H1) | Tras S5 |
 | Commits aislados | `git log --oneline -n 4` | Tras S5 |
