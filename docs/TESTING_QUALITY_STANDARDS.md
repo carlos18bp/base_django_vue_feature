@@ -1223,10 +1223,10 @@ All exceptions are tracked and reported:
 | **Random Failures** | Tests using random without seed | Seed or inject values |
 | **Global Pollution** | Tests that mutate shared state | Isolate and restore |
 | **Selector Roulette** | CSS classes/IDs as selectors | Use test IDs or roles |
-| **Viewport-Only Module** | Standalone module that only checks `body` visibility at different sizes — no observable behavior verified | Use Playwright multi-project viewports; place viewport-specific behavioral tests in the owning functional module |
 | **Sleep Walking** | Arbitrary waits | Condition-based waits |
 | **Loop Testing** | Assertions in loops | Use parameterization |
 | **Conjunction Tests** | "Test X and Y and Z" | Split by behavior |
+| **Viewport-Only Module** | Standalone module that only checks `body` visibility at different sizes — no observable behavior verified | Use Playwright multi-project viewports; place viewport-specific behavioral tests in the owning functional module |
 
 ---
 
