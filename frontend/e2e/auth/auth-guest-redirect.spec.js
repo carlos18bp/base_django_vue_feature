@@ -2,9 +2,12 @@ import { test, expect } from '../helpers/test.js';
 import { AUTH_GUEST_REDIRECT } from '../helpers/flow-tags.js';
 
 /**
- * E2E tests for guest route redirection.
+ * E2E test for the guest-only route guard.
  *
- * Covers authenticated user being redirected away from guest-only routes.
+ * An authenticated user hitting a guest-only route (sign_in) is sent to the
+ * dashboard. There is no UI link back to sign_in once logged in, so the guard
+ * is exercised by direct navigation — the redirect is the behavior, asserted by
+ * the concrete landing URL (not merely "not sign_in").
  */
 
 test.describe('Auth — guest redirect when already authenticated', () => {
@@ -19,12 +22,13 @@ test.describe('Auth — guest redirect when already authenticated', () => {
     await page.context().clearCookies();
   });
 
-  test('authenticated user navigating to sign_in is redirected away', {
-    tag: [...AUTH_GUEST_REDIRECT, '@role:shared'],
+  test('an authenticated user visiting sign_in lands on the dashboard', {
+    tag: [...AUTH_GUEST_REDIRECT, '@role:shared', '@outcome:success'],
   }, async ({ page }) => {
+    // quality: allow-no-interaction (a logged-in user has no UI link to sign_in; the guest-guard redirect on direct navigation is the behavior)
     await page.goto('/sign_in');
     await page.waitForLoadState('networkidle');
 
-    await expect(page).not.toHaveURL(/\/sign_in/);
+    await expect(page).toHaveURL(/\/dashboard/);
   });
 });

@@ -5,7 +5,9 @@
     "auth-login-email": {
       "name": "Login with email/password",
       "module": "auth",
-      "roles": ["shared"],
+      "roles": [
+        "shared"
+      ],
       "priority": "P1",
       "description": "User signs in with email and password credentials",
       "expectedSpecs": 1
@@ -13,7 +15,9 @@
     "auth-login-invalid": {
       "name": "Login with invalid credentials",
       "module": "auth",
-      "roles": ["shared"],
+      "roles": [
+        "shared"
+      ],
       "priority": "P1",
       "description": "User sees error when submitting invalid credentials",
       "expectedSpecs": 1
@@ -21,15 +25,22 @@
     "auth-register": {
       "name": "Register new account",
       "module": "auth",
-      "roles": ["shared"],
+      "roles": [
+        "shared"
+      ],
       "priority": "P1",
       "description": "User registers a new account via sign-up form",
-      "expectedSpecs": 1
+      "outcomes": [
+        "success",
+        "error"
+      ]
     },
     "auth-logout": {
       "name": "Sign out",
       "module": "auth",
-      "roles": ["shared"],
+      "roles": [
+        "shared"
+      ],
       "priority": "P2",
       "description": "User signs out and session/localStorage is cleared",
       "expectedSpecs": 1
@@ -37,23 +48,33 @@
     "auth-protected-redirect": {
       "name": "Protected route redirect",
       "module": "auth",
-      "roles": ["shared"],
+      "roles": [
+        "shared"
+      ],
       "priority": "P1",
       "description": "Unauthenticated user is redirected to sign_in when accessing protected routes",
-      "expectedSpecs": 1
+      "outcomes": [
+        "success"
+      ]
     },
     "auth-guest-redirect": {
       "name": "Guest route redirect",
       "module": "auth",
-      "roles": ["shared"],
+      "roles": [
+        "shared"
+      ],
       "priority": "P2",
       "description": "Authenticated user is redirected away from guest-only routes (sign_in, sign_up)",
-      "expectedSpecs": 1
+      "outcomes": [
+        "success"
+      ]
     },
     "shopping-catalog-browse": {
       "name": "Browse product catalog",
       "module": "shopping",
-      "roles": ["shared"],
+      "roles": [
+        "shared"
+      ],
       "priority": "P1",
       "description": "User browses the product catalog page and sees products",
       "expectedSpecs": 1
@@ -61,15 +82,22 @@
     "shopping-product-detail": {
       "name": "View product detail",
       "module": "shopping",
-      "roles": ["shared"],
+      "roles": [
+        "shared"
+      ],
       "priority": "P1",
       "description": "User navigates to and views a product detail page",
-      "expectedSpecs": 1
+      "outcomes": [
+        "success",
+        "error"
+      ]
     },
     "shopping-cart-add": {
       "name": "Add product to cart",
       "module": "shopping",
-      "roles": ["shared"],
+      "roles": [
+        "shared"
+      ],
       "priority": "P1",
       "description": "User adds a product to the shopping cart from the detail page",
       "expectedSpecs": 1
@@ -77,7 +105,9 @@
     "shopping-cart-persist": {
       "name": "Cart persists across pages",
       "module": "shopping",
-      "roles": ["shared"],
+      "roles": [
+        "shared"
+      ],
       "priority": "P2",
       "description": "Cart items persist when navigating between pages",
       "expectedSpecs": 1
@@ -85,7 +115,9 @@
     "shopping-checkout-complete": {
       "name": "Complete checkout flow",
       "module": "shopping",
-      "roles": ["shared"],
+      "roles": [
+        "shared"
+      ],
       "priority": "P1",
       "description": "User completes checkout with items in cart",
       "expectedSpecs": 1
@@ -93,7 +125,9 @@
     "blog-list-view": {
       "name": "View blog listing",
       "module": "blog",
-      "roles": ["shared"],
+      "roles": [
+        "shared"
+      ],
       "priority": "P2",
       "description": "User views the blog listing page with blog entries",
       "expectedSpecs": 1
@@ -101,23 +135,33 @@
     "blog-detail-view": {
       "name": "View blog detail",
       "module": "blog",
-      "roles": ["shared"],
+      "roles": [
+        "shared"
+      ],
       "priority": "P2",
       "description": "User navigates to and views a blog detail page",
-      "expectedSpecs": 1
+      "outcomes": [
+        "success"
+      ]
     },
     "blog-detail-not-found": {
       "name": "Blog detail handles non-existent entry",
       "module": "blog",
-      "roles": ["shared"],
+      "roles": [
+        "shared"
+      ],
       "priority": "P3",
       "description": "User navigates to a non-existent blog and the app handles it gracefully",
-      "expectedSpecs": 1
+      "outcomes": [
+        "error"
+      ]
     },
     "home-carousel-navigate": {
       "name": "Navigate home page carousels",
       "module": "home",
-      "roles": ["shared"],
+      "roles": [
+        "shared"
+      ],
       "priority": "P3",
       "description": "User navigates product and blog carousels on the home page",
       "expectedSpecs": 1
@@ -125,7 +169,9 @@
     "header-search": {
       "name": "Search modal open/close",
       "module": "navigation",
-      "roles": ["shared"],
+      "roles": [
+        "shared"
+      ],
       "priority": "P2",
       "description": "User opens the search modal, types a query, and closes it",
       "expectedSpecs": 1
@@ -133,7 +179,9 @@
     "header-cart-overlay": {
       "name": "Cart overlay open/close",
       "module": "navigation",
-      "roles": ["shared"],
+      "roles": [
+        "shared"
+      ],
       "priority": "P2",
       "description": "User opens and closes the shopping cart overlay from the header",
       "expectedSpecs": 1
@@ -141,26 +189,38 @@
     "static-about": {
       "name": "View About Us page",
       "module": "static",
-      "roles": ["shared"],
+      "roles": [
+        "shared"
+      ],
       "priority": "P4",
       "description": "User views the About Us page content",
-      "expectedSpecs": 1
+      "outcomes": [
+        "display"
+      ]
     },
     "static-contact": {
       "name": "View Contact page",
       "module": "static",
-      "roles": ["shared"],
+      "roles": [
+        "shared"
+      ],
       "priority": "P4",
       "description": "User views the Contact page content",
-      "expectedSpecs": 1
+      "outcomes": [
+        "display"
+      ]
     },
     "not-found-page": {
       "name": "404 not found page",
       "module": "navigation",
-      "roles": ["shared"],
+      "roles": [
+        "shared"
+      ],
       "priority": "P3",
       "description": "User navigates to an unknown route and sees the 404 page",
-      "expectedSpecs": 1
+      "outcomes": [
+        "display"
+      ]
     }
   }
 }

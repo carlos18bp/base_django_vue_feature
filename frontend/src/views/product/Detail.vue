@@ -68,19 +68,21 @@
                             <div class="flex items-center border border-border rounded-full h-12">
                                 <button
                                     class="px-3 py-2 hover:text-muted-foreground"
+                                    data-testid="quantity-decrement"
                                     @click="decrementQuantity">
                                     <MinusSmallIcon class="h-6 w-6" aria-hidden="true" />
                                 </button>
-                                <span class="px-4 py-2 font-semibold">{{ productQuantity }}</span>
+                                <span data-testid="quantity-value" class="px-4 py-2 font-semibold">{{ productQuantity }}</span>
                                 <button
                                     class="px-3 py-2 hover:text-muted-foreground"
+                                    data-testid="quantity-increment"
                                     @click="productQuantity++">
                                     <PlusSmallIcon class="w-6 h-6"/>
                                 </button>
                                 
                             </div>
 
-                            <button @click="addToCart"
+                            <button data-testid="add-to-cart" @click="addToCart"
                                 class="px-8 py-2 w-full h-12 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 text-md">
                                 <span class="uppercase">Add to cart</span>
                             </button>

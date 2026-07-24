@@ -2,10 +2,12 @@ import { test, expect } from '../helpers/test.js';
 import { SHOPPING_PRODUCT_DETAIL } from '../helpers/flow-tags.js';
 
 /**
- * E2E tests for the product detail page flow.
+ * E2E tests for the product detail page.
  *
- * Covers viewing product detail, changing quantity,
- * and handling non-existent products.
+ * Reaches the detail page by clicking a product in the catalog (not a deep
+ * link), and exercises the quantity control the flow is named for. The
+ * not-found case has no UI path and is asserted by the absence of the product
+ * actions.
  */
 
 test.describe('Shopping — product detail', () => {
@@ -14,47 +16,50 @@ test.describe('Shopping — product detail', () => {
     await page.addInitScript(() => localStorage.clear());
   });
 
-  test('navigating to a product detail URL renders the product page', {
-    tag: [...SHOPPING_PRODUCT_DETAIL, '@role:shared'],
+  test('opens a product from the catalog and shows its actions', {
+    tag: [...SHOPPING_PRODUCT_DETAIL, '@role:shared', '@outcome:success'],
   }, async ({ page }) => {
     await page.goto('/catalog');
     await page.waitForLoadState('domcontentloaded');
 
     const productLinks = page.locator('a[href*="/product/"]');
     await expect(productLinks.first()).toBeVisible({ timeout: 15000 });
-    const count = await productLinks.count();
-    expect(count).toBeGreaterThan(0);
-    // quality: allow-fragile-selector (selecting first product link from dynamic server-rendered list; no stable per-item ID available)
-    const href = await productLinks.first().getAttribute('href');
-    await page.goto(href);
+    // quality: allow-fragile-selector (first product from a dynamic server-rendered list; no stable per-item id)
+    await productLinks.first().click();
+
     await expect(page).toHaveURL(/\/product\//);
+    await expect(page.getByTestId('add-to-cart')).toBeVisible();
   });
 
-  test('can change product quantity', {
-    tag: [...SHOPPING_PRODUCT_DETAIL, '@role:shared'],
+  test('can change the product quantity on the detail page', {
+    tag: [...SHOPPING_PRODUCT_DETAIL, '@role:shared', '@outcome:success'],
   }, async ({ page }) => {
     await page.goto('/catalog');
     await page.waitForLoadState('domcontentloaded');
 
     const productLinks = page.locator('a[href*="/product/"]');
     await expect(productLinks.first()).toBeVisible({ timeout: 15000 });
-    const count = await productLinks.count();
-    expect(count).toBeGreaterThan(0);
-    // quality: allow-fragile-selector (selecting first product link from dynamic server-rendered list; no stable per-item ID available)
-    const href = await productLinks.first().getAttribute('href');
-    await page.goto(href);
+    // quality: allow-fragile-selector (first product from a dynamic server-rendered list; no stable per-item id)
+    await productLinks.first().click();
+    await expect(page).toHaveURL(/\/product\//);
 
-    const addToCartButton = page.getByRole('button', { name: /add to cart/i });
-    await expect(addToCartButton).toBeVisible();
+    const quantity = page.getByTestId('quantity-value');
+    await expect(quantity).toHaveText('1');
+
+    await page.getByTestId('quantity-increment').click();
+    await expect(quantity).toHaveText('2');
+
+    await page.getByTestId('quantity-decrement').click();
+    await expect(quantity).toHaveText('1');
   });
 
-  test('product detail handles non-existent product gracefully', {
-    tag: [...SHOPPING_PRODUCT_DETAIL, '@role:shared'],
+  test('a non-existent product shows no add-to-cart action', {
+    tag: [...SHOPPING_PRODUCT_DETAIL, '@role:shared', '@outcome:error'],
   }, async ({ page }) => {
+    // quality: allow-no-interaction (there is no UI path to a non-existent product; direct navigation is the only way to exercise the missing-product case)
     await page.goto('/product/999999');
+    await page.waitForLoadState('domcontentloaded');
 
-    await expect(page).toHaveURL(/\/product\/999999/);
-    const addToCartButton = page.getByRole('button', { name: /add to cart/i });
-    await expect(addToCartButton).toHaveCount(0);
+    await expect(page.getByTestId('add-to-cart')).toHaveCount(0);
   });
 });
