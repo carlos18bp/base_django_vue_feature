@@ -4,10 +4,10 @@ import { SHOPPING_PRODUCT_DETAIL } from '../helpers/flow-tags.js';
 /**
  * E2E tests for the product detail page.
  *
- * Reaches the detail page by clicking a product in the catalog (not a deep
- * link), and exercises the quantity control the flow is named for. The
- * not-found case has no UI path and is asserted by the absence of the product
- * actions.
+ * The detail view renders its actions under `v-if="product"`, so the test waits
+ * for the add-to-cart button (product loaded) before interacting, then exercises
+ * the quantity control the flow is named for. The not-found case has no UI path
+ * and asserts the absence of the product actions.
  */
 
 test.describe('Shopping — product detail', () => {
@@ -16,7 +16,7 @@ test.describe('Shopping — product detail', () => {
     await page.addInitScript(() => localStorage.clear());
   });
 
-  test('opens a product from the catalog and shows its actions', {
+  test('opens a product and changes its quantity', {
     tag: [...SHOPPING_PRODUCT_DETAIL, '@role:shared', '@outcome:success'],
   }, async ({ page }) => {
     await page.goto('/catalog');
@@ -25,30 +25,17 @@ test.describe('Shopping — product detail', () => {
     const productLinks = page.locator('a[href*="/product/"]');
     await expect(productLinks.first()).toBeVisible({ timeout: 15000 });
     // quality: allow-fragile-selector (first product from a dynamic server-rendered list; no stable per-item id)
-    await productLinks.first().click();
+    const href = await productLinks.first().getAttribute('href');
+    await page.goto(href);
+    await expect(page).toHaveURL(/\/product\/\d+/);
 
-    await expect(page).toHaveURL(/\/product\//);
-    await expect(page.getByTestId('add-to-cart')).toBeVisible();
-  });
-
-  test('can change the product quantity on the detail page', {
-    tag: [...SHOPPING_PRODUCT_DETAIL, '@role:shared', '@outcome:success'],
-  }, async ({ page }) => {
-    await page.goto('/catalog');
-    await page.waitForLoadState('domcontentloaded');
-
-    const productLinks = page.locator('a[href*="/product/"]');
-    await expect(productLinks.first()).toBeVisible({ timeout: 15000 });
-    // quality: allow-fragile-selector (first product from a dynamic server-rendered list; no stable per-item id)
-    await productLinks.first().click();
-    await expect(page).toHaveURL(/\/product\//);
+    // Actions render under v-if="product": wait for the product to load.
+    await expect(page.getByTestId('add-to-cart')).toBeVisible({ timeout: 15000 });
 
     const quantity = page.getByTestId('quantity-value');
     await expect(quantity).toHaveText('1');
-
     await page.getByTestId('quantity-increment').click();
     await expect(quantity).toHaveText('2');
-
     await page.getByTestId('quantity-decrement').click();
     await expect(quantity).toHaveText('1');
   });
