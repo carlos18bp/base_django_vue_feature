@@ -1,18 +1,4 @@
 {
   "_comment": "Junk-test findings that predate the rules. These stay warnings under --junk-severity=error so existing debt does not block merges; anything not listed here is a new finding and fails. This file should only ever shrink.",
-  "findings": [
-    "frontend/e2e/auth/auth-login.spec.js::flow_tag_mismatch::validates empty form submission stays on sign-in",
-    "frontend/e2e/blog/blog-list.spec.js::no_user_interaction::blogs list page loads with content",
-    "frontend/e2e/home/home-carousels.spec.js::no_data_assertion::blog carousel can navigate",
-    "frontend/e2e/home/home-carousels.spec.js::no_data_assertion::product carousel advances forward when next button is clicked",
-    "frontend/e2e/home/home-carousels.spec.js::no_data_assertion::product carousel moves back when prev button is clicked",
-    "frontend/e2e/home/home-carousels.spec.js::no_data_assertion::product carousel shows navigation controls when items are loaded",
-    "frontend/e2e/home/home-carousels.spec.js::no_user_interaction::product carousel shows navigation controls when items are loaded",
-    "frontend/e2e/home/home-carousels.spec.js::weak_assertion::blog carousel can navigate",
-    "frontend/e2e/home/home-carousels.spec.js::weak_assertion::product carousel advances forward when next button is clicked",
-    "frontend/e2e/home/home-carousels.spec.js::weak_assertion::product carousel moves back when prev button is clicked",
-    "frontend/e2e/shopping/shopping-catalog.spec.js::no_user_interaction::can navigate to product detail from catalog",
-    "frontend/e2e/shopping/shopping-catalog.spec.js::no_user_interaction::catalog page is reachable and shows products",
-    "frontend/test/views/SignIn.test.js::weak_assertion::submit button is disabled while loading"
-  ]
+  "findings": []
 }
