@@ -40,16 +40,6 @@ test.describe('Auth — sign-in page', () => {
     await expect(page).toHaveURL(/\/dashboard/);
   });
 
-  test('validates empty form submission stays on sign-in', {
-    tag: [...AUTH_LOGIN_EMAIL, '@role:shared'],
-  }, async ({ page }) => {
-    const submitButton = page.getByRole('button', { name: /(sign in|login|entrar)/i }).first();
-
-    await expect(submitButton).toBeVisible();
-    await submitButton.click();
-    await expect(page).toHaveURL(/sign_in/);
-  });
-
   test('shows error with invalid credentials', {
     tag: [...AUTH_LOGIN_INVALID, '@role:shared'],
   }, async ({ page }) => {

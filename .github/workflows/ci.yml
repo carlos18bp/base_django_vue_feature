@@ -169,7 +169,7 @@ jobs:
           from base_feature_app.models import User
           User.objects.create_user(email='admin@gmail.com', password='password', is_active=True)
           "
-          python backend/manage.py create_fake_data 5
+          python backend/manage.py create_fake_data 12
         working-directory: .
 
       - name: Install dependencies
