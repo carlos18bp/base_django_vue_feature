@@ -1,4 +1,20 @@
 {
   "_comment": "Junk-test findings that predate the rules. These stay warnings under --junk-severity=error so existing debt does not block merges; anything not listed here is a new finding and fails. This file should only ever shrink.",
-  "findings": []
+  "findings": [
+    "frontend/test/components/BlogCarousel.test.js::mock_only_assertion::stopCarousel clears interval on unmount",
+    "frontend/test/components/BlogCarousel.test.js::mock_only_assertion::stopCarousel does not call clearInterval when interval was never started",
+    "frontend/test/components/ProductCarousel.test.js::mock_only_assertion::stopCarousel clears interval on unmount",
+    "frontend/test/components/ProductCarousel.test.js::mock_only_assertion::stopCarousel does not call clearInterval when interval was never started",
+    "frontend/test/components/ShoppingCart.test.js::mock_only_assertion::CartProduct removeProduct event with unknown id does not call store",
+    "frontend/test/components/ShoppingCart.test.js::mock_only_assertion::handleRemoveProduct with numeric id not in cart does not call removeProductFromCart",
+    "frontend/test/helpers/notification.test.js::mock_only_assertion::didOpen callback attaches mouseenter listener that calls Swal.stopTimer",
+    "frontend/test/helpers/notification.test.js::mock_only_assertion::didOpen callback attaches mouseleave listener that calls Swal.resumeTimer",
+    "frontend/test/stores/auth.test.js::mock_only_assertion::does not persist tokens when access token is missing",
+    "frontend/test/stores/auth.test.js::mock_only_assertion::should clear all auth data on sign out",
+    "frontend/test/stores/blog.test.js::mock_only_assertion::should not fetch if data already loaded",
+    "frontend/test/stores/product.test.js::mock_only_assertion::should handle createSale error",
+    "frontend/test/stores/product.test.js::mock_only_assertion::should not fetch if data already loaded",
+    "frontend/test/views/Dashboard.test.js::mock_only_assertion::signOut button calls authStore.signOut",
+    "frontend/test/views/SignIn.test.js::mock_only_assertion::onMounted does not redirect when not authenticated"
+  ]
 }
