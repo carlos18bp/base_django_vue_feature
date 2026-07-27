@@ -9,7 +9,7 @@ import { HEADER_CART_OVERLAY } from '../helpers/flow-tags.js';
 
 test.describe('Navigation — cart overlay', () => {
   test('can open and close the shopping cart', {
-    tag: [...HEADER_CART_OVERLAY, '@role:shared'],
+    tag: [...HEADER_CART_OVERLAY, '@role:shared', '@outcome:success'],
   }, async ({ page }) => {
     const viewport = page.viewportSize();
     if (viewport && viewport.width < 1024) test.skip(true, 'Desktop-only flow — cart button hidden on mobile (hidden lg:flex)');

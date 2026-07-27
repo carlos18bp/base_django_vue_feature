@@ -14,7 +14,7 @@ test.describe('Shopping — checkout', () => {
   });
 
   test('can complete checkout with items in cart', {
-    tag: [...SHOPPING_CHECKOUT_COMPLETE, '@role:shared'],
+    tag: [...SHOPPING_CHECKOUT_COMPLETE, '@role:shared', '@outcome:success'],
     timeout: 60000,
   }, async ({ page }) => {
     await page.goto('/catalog');
@@ -51,7 +51,7 @@ test.describe('Shopping — checkout', () => {
   });
 
   test('validates required fields in checkout form', {
-    tag: [...SHOPPING_CHECKOUT_COMPLETE, '@role:shared'],
+    tag: [...SHOPPING_CHECKOUT_COMPLETE, '@role:shared', '@outcome:error'],
   }, async ({ page }) => {
     await page.goto('/checkout');
 

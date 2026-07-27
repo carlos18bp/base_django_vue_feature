@@ -14,7 +14,7 @@ test.describe('Shopping — cart', () => {
   });
 
   test('can add product to cart', {
-    tag: [...SHOPPING_CART_ADD, '@role:shared'],
+    tag: [...SHOPPING_CART_ADD, '@role:shared', '@outcome:success'],
   }, async ({ page }) => {
     await page.goto('/catalog');
     await page.waitForLoadState('domcontentloaded');
@@ -35,7 +35,7 @@ test.describe('Shopping — cart', () => {
   });
 
   test('cart persists across pages', {
-    tag: [...SHOPPING_CART_PERSIST, '@role:shared'],
+    tag: [...SHOPPING_CART_PERSIST, '@role:shared', '@outcome:display'],
   }, async ({ page }) => {
     await page.goto('/catalog');
     await page.waitForLoadState('domcontentloaded');

@@ -10,7 +10,9 @@
       ],
       "priority": "P1",
       "description": "User signs in with email and password credentials",
-      "expectedSpecs": 1
+      "outcomes": [
+        "success"
+      ]
     },
     "auth-login-invalid": {
       "name": "Login with invalid credentials",
@@ -20,7 +22,9 @@
       ],
       "priority": "P1",
       "description": "User sees error when submitting invalid credentials",
-      "expectedSpecs": 1
+      "outcomes": [
+        "error"
+      ]
     },
     "auth-register": {
       "name": "Register new account",
@@ -43,7 +47,9 @@
       ],
       "priority": "P2",
       "description": "User signs out and session/localStorage is cleared",
-      "expectedSpecs": 1
+      "outcomes": [
+        "success"
+      ]
     },
     "auth-protected-redirect": {
       "name": "Protected route redirect",
@@ -77,7 +83,9 @@
       ],
       "priority": "P1",
       "description": "User browses the product catalog page and sees products",
-      "expectedSpecs": 1
+      "outcomes": [
+        "success"
+      ]
     },
     "shopping-product-detail": {
       "name": "View product detail",
@@ -100,7 +108,9 @@
       ],
       "priority": "P1",
       "description": "User adds a product to the shopping cart from the detail page",
-      "expectedSpecs": 1
+      "outcomes": [
+        "success"
+      ]
     },
     "shopping-cart-persist": {
       "name": "Cart persists across pages",
@@ -110,7 +120,9 @@
       ],
       "priority": "P2",
       "description": "Cart items persist when navigating between pages",
-      "expectedSpecs": 1
+      "outcomes": [
+        "display"
+      ]
     },
     "shopping-checkout-complete": {
       "name": "Complete checkout flow",
@@ -120,7 +132,10 @@
       ],
       "priority": "P1",
       "description": "User completes checkout with items in cart",
-      "expectedSpecs": 1
+      "outcomes": [
+        "success",
+        "error"
+      ]
     },
     "blog-list-view": {
       "name": "View blog listing",
@@ -130,7 +145,9 @@
       ],
       "priority": "P2",
       "description": "User views the blog listing page with blog entries",
-      "expectedSpecs": 1
+      "outcomes": [
+        "success"
+      ]
     },
     "blog-detail-view": {
       "name": "View blog detail",
@@ -164,7 +181,9 @@
       ],
       "priority": "P3",
       "description": "User navigates product and blog carousels on the home page",
-      "expectedSpecs": 1
+      "outcomes": [
+        "success"
+      ]
     },
     "header-search": {
       "name": "Search modal open/close",
@@ -174,7 +193,9 @@
       ],
       "priority": "P2",
       "description": "User opens the search modal, types a query, and closes it",
-      "expectedSpecs": 1
+      "outcomes": [
+        "success"
+      ]
     },
     "header-cart-overlay": {
       "name": "Cart overlay open/close",
@@ -184,7 +205,9 @@
       ],
       "priority": "P2",
       "description": "User opens and closes the shopping cart overlay from the header",
-      "expectedSpecs": 1
+      "outcomes": [
+        "success"
+      ]
     },
     "static-about": {
       "name": "View About Us page",

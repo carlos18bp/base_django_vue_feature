@@ -10,7 +10,7 @@ import { setAuthLocalStorage } from '../helpers/auth.js';
 
 test.describe('Auth — sign out', () => {
   test('sign out clears authenticated header state', {
-    tag: [...AUTH_LOGOUT, '@role:shared'],
+    tag: [...AUTH_LOGOUT, '@role:shared', '@outcome:success'],
   }, async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await setAuthLocalStorage(page, {

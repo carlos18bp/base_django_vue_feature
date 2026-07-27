@@ -9,7 +9,7 @@ import { HEADER_SEARCH } from '../helpers/flow-tags.js';
 
 test.describe('Navigation — search modal', () => {
   test('can open and close the search modal', {
-    tag: [...HEADER_SEARCH, '@role:shared'],
+    tag: [...HEADER_SEARCH, '@role:shared', '@outcome:success'],
   }, async ({ page }) => {
     const viewport = page.viewportSize();
     if (viewport && viewport.width < 1024) test.skip(true, 'Desktop-only flow — search button hidden on mobile (hidden lg:flex)');

@@ -21,7 +21,7 @@ test.describe('Auth — sign-in page', () => {
   });
 
   test('can sign in with valid credentials', {
-    tag: [...AUTH_LOGIN_EMAIL, '@role:shared'],
+    tag: [...AUTH_LOGIN_EMAIL, '@role:shared', '@outcome:success'],
   }, async ({ page }) => {
     await expect(page.locator('[name="email"]')).toBeVisible();
     await expect(page.locator('[type="password"]')).toBeVisible();
@@ -41,7 +41,7 @@ test.describe('Auth — sign-in page', () => {
   });
 
   test('shows error with invalid credentials', {
-    tag: [...AUTH_LOGIN_INVALID, '@role:shared'],
+    tag: [...AUTH_LOGIN_INVALID, '@role:shared', '@outcome:error'],
   }, async ({ page }) => {
     await page.locator('[name="email"]').fill('nobody@example.com');
     await page.locator('[type="password"]').fill('wrongpass');
