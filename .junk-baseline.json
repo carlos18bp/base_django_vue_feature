@@ -9,8 +9,6 @@
     "frontend/test/components/ShoppingCart.test.js::mock_only_assertion::handleRemoveProduct with numeric id not in cart does not call removeProductFromCart",
     "frontend/test/helpers/notification.test.js::mock_only_assertion::didOpen callback attaches mouseenter listener that calls Swal.stopTimer",
     "frontend/test/helpers/notification.test.js::mock_only_assertion::didOpen callback attaches mouseleave listener that calls Swal.resumeTimer",
-    "frontend/test/stores/auth.test.js::mock_only_assertion::does not persist tokens when access token is missing",
-    "frontend/test/stores/auth.test.js::mock_only_assertion::should clear all auth data on sign out",
     "frontend/test/stores/blog.test.js::mock_only_assertion::should not fetch if data already loaded",
     "frontend/test/stores/product.test.js::mock_only_assertion::should handle createSale error",
     "frontend/test/stores/product.test.js::mock_only_assertion::should not fetch if data already loaded",
