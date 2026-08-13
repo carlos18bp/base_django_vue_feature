@@ -7,134 +7,73 @@ description: Project intelligence and lessons learned. Reference for project-spe
 
 This file captures important patterns, preferences, and project intelligence that help work more effectively with this codebase. Updated as new insights are discovered.
 
+> Refreshed 2026-08-12: earlier revisions carried patterns from the parent lineage (single `content` app, BusinessProposal/email registry, Nuxt `serve_nuxt`). None of that exists in this template — everything below is verified against the current code.
+
 ---
 
 ## 1. Architecture Patterns
 
-### Content Storage: Structured JSON over CMS
-- Proposal sections, portfolio works, and blog posts use Django `JSONField` for content
-- Each proposal section's `content_json` maps directly to a Vue component's props schema
-- Blog supports dual format: structured JSON (preferred) with HTML fallback via `v-html`
-- This avoids the need for a full CMS while keeping content rich and structured
+### Single Django App: `base_feature_app`
+- All domain code lives in `base_feature_app`; `django_attachments` is the only sibling app.
+- **Per-domain packages**: `models/`, `views/`, `urls/`, `serializers/` are packages with one module per domain (`auth`, `blog`, `product`, `sale`, `staging_phase_banner`, `user`, `captcha`). New domains follow the same split.
 
-### Single Django App: `content`
-- All models, views, serializers, and services live in the `content` app
-- This works for now but may need splitting if scope grows significantly
-- Models are already split into individual files under `content/models/`
+### Service Layer
+- Business logic belongs in `base_feature_app/services/` (currently `auth_service.py`); views stay thin.
 
-### Service Layer Pattern
-- Business logic lives in `content/services/`, not in views
-- Views are thin FBV wrappers that call service methods
+### Guest checkout, protected products
+- `Sale` stores customer data inline (email/address — **no FK to User**), holds `SoldProduct` via M2M; `SoldProduct → Product` is `on_delete=PROTECT`. Sales can be deleted (custom `delete()` cleans sold products); products referenced by sales cannot.
 
----
+### Health endpoint as identity probe
+- `/api/health/` returns `{status, project, environment}` — `project` = clone dir name, `environment` reads the **setting** (not raw `os.getenv`). Reason: a dead staging domain can fall through DNS/nginx to another app; external probes must verify WHO answered (fleet lesson F24).
 
 ## 2. Code Style & Conventions
 
 ### Backend: Function-Based Views (FBV)
-- **All** DRF views use `@api_view` decorators, not class-based views
-- Never convert to CBV unless explicitly requested
+- **All** DRF views use `@api_view` decorators, not class-based views. Never convert to CBV unless explicitly requested.
 
 ### Frontend: Pinia Options API
-- **All** Pinia stores use Options API pattern: `{ state, getters, actions }`
-- Do NOT use Composition API (`setup()`) style for stores
-- HTTP requests go through `stores/services/request_http` centralized service
+- **All** Pinia stores use Options API pattern: `{ state, getters, actions }` — never `setup()` style stores.
+- HTTP requests go through the centralized service under `frontend/src/stores/services/`.
+- i18n is frontend-side (`stores/i18n.js`, `language.js`) — models have **no** bilingual paired fields in this template.
 
-### Bilingual Content Pattern
-- Models have paired fields: `title_en`/`title_es`, `content_json_en`/`content_json_es`, etc.
-- Frontend reads the appropriate field based on current locale
-- Proposals have a `language` field (`es`/`en`) that determines which default content to use
-
-### Naming Conventions
-- Backend: snake_case for everything (Python standard)
-- Frontend stores: snake_case file names (`portfolio_works.js`, `proposals.js`)
-- Frontend components: PascalCase (`BusinessProposal/Greeting.vue`)
-- Frontend composables: camelCase with `use` prefix (`useExpirationTimer.js`)
-
----
+### Naming
+- Backend: snake_case. Frontend stores: camelCase/snake files (`stagingBanner.js`, `auth.js`); components PascalCase; composables `use*`.
 
 ## 3. Development Workflow
 
-### Backend Commands Always Need venv
+### Environment selection — the trap
+- `DJANGO_SETTINGS_MODULE` picks the settings module (`manage.py` defaults to `settings_dev` → **SQLite**, DEBUG, console email; `settings_prod` → MySQL).
+- `DJANGO_ENV` is a separate flag (`IS_PRODUCTION`) driving huey `immediate` and the health payload. **It does not switch databases.** Never run tests with `DJANGO_ENV=production` expecting MySQL.
+
+### Backend commands always need the venv
 ```bash
-source venv/bin/activate && <command>
-# or
-venv/bin/python <command>
+cd backend && source venv/bin/activate && <command>   # or venv/bin/python
 ```
+- The venv is also load-bearing for E2E: `playwright.config.mjs` boots `../backend/venv/bin/python manage.py runserver 127.0.0.1:8001`.
 
-### Huey Immediate Mode in Development
-- When `DJANGO_ENV != 'production'`, Huey tasks execute synchronously
-- No need to run Redis or Huey worker for development
-- Tasks still need to be importable and functional
+### Huey immediate mode in development
+- With `DJANGO_ENV != 'production'`, huey runs `immediate=True` — no Redis/worker needed locally. No huey tasks are defined in the template yet.
 
-### Frontend Dev Proxy
-- Nuxt proxies `/api`, `/admin`, `/static`, `/media` to Django at `127.0.0.1:8000`
-- Both servers must be running simultaneously for full functionality
-- In production, everything goes through Django (no separate Nuxt server)
+### Frontend dev: Vite proxy
+- Vite proxies API paths to the backend (`VITE_BACKEND_URL`, default `http://127.0.0.1:8000/`); the E2E webServer overrides it to `:8001`. Both servers must run for full functionality (Playwright self-provisions both, `reuseExistingServer: true`).
 
-### Test Execution Rules
-- Never run the full test suite — always specify files
-- Backend: `pytest backend/content/tests/<specific_file> -v`
-- Frontend: `npm test -- <specific_file>`
-- E2E: max 2 files per `npx playwright test` invocation
-- Use `E2E_REUSE_SERVER=1` when dev server is already running
+### Test execution rules
+- Never run the full suite — always specify files; batches ≤20 tests.
+- Backend: `pytest base_feature_app/tests/<file> -v` (from `backend/`, venv active).
+- Frontend unit: `npm test -- test/<file>` (Jest).
+- E2E: max 2 files per `npx playwright test` invocation; `RECAPTCHA_*` env emptied by the webServer.
+- E2E seed recipe (mirrors `ci.yml`): migrate + `admin@gmail.com`/`password` + `create_fake_data 12`.
 
----
-
-## 4. Staging Deployment
-
-### Build Flow
-1. Frontend: `npm run build:django` → generates `backend/static/frontend/`
-2. Backend: `python manage.py collectstatic` → copies to `backend/staticfiles/`
-3. Restart: `sudo systemctl restart base_django_vue_feature_staging && sudo systemctl restart base_django_vue_feature-staging-huey`
-
-### Django Serves Nuxt Pages
-- The `serve_nuxt` catch-all view in `base_feature_project/views.py` serves pre-rendered Nuxt pages
-- This is the LAST URL pattern — all other routes take priority
-- CDN URL for assets configurable via `NUXT_APP_CDN_URL`
-
----
-
-## 5. Email System
-
-### Template Registry Pattern
-- All emails defined in `EmailTemplateRegistry` with default content
-- Admin can override content via `EmailTemplateConfig` model
-- Admin can disable specific emails via `is_active` flag
-- Preview rendering available for all templates
-
-### 24h Cooldown Rule
-- `last_automated_email_at` field on `BusinessProposal` tracks last automated email
-- All automated email tasks check this before sending
-- Manual sends (admin clicks "Send") bypass the cooldown
-
-### Automations Pause
-- `automations_paused` flag on `BusinessProposal` stops all automated emails
-- Each Huey task checks this flag early and returns if paused
-
----
-
-## 6. Proposal System Specifics
-
-### Section Types Are Fixed
-- 12 section types defined in `ProposalSection.SectionType` choices
-- Each maps to a specific Vue component in `components/BusinessProposal/`
-- Unique together constraint: `(proposal, section_type)` — one of each per proposal
-
-### Heat Score (1-10)
-- Pre-computed and cached in `cached_heat_score` field
-- Updated by tracking endpoint and periodic task (`refresh_all_heat_scores`)
-- Based on: view count, section time, recency, engagement patterns
-
----
-
-## 7. Testing Insights
+## 4. Testing Insights
 
 ### Backend conftest.py
-- Custom coverage report with Unicode progress bars replaces default pytest-cov output
-- `api_client` fixture provides unauthenticated DRF APIClient
-- Content tests have their own `conftest.py` with model-specific fixtures
+- Custom coverage report (Unicode bars) replaces default pytest-cov output; `api_client` fixture provides an unauthenticated DRF APIClient; sub-suites carry their own fixtures.
 
-### E2E Flow Definitions
-- Every navigation flow must be registered in `docs/USER_FLOW_MAP.md` and `frontend/e2e/flow-definitions.json`
-- E2E tests must reflect real user integrations
-- Follow quality standards from `docs/TESTING_QUALITY_STANDARDS.md`
+### Flow map discipline
+- Every user flow lives in `frontend/e2e/flow-definitions.json` (id, module, priority P1–P4, outcome classes) with `docs/USER_FLOW_MAP.md` as the readable mirror; specs tag `@flow:<id>` / `@outcome:<class>`. The Playwright reporter emits `e2e-results/flow-coverage.json`.
+- Quality bar: `docs/TESTING_QUALITY_STANDARDS.md` + gate (`scripts/test_quality_gate.py`, `.testquality.yml`, baseline `.junk-baseline.json`). CI runs the gate at `--junk-severity=error`.
+
+### Known traps
+- `pytest.ini` `python_files = test_*.py` collects `management/commands/test_email.py` (not a test).
+- `frontend/test/e2e/` is a dead legacy Playwright suite (no runner executes it) — do not add specs there; real E2E lives in `frontend/e2e/`.
+- The QA engine's registry fallback says `db=mysql` for this project; the test path is SQLite (see §3).

@@ -127,7 +127,7 @@ backend/<app>/tests/
 ├── contracts/        # OpenAPI/schema contract tests
 ├── integration/      # Cross-layer integration tests
 ├── management/       # Management command tests
-└── test_admin.py     # Django admin tests (standalone)
+└── admin/            # Django admin tests
 ```
 
 **Frontend Structure:**

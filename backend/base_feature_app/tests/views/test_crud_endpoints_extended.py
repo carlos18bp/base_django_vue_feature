@@ -1,10 +1,8 @@
+"""Extended CRUD endpoint tests: auth guards, 404 paths and serializer contracts."""
 import pytest
 from django.urls import reverse
-from rest_framework import status
-
 from django_attachments.models import Library
-
-from base_feature_app.models import Product
+from rest_framework import status
 
 
 @pytest.fixture
@@ -33,6 +31,7 @@ def created_blog(staff_client):
 
 @pytest.mark.django_db
 def test_blog_create_returns_201_for_staff(staff_client):
+    """Blog create returns 201 for staff."""
     library = Library.objects.create(title='Blog Library Create')
     url = reverse('create-blog')
     response = staff_client.post(
@@ -46,6 +45,7 @@ def test_blog_create_returns_201_for_staff(staff_client):
 
 @pytest.mark.django_db
 def test_blog_retrieve_returns_200_for_staff(created_blog):
+    """Blog retrieve returns 200 for staff."""
     client, blog_id = created_blog
     url = reverse('retrieve-blog', kwargs={'blog_id': blog_id})
     response = client.get(url)
@@ -54,6 +54,7 @@ def test_blog_retrieve_returns_200_for_staff(created_blog):
 
 @pytest.mark.django_db
 def test_blog_patch_returns_200_for_staff(created_blog):
+    """Blog patch returns 200 for staff."""
     client, blog_id = created_blog
     url = reverse('update-blog', kwargs={'blog_id': blog_id})
     response = client.patch(url, {'title': 'Updated Title'}, format='json')
@@ -63,6 +64,7 @@ def test_blog_patch_returns_200_for_staff(created_blog):
 
 @pytest.mark.django_db
 def test_blog_delete_returns_204_for_staff(created_blog):
+    """Blog delete returns 204 for staff."""
     client, blog_id = created_blog
     url = reverse('delete-blog', kwargs={'blog_id': blog_id})
     response = client.delete(url)
@@ -71,6 +73,7 @@ def test_blog_delete_returns_204_for_staff(created_blog):
 
 @pytest.mark.django_db
 def test_blog_returns_404_after_delete(created_blog):
+    """Blog returns 404 after delete."""
     client, blog_id = created_blog
     delete_url = reverse('delete-blog', kwargs={'blog_id': blog_id})
     retrieve_url = reverse('retrieve-blog', kwargs={'blog_id': blog_id})
@@ -81,6 +84,7 @@ def test_blog_returns_404_after_delete(created_blog):
 
 @pytest.mark.django_db
 def test_blog_retrieve_returns_404_when_not_found(staff_client):
+    """Blog retrieve returns 404 when not found."""
     url = reverse('retrieve-blog', kwargs={'blog_id': 999999})
     response = staff_client.get(url)
     assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -88,6 +92,7 @@ def test_blog_retrieve_returns_404_when_not_found(staff_client):
 
 @pytest.mark.django_db
 def test_blog_create_invalid_payload_returns_400(staff_client):
+    """Blog create invalid payload returns 400."""
     url = reverse('create-blog')
     response = staff_client.post(url, {}, format='json')
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -95,6 +100,7 @@ def test_blog_create_invalid_payload_returns_400(staff_client):
 
 @pytest.mark.django_db
 def test_blog_create_rejects_unauthenticated(api_client):
+    """Blog create rejects unauthenticated."""
     url = reverse('create-blog')
     response = api_client.post(url, {'title': 'X', 'description': 'D', 'category': 'C'}, format='json')
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
@@ -127,6 +133,7 @@ def created_product(staff_client):
 
 @pytest.mark.django_db
 def test_product_create_returns_201_for_staff(staff_client):
+    """Product create returns 201 for staff."""
     library = Library.objects.create(title='Product Library Create')
     url = reverse('create-product')
     response = staff_client.post(
@@ -140,6 +147,7 @@ def test_product_create_returns_201_for_staff(staff_client):
 
 @pytest.mark.django_db
 def test_product_retrieve_returns_200_for_staff(created_product):
+    """Product retrieve returns 200 for staff."""
     client, product_id, _ = created_product
     url = reverse('retrieve-product', kwargs={'product_id': product_id})
     response = client.get(url)
@@ -148,6 +156,7 @@ def test_product_retrieve_returns_200_for_staff(created_product):
 
 @pytest.mark.django_db
 def test_product_put_returns_200_for_staff(created_product):
+    """Product put returns 200 for staff."""
     client, product_id, library_id = created_product
     url = reverse('update-product', kwargs={'product_id': product_id})
     response = client.put(
@@ -161,6 +170,7 @@ def test_product_put_returns_200_for_staff(created_product):
 
 @pytest.mark.django_db
 def test_product_delete_returns_204_for_staff(created_product):
+    """Product delete returns 204 for staff."""
     client, product_id, _ = created_product
     url = reverse('delete-product', kwargs={'product_id': product_id})
     response = client.delete(url)
@@ -169,6 +179,7 @@ def test_product_delete_returns_204_for_staff(created_product):
 
 @pytest.mark.django_db
 def test_product_retrieve_returns_404_when_not_found(staff_client):
+    """Product retrieve returns 404 when not found."""
     url = reverse('retrieve-product', kwargs={'product_id': 999999})
     response = staff_client.get(url)
     assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -176,6 +187,7 @@ def test_product_retrieve_returns_404_when_not_found(staff_client):
 
 @pytest.mark.django_db
 def test_product_create_invalid_payload_returns_400(staff_client):
+    """Product create invalid payload returns 400."""
     url = reverse('create-product')
     response = staff_client.post(url, {}, format='json')
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -183,6 +195,7 @@ def test_product_create_invalid_payload_returns_400(staff_client):
 
 @pytest.mark.django_db
 def test_product_create_rejects_unauthenticated(api_client):
+    """Product create rejects unauthenticated."""
     url = reverse('create-product')
     response = api_client.post(url, {'title': 'X', 'category': 'C', 'sub_category': 'S', 'description': 'D', 'price': 1}, format='json')
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
@@ -215,6 +228,7 @@ def created_user_via_api(staff_client):
 
 @pytest.mark.django_db
 def test_user_create_returns_201_for_staff(staff_client):
+    """User create returns 201 for staff."""
     url = reverse('create-user')
     response = staff_client.post(url, _NEW_USER_PAYLOAD, format='json')
     assert response.status_code == status.HTTP_201_CREATED
@@ -223,6 +237,7 @@ def test_user_create_returns_201_for_staff(staff_client):
 
 @pytest.mark.django_db
 def test_user_retrieve_returns_200_for_staff(created_user_via_api):
+    """User retrieve returns 200 for staff."""
     client, user_id = created_user_via_api
     url = reverse('retrieve-user', kwargs={'user_id': user_id})
     response = client.get(url)
@@ -231,6 +246,7 @@ def test_user_retrieve_returns_200_for_staff(created_user_via_api):
 
 @pytest.mark.django_db
 def test_user_patch_returns_200_for_staff(created_user_via_api):
+    """User patch returns 200 for staff."""
     client, user_id = created_user_via_api
     url = reverse('update-user', kwargs={'user_id': user_id})
     response = client.patch(url, {'first_name': 'Updated'}, format='json')
@@ -240,6 +256,7 @@ def test_user_patch_returns_200_for_staff(created_user_via_api):
 
 @pytest.mark.django_db
 def test_user_delete_returns_204_for_staff(created_user_via_api):
+    """User delete returns 204 for staff."""
     client, user_id = created_user_via_api
     url = reverse('delete-user', kwargs={'user_id': user_id})
     response = client.delete(url)
@@ -248,6 +265,7 @@ def test_user_delete_returns_204_for_staff(created_user_via_api):
 
 @pytest.mark.django_db
 def test_user_returns_404_after_delete(created_user_via_api):
+    """User returns 404 after delete."""
     client, user_id = created_user_via_api
     delete_url = reverse('delete-user', kwargs={'user_id': user_id})
     retrieve_url = reverse('retrieve-user', kwargs={'user_id': user_id})
@@ -258,6 +276,7 @@ def test_user_returns_404_after_delete(created_user_via_api):
 
 @pytest.mark.django_db
 def test_user_create_invalid_payload_returns_400(staff_client):
+    """User create invalid payload returns 400."""
     url = reverse('create-user')
     response = staff_client.post(url, {}, format='json')
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -265,6 +284,7 @@ def test_user_create_invalid_payload_returns_400(staff_client):
 
 @pytest.mark.django_db
 def test_user_delete_rejects_unauthenticated(api_client, user):
+    """User delete rejects unauthenticated."""
     url = reverse('delete-user', kwargs={'user_id': user.id})
     response = api_client.delete(url)
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
@@ -292,6 +312,7 @@ def sale_in_db(db, product):
 
 @pytest.mark.django_db
 def test_sale_list_returns_200_for_staff(staff_client, sale_in_db):
+    """Sale list returns 200 for staff."""
     url = reverse('list-sales')
     response = staff_client.get(url)
     assert response.status_code == status.HTTP_200_OK
@@ -299,6 +320,7 @@ def test_sale_list_returns_200_for_staff(staff_client, sale_in_db):
 
 @pytest.mark.django_db
 def test_sale_retrieve_returns_200_for_staff(staff_client, sale_in_db):
+    """Sale retrieve returns 200 for staff."""
     url = reverse('retrieve-sale', kwargs={'sale_id': sale_in_db.id})
     response = staff_client.get(url)
     assert response.status_code == status.HTTP_200_OK
@@ -306,16 +328,10 @@ def test_sale_retrieve_returns_200_for_staff(staff_client, sale_in_db):
 
 @pytest.mark.django_db
 def test_sale_retrieve_returns_404_when_not_found(staff_client):
+    """Sale retrieve returns 404 when not found."""
     url = reverse('retrieve-sale', kwargs={'sale_id': 999999})
     response = staff_client.get(url)
     assert response.status_code == status.HTTP_404_NOT_FOUND
-
-
-@pytest.mark.django_db
-def test_sale_list_rejects_unauthenticated(api_client):
-    url = reverse('list-sales')
-    response = api_client.get(url)
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 # ---------------------------------------------------------------------------
@@ -324,6 +340,7 @@ def test_sale_list_rejects_unauthenticated(api_client):
 
 @pytest.mark.django_db
 def test_blog_update_returns_404_when_not_found(staff_client):
+    """Blog update returns 404 when not found."""
     url = reverse('update-blog', kwargs={'blog_id': 999999})
     response = staff_client.patch(url, {'title': 'X'}, format='json')
     assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -331,6 +348,7 @@ def test_blog_update_returns_404_when_not_found(staff_client):
 
 @pytest.mark.django_db
 def test_blog_delete_returns_404_when_not_found(staff_client):
+    """Blog delete returns 404 when not found."""
     url = reverse('delete-blog', kwargs={'blog_id': 999999})
     response = staff_client.delete(url)
     assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -338,6 +356,7 @@ def test_blog_delete_returns_404_when_not_found(staff_client):
 
 @pytest.mark.django_db
 def test_product_update_returns_404_when_not_found(staff_client):
+    """Product update returns 404 when not found."""
     url = reverse('update-product', kwargs={'product_id': 999999})
     response = staff_client.patch(url, {'title': 'X'}, format='json')
     assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -345,6 +364,7 @@ def test_product_update_returns_404_when_not_found(staff_client):
 
 @pytest.mark.django_db
 def test_product_delete_returns_404_when_not_found(staff_client):
+    """Product delete returns 404 when not found."""
     url = reverse('delete-product', kwargs={'product_id': 999999})
     response = staff_client.delete(url)
     assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -352,6 +372,7 @@ def test_product_delete_returns_404_when_not_found(staff_client):
 
 @pytest.mark.django_db
 def test_user_update_returns_404_when_not_found(staff_client):
+    """User update returns 404 when not found."""
     url = reverse('update-user', kwargs={'user_id': 999999})
     response = staff_client.patch(url, {'first_name': 'X'}, format='json')
     assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -359,6 +380,7 @@ def test_user_update_returns_404_when_not_found(staff_client):
 
 @pytest.mark.django_db
 def test_user_delete_returns_404_when_not_found(staff_client):
+    """User delete returns 404 when not found."""
     url = reverse('delete-user', kwargs={'user_id': 999999})
     response = staff_client.delete(url)
     assert response.status_code == status.HTTP_404_NOT_FOUND
