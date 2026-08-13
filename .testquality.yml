@@ -16,6 +16,7 @@ min_lines_for_docstring: 15
 max_timeout_ms: 100
 
 py_allowed_folders:
+  - "admin"
   - "contracts"
   - "forms"
   - "integration"

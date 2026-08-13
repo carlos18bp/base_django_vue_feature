@@ -1490,7 +1490,7 @@ backend/
         ├── services/          # Business logic in services (if services/ exists)
         ├── utils/             # Pure utility tests
         ├── views/             # REST endpoint tests
-        └── test_admin.py      # Django admin tests (standalone file)
+        └── admin/             # Django admin tests
 ```
 
 **When to use each layer:**
