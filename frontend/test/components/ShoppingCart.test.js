@@ -120,26 +120,17 @@ describe("ShoppingCart Component", () => {
     });
 
     // Root div with fixed inset-0 should not be rendered when visible is false
-    expect(wrapper.find(".fixed").exists()).toBe(false);
+    expect(wrapper.find('[data-testid="cart-overlay"]').exists()).toBe(false);
     expect(document.body.style.overflow).toBe("auto");
   });
 
-  test("displays cart products", async () => {
-    const addSpy = jest.spyOn(productStore, "addProductToCart");
-    const removeSpy = jest.spyOn(productStore, "removeProductFromCart");
-
+  test("displays cart products", () => {
     wrapper = mount(ShoppingCart, {
       props: {
         visible: true,
       },
       global: {
-        stubs: buildStubs({
-          CartProduct: {
-            props: ["product"],
-            template:
-              "<div class='cart-product'>{{ product.title }}<button class='add' @click=\"$emit('addProduct', product)\"></button><button class='remove' @click=\"$emit('removeProduct', product)\"></button></div>",
-          },
-        }),
+        stubs: buildStubs(),
       },
     });
 
@@ -147,20 +138,10 @@ describe("ShoppingCart Component", () => {
     expect(cartProducts.length).toBe(2);
     expect(wrapper.text()).toContain("Product 1");
     expect(wrapper.text()).toContain("Product 2");
-
-    const firstAddButton = wrapper.find(".add");
-    const firstRemoveButton = wrapper.find(".remove");
-    await firstAddButton.trigger("click");
-    await firstRemoveButton.trigger("click");
-
-    const firstProduct = productStore.cartProducts[0];
-    expect(addSpy).toHaveBeenCalledWith(firstProduct);
-    expect(removeSpy).toHaveBeenCalledWith(firstProduct);
   });
 
-  test("handles add and remove actions through real CartProduct with memory router", async () => {
+  test("clicking the real CartProduct Add link calls store addProductToCart", async () => {
     const addSpy = jest.spyOn(productStore, "addProductToCart");
-    const removeSpy = jest.spyOn(productStore, "removeProductFromCart");
     productStore.cartProducts = [
       {
         id: 10,
@@ -170,6 +151,7 @@ describe("ShoppingCart Component", () => {
         gallery_urls: ["/image-1.jpg"],
       },
     ];
+    const firstProduct = productStore.cartProducts[0];
 
     const router = createRouter({
       history: createMemoryHistory(),
@@ -191,15 +173,48 @@ describe("ShoppingCart Component", () => {
     const cartProduct = wrapper.findComponent({ name: "CartProduct" });
     expect(cartProduct.exists()).toBe(true);
 
-    const links = cartProduct.findAll("a");
-    const addLink = links.find((link) => link.text() === "Add");
-    const removeLink = links.find((link) => link.text() === "Remove");
-
+    const addLink = cartProduct.findAll("a").find((link) => link.text() === "Add");
     await addLink.trigger("click");
+
+    expect(addSpy).toHaveBeenCalledWith(firstProduct);
+  });
+
+  test("clicking the real CartProduct Remove link calls store removeProductFromCart", async () => {
+    const removeSpy = jest.spyOn(productStore, "removeProductFromCart");
+    productStore.cartProducts = [
+      {
+        id: 10,
+        title: "Product 10",
+        price: 150,
+        quantity: 1,
+        gallery_urls: ["/image-1.jpg"],
+      },
+    ];
+    const firstProduct = productStore.cartProducts[0];
+
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        { path: "/", name: "home", component: { template: "<div />" } },
+        { path: "/catalog", name: "catalog", component: { template: "<div />" } },
+        { path: "/checkout", name: "checkout", component: { template: "<div />" } },
+      ],
+    });
+
+    router.push("/");
+    await router.isReady();
+
+    wrapper = mount(ShoppingCart, {
+      props: { visible: true },
+      global: { plugins: [router], stubs: { XMarkIcon: true } },
+    });
+
+    const cartProduct = wrapper.findComponent({ name: "CartProduct" });
+    expect(cartProduct.exists()).toBe(true);
+
+    const removeLink = cartProduct.findAll("a").find((link) => link.text() === "Remove");
     await removeLink.trigger("click");
 
-    const firstProduct = productStore.cartProducts[0];
-    expect(addSpy).toHaveBeenCalledWith(firstProduct);
     expect(removeSpy).toHaveBeenCalledWith(firstProduct);
   });
 
@@ -318,47 +333,6 @@ describe("ShoppingCart Component", () => {
     expect(wrapper.text()).toContain("Subtotal");
   });
 
-  test("delegating CartProduct addProduct event calls store addProductToCart", async () => {
-    const addSpy = jest.spyOn(productStore, "addProductToCart");
-
-    wrapper = mount(ShoppingCart, {
-      props: { visible: true },
-      global: {
-        stubs: buildStubs({
-          CartProduct: {
-            props: ["product"],
-            template: "<div><button class='add' @click=\"$emit('addProduct', product)\"></button></div>",
-          },
-        }),
-      },
-    });
-
-    await wrapper.find(".add").trigger("click");
-
-    expect(addSpy).toHaveBeenCalledWith(productStore.cartProducts[0]);
-  });
-
-  test("CartProduct removeProduct event removes item from store", async () => {
-    const removeSpy = jest.spyOn(productStore, "removeProductFromCart");
-    const firstProduct = productStore.cartProducts[0];
-
-    wrapper = mount(ShoppingCart, {
-      props: { visible: true },
-      global: {
-        stubs: buildStubs({
-          CartProduct: {
-            props: ["product"],
-            template: "<div><button class='remove' @click=\"$emit('removeProduct', product)\"></button></div>",
-          },
-        }),
-      },
-    });
-
-    await wrapper.find(".remove").trigger("click");
-
-    expect(removeSpy).toHaveBeenCalledWith(firstProduct);
-  });
-
   test("renders total price from store in the cart footer", () => {
     wrapper = mount(ShoppingCart, {
       props: { visible: true },
@@ -368,30 +342,6 @@ describe("ShoppingCart Component", () => {
     const expectedTotal = productStore.totalCartPrice;
     expect(wrapper.text()).toContain(String(expectedTotal));
     expect(productStore.cartProducts.length).toBe(2);
-  });
-
-  test("CartProduct events add and remove in same render cycle", async () => {
-    const addSpy = jest.spyOn(productStore, "addProductToCart");
-    const removeSpy = jest.spyOn(productStore, "removeProductFromCart");
-    const firstProduct = productStore.cartProducts[0];
-
-    wrapper = mount(ShoppingCart, {
-      props: { visible: true },
-      global: {
-        stubs: buildStubs({
-          CartProduct: {
-            props: ["product"],
-            template: "<div><button class='add' @click=\"$emit('addProduct', product)\"></button><button class='remove' @click=\"$emit('removeProduct', product)\"></button></div>",
-          },
-        }),
-      },
-    });
-
-    await wrapper.find(".add").trigger("click");
-    await wrapper.find(".remove").trigger("click");
-
-    expect(addSpy).toHaveBeenCalledWith(firstProduct);
-    expect(removeSpy).toHaveBeenCalledWith(firstProduct);
   });
 
   test("renders correctly regardless of current language setting", () => {
@@ -445,32 +395,6 @@ describe("ShoppingCart Component", () => {
 
     expect(document.body.style.overflow).toBe("hidden");
     expect(gsap.fromTo.mock.calls.length).toBeGreaterThanOrEqual(2);
-  });
-
-  test("handles CartProduct emitted events", async () => {
-    const addSpy = jest.spyOn(productStore, "addProductToCart");
-    const removeSpy = jest.spyOn(productStore, "removeProductFromCart");
-
-    wrapper = mount(ShoppingCart, {
-      props: {
-        visible: true,
-      },
-      global: {
-        stubs: buildStubs({
-          CartProduct: {
-            props: ["product"],
-            template: "<div><button class='add' @click=\"$emit('addProduct', product)\"></button><button class='remove' @click=\"$emit('removeProduct', product)\"></button></div>",
-          },
-        }),
-      },
-    });
-
-    await wrapper.find(".add").trigger("click");
-    await wrapper.find(".remove").trigger("click");
-
-    const firstProduct = productStore.cartProducts[0];
-    expect(addSpy).toHaveBeenCalledWith(firstProduct);
-    expect(removeSpy).toHaveBeenCalledWith(firstProduct);
   });
 
   test("CartProduct removeProduct event with id looks up and removes correct item", async () => {

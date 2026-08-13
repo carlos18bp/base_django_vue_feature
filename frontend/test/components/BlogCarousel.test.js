@@ -1,6 +1,7 @@
 import { mount, flushPromises } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { createRouter, createMemoryHistory } from 'vue-router';
+import { nextTick } from 'vue';
 
 jest.mock('@/services/http/client', () => ({
   get: jest.fn(),
@@ -78,7 +79,9 @@ describe('BlogCarousel Component', () => {
 
     await wrapper.find('[data-testid="blog-carousel-next"]').trigger('click');
 
-    expect(list.attributes('style')).not.toBe(styleBefore);
+    // Fails if next() advances to the wrong index (off-by-one) or if the
+    // translateX formula uses a divisor other than 5.
+    expect(list.attributes('style')).toContain('translateX(-20%');
   });
 
   test('next button wraps currentIndex to 0 when at last page', async () => {
@@ -101,7 +104,8 @@ describe('BlogCarousel Component', () => {
 
     await wrapper.find('[data-testid="blog-carousel-prev"]').trigger('click');
 
-    expect(wrapper.find('[data-testid="blog-carousel-list"]').attributes('style')).not.toBe(styleAfterNext);
+    // Fails if prev() does not land back on exactly index 0 after next()+prev().
+    expect(wrapper.find('[data-testid="blog-carousel-list"]').attributes('style')).toContain('translateX(-0%');
   });
 
   test('prev button wraps to last page when at index 0', async () => {
@@ -111,7 +115,9 @@ describe('BlogCarousel Component', () => {
     await wrapper.find('[data-testid="blog-carousel-prev"]').trigger('click');
 
     const list = wrapper.find('[data-testid="blog-carousel-list"]');
-    expect(list.attributes('style')).not.toContain('translateX(-0%');
+    // Fails if the wrap from index 0 lands on any page other than the last
+    // one (Math.ceil(6/5)-1=1), not just "something other than 0".
+    expect(list.attributes('style')).toContain('translateX(-20%');
   });
 
   test('startCarousel sets up auto-advance interval', async () => {
@@ -152,9 +158,11 @@ describe('BlogCarousel Component', () => {
 
     const styleBefore = wrapper.find('[data-testid="blog-carousel-list"]').attributes('style');
     jest.advanceTimersByTime(3000);
-    await wrapper.vm.$nextTick();
+    await nextTick();
 
-    expect(wrapper.find('[data-testid="blog-carousel-list"]').attributes('style')).not.toBe(styleBefore);
+    // Fails if the setInterval callback advances to the wrong index (or not
+    // at all) on the first 3s tick.
+    expect(wrapper.find('[data-testid="blog-carousel-list"]').attributes('style')).toContain('translateX(-20%');
   });
 
   test('does not render blog title span when language is not en', async () => {

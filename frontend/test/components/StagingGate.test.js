@@ -112,4 +112,20 @@ describe('StagingGate', () => {
 
     expect(presence(wrapper)).toEqual({ banner: false, overlay: true, content: false });
   });
+
+  // Falla si el catch silencioso de stagingBanner.js (fetchState, catch :38-39)
+  // deja de tragarse el rechazo del fetch (p.ej. un rethrow, o si se pierde
+  // `hasFetched = true` en el finally): App.vue envuelve Header+RouterView+Footer
+  // en StagingGate, así que un rechazo sin manejar rompería el shell entero en
+  // cada página mientras el endpoint del banner de staging esté caído.
+  test('renders only the default slot when the staging banner fetch rejects', async () => {
+    fetchStagingBannerState.mockRejectedValue(new Error('network down'));
+    wrapper = mount(StagingGate, {
+      global: { plugins: [i18n] },
+      slots: { default: '<div data-testid="site-content">content</div>' },
+    });
+    await flushPromises();
+
+    expect(presence(wrapper)).toEqual({ banner: false, overlay: false, content: true });
+  });
 });
