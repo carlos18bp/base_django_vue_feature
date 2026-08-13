@@ -12,6 +12,7 @@ e2e/
 ├── helpers/
 │   ├── flow-tags.js               # Tag constants per flow
 │   ├── auth.js                    # Auth helpers (login, logout, localStorage)
+│   ├── django-shell.js            # Idempotent manage.py shell-outs (fixtures: staff/superuser, staging singleton)
 │   └── test.js                    # Custom test base (error logging, timeouts)
 ├── auth/                          # Auth module specs
 │   ├── auth-login.spec.js
@@ -19,6 +20,9 @@ e2e/
 │   ├── auth-logout.spec.js
 │   ├── auth-protected-redirect.spec.js
 │   └── auth-guest-redirect.spec.js
+├── admin/                         # Admin/backoffice module specs
+│   ├── backoffice.spec.js
+│   └── admin-login-handoff.spec.js
 ├── shopping/                      # Shopping module specs
 │   ├── shopping-catalog.spec.js
 │   ├── shopping-product-detail.spec.js
@@ -29,10 +33,16 @@ e2e/
 │   └── blog-detail.spec.js
 ├── home/                          # Home module specs
 │   └── home-carousels.spec.js
+├── manual/                        # Manual module specs
+│   ├── manual-view.spec.js
+│   └── manual-search.spec.js
 ├── navigation/                    # Navigation module specs
 │   ├── navigation-search.spec.js
 │   ├── navigation-cart-overlay.spec.js
+│   ├── navigation-theme-toggle.spec.js
 │   └── navigation-not-found.spec.js
+├── platform/                      # Platform module specs (staging gate — serial, mutates a DB singleton)
+│   └── staging-banner.spec.js
 └── static/                        # Static pages module specs
     └── static-pages.spec.js
 ```
@@ -167,22 +177,26 @@ JSON artifacts:
 | `logout(page)` | `helpers/auth.js` | Sign out via UI button |
 | `test` / `expect` | `helpers/test.js` | Custom test base with error logging |
 | Flow tag constants | `helpers/flow-tags.js` | Tag arrays per flow |
+| Django shell-outs | `helpers/django-shell.js` | Idempotent `manage.py shell -c` fixtures (staff/superuser users, staging-banner singleton) — CI/local python branching included |
 
 ### Logging
 
 Set `E2E_LOG_ERRORS=1` (or `E2E_LOG_CONSOLE_ERRORS=1`) to log page errors and console errors during runs.
 
-## Flow Definitions (20 flows)
+## Flow Definitions (31 flows)
 
-Source of truth: `e2e/flow-definitions.json` (update `lastUpdated` when adding flows).
+Source of truth: `e2e/flow-definitions.json` (update `lastUpdated` when adding flows). Human-readable mirror with evidence and outcome detail: `docs/USER_FLOW_MAP.md`.
 
 | Module | Flows | Priority |
 |--------|-------|----------|
-| **auth** | login-email, login-invalid, register, logout, protected-redirect, guest-redirect | P1-P2 |
-| **shopping** | catalog-browse, product-detail, cart-add, cart-persist, checkout-complete | P1-P2 |
+| **auth** | login-email, login-invalid, login-server-error, register, google-login (structurally excluded in e2e — see helpers/test.js), logout, protected-redirect, guest-redirect, admin-login-handoff | P1-P3 |
+| **admin** | backoffice-users-list, backoffice-sales-list | P2 |
+| **shopping** | catalog-browse, product-detail, cart-add, cart-remove, cart-persist, checkout-complete | P1-P2 |
 | **blog** | list-view, detail-view, detail-not-found | P2-P3 |
 | **home** | carousel-navigate | P3 |
-| **navigation** | header-search, header-cart-overlay, not-found-page | P2-P3 |
+| **manual** | manual-view, manual-search | P3 |
+| **navigation** | header-search, header-cart-overlay, theme-toggle, not-found-page | P2-P4 |
+| **platform** | staging-phase-banner-display, staging-review-expired-overlay | P3-P4 |
 | **static** | static-about, static-contact | P4 |
 
 ## References

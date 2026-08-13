@@ -1,10 +1,13 @@
 import { test, expect } from '../helpers/test.js';
-import { AUTH_LOGIN_EMAIL, AUTH_LOGIN_INVALID } from '../helpers/flow-tags.js';
+import { AUTH_LOGIN_EMAIL, AUTH_LOGIN_INVALID, AUTH_LOGIN_SERVER_ERROR } from '../helpers/flow-tags.js';
 
 /**
  * E2E tests for the sign-in flow.
  *
- * Covers valid login, invalid credentials, and empty form submission.
+ * Covers valid login, invalid credentials, and a server-side 500 (a failure
+ * distinct from "invalid credentials" — SignIn.vue branches on response
+ * status and only the 401 branch is exercised by the invalid-credentials
+ * test above).
  */
 
 test.describe('Auth — sign-in page', () => {
@@ -53,6 +56,24 @@ test.describe('Auth — sign-in page', () => {
     await signInResponse;
 
     await expect(page.getByRole('alert', { name: /invalid credentials/i })).toBeVisible();
+    await expect(page).toHaveURL(/\/sign_in/);
+  });
+
+  test('shows a generic failure notice when the server errors', {
+    tag: [...AUTH_LOGIN_SERVER_ERROR, '@role:shared', '@outcome:failure'],
+  }, async ({ page }) => {
+    // Bug this catches: the same unified catch-block regression as above, but
+    // in SignIn.vue's own status-branching (handleSignIn) — a 5xx must fall
+    // to the generic "Error signing in" else-branch, not the 401-only
+    // "Invalid credentials" message, and must not throw unhandled or navigate
+    // away.
+    await page.route('**/sign_in/', (route) => route.fulfill({ status: 500 }));
+
+    await page.locator('[name="email"]').fill('admin@gmail.com');
+    await page.locator('[type="password"]').fill('password');
+    await page.getByRole('button', { name: /(sign in|login|entrar)/i }).first().click();
+
+    await expect(page.getByRole('alert', { name: /error signing in/i })).toBeVisible();
     await expect(page).toHaveURL(/\/sign_in/);
   });
 });
