@@ -494,18 +494,6 @@ describe("ShoppingCart Component", () => {
     expect(removeSpy).toHaveBeenCalledWith(firstProduct);
   });
 
-  test("CartProduct removeProduct event with unknown id does not call store", async () => {
-    const removeSpy = jest.spyOn(productStore, "removeProductFromCart");
-    productStore.cartProducts = [];
-
-    wrapper = mount(ShoppingCart, {
-      props: { visible: true },
-      global: { stubs: buildStubs() },
-    });
-
-    expect(removeSpy).not.toHaveBeenCalled();
-  });
-
   test("handleRemoveProduct with numeric id not in cart does not call removeProductFromCart", async () => {
     const removeSpy = jest.spyOn(productStore, "removeProductFromCart");
 
