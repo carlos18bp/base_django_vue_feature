@@ -1,6 +1,7 @@
 import { mount, flushPromises } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { createRouter, createMemoryHistory } from 'vue-router';
+import { nextTick } from 'vue';
 
 jest.mock('@/services/http/client', () => ({
   get: jest.fn().mockRejectedValue(new Error('no key')),
@@ -203,7 +204,7 @@ describe('SignIn View', () => {
     await wrapper.find('input[type="password"]').setValue('secret');
 
     wrapper.find('form').trigger('submit');
-    await wrapper.vm.$nextTick();
+    await nextTick();
     wrapper.find('form').trigger('submit');
     await flushPromises();
 
@@ -219,7 +220,7 @@ describe('SignIn View', () => {
     await wrapper.find('input[type="email"]').setValue('user@example.com');
     await wrapper.find('input[type="password"]').setValue('secret');
     wrapper.find('form').trigger('submit');
-    await wrapper.vm.$nextTick();
+    await nextTick();
 
     expect(wrapper.find('button[type="submit"]').text()).toContain('Signing in');
     resolvePost({ data: {} });

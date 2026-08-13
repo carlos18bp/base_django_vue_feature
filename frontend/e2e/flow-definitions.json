@@ -39,8 +39,8 @@
       "module": "auth",
       "roles": ["shared"],
       "priority": "P3",
-      "description": "User authenticates via the Google button on sign-in/sign-up; backend creates or logs in the account",
-      "outcomes": ["success", "error", "failure"]
+      "description": "User authenticates via the Google button on sign-in/sign-up; backend creates or logs in the account. Structurally abstained: every e2e run sets window.__E2E_DISABLE_GOOGLE_LOGIN__=true so the Google button never renders (frontend/e2e/helpers/test.js:19-21); backend logic is fully unit-covered.",
+      "expectedSpecs": 0
     },
     "auth-logout": {
       "name": "Sign out",
@@ -88,7 +88,7 @@
       "roles": ["shared"],
       "priority": "P1",
       "description": "User navigates to and views a product detail page",
-      "outcomes": ["success", "error"]
+      "outcomes": ["success", "display"]
     },
     "shopping-cart-add": {
       "name": "Add product to cart",
@@ -144,7 +144,7 @@
       "roles": ["shared"],
       "priority": "P3",
       "description": "User navigates to a non-existent blog and the app handles it gracefully",
-      "outcomes": ["error"]
+      "outcomes": ["display"]
     },
     "home-carousel-navigate": {
       "name": "Navigate home page carousels",

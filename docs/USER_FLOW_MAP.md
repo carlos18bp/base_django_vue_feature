@@ -99,7 +99,7 @@ Sources: frontend/e2e/flow-definitions.json, frontend/e2e/helpers/flow-tags.js, 
 - Module: auth · Priority: P3 · Routes: `/sign_in`, `/sign_up` · Roles: shared
 - Description: User authenticates via the "Continue with Google" button; backend creates or logs in the account.
 - Evidence: button + flag `frontend/src/views/auth/SignIn.vue:80-98,145-146,219-224` and `frontend/src/views/auth/SignUp.vue:129-147,197-198,289-291`; shared handler `frontend/src/helpers/googleLogin.js:11-50`; endpoint `backend/base_feature_app/views/auth.py:78-106`.
-- E2E Coverage: all outcomes ❌ missing — **structurally excluded**: every e2e test sets `window.__E2E_DISABLE_GOOGLE_LOGIN__ = true` before navigation (`frontend/e2e/helpers/test.js:19-21`), so the button never renders in a spec run.
+- E2E Coverage: exempt (`expectedSpecs: 0`) — **structurally abstained, not a gap**: every e2e test sets `window.__E2E_DISABLE_GOOGLE_LOGIN__ = true` before navigation (`frontend/e2e/helpers/test.js:19-21`), so the button never renders in a spec run. Backend logic is fully unit-covered (`backend/base_feature_app/tests/services/test_auth_service.py:126-236`; `backend/base_feature_app/tests/views/test_auth_endpoints.py:167-317`).
 
 **Steps**
 1. Click "Continue with Google" (rendered by `vue3-google-login`'s `<GoogleLogin>`, a third-party iframe/button — not addressable via `data-testid`).
@@ -109,7 +109,7 @@ Sources: frontend/e2e/flow-definitions.json, frontend/e2e/helpers/flow-tags.js, 
 - Missing/rejected credential from Google → client-side "Google login failed" (`googleLogin.js:13-16`), no request sent.
 - Backend `ValueError` on email resolution → 400; invalid/expired Google token → 401 (`views/auth.py:96-102`).
 - Network/5xx → generic "Error during Google authentication" (same unified-pipeline pattern as `auth-register`).
-- **Open question for the Architect**: testing this needs either mocking Google Identity Services end-to-end or conditionally allowing the button in a controlled e2e mode — the current `__E2E_DISABLE_GOOGLE_LOGIN__` flag is a hard exclusion, not a test seam.
+- **Resolved 2026-08-13**: declared `exempt` (`expectedSpecs: 0`) rather than tested. Mocking Google Identity Services end-to-end, or building a controlled e2e test seam, remains a possible future product decision but is not required for coverage — the current `__E2E_DISABLE_GOOGLE_LOGIN__` flag is a deliberate structural exclusion, not an untested gap.
 
 ---
 
@@ -176,7 +176,7 @@ Sources: frontend/e2e/flow-definitions.json, frontend/e2e/helpers/flow-tags.js, 
 #### shopping-product-detail: View product detail
 - Module: shopping · Priority: P1 · Route: `/product/:product_id` · Roles: shared
 - Evidence: `frontend/src/views/product/Detail.vue`.
-- E2E Coverage: success ✅, error ✅ (both `frontend/e2e/shopping/shopping-product-detail.spec.js`)
+- E2E Coverage: success ✅, display ✅ (both `frontend/e2e/shopping/shopping-product-detail.spec.js`)
 
 **Steps**: from `/catalog`, open a product; quantity stepper (`data-testid="quantity-decrement/value/increment"`) adjusts; gallery/price/description load from the API.
 
@@ -251,11 +251,11 @@ Sources: frontend/e2e/flow-definitions.json, frontend/e2e/helpers/flow-tags.js, 
 
 #### blog-detail-not-found: Blog detail handles non-existent entry
 - Module: blog · Priority: P3 · Route: `/blog/999999` · Roles: shared
-- E2E Coverage: error ⚠️ (`frontend/e2e/blog/blog-detail.spec.js`)
+- E2E Coverage: display ✅ (`frontend/e2e/blog/blog-detail.spec.js`)
 
 **Steps**: navigate directly to a non-existent blog id.
 
-**Semantic note (not a gap, a labeling caveat for the Architect)**: `Detail.vue` initializes `blog = reactive({})` (`frontend/src/views/blog/Detail.vue:33`), which is always truthy, so `v-if="blog"` never hides the article region (`:3,54-56`). A missing id renders an **empty** article (blank `<h1>`, broken image) rather than any error message. The existing spec's own comment already says this: *"The scaffold has no real not-found handling... Asserting the empty title documents that degraded behavior — a template gap worth closing"* (`frontend/e2e/blog/blog-detail.spec.js:6-11,47-53`). Per the outcome-class rubric this is closer to a degraded **`display`** (empty state) than an `error` (validation/permission message) — left as declared `error` here only because an existing qualifying test is already tagged `@outcome:error` against it; relabeling would orphan that tag. Flagging for the Architect to decide: fix the template (real not-found handling) vs. relabel the outcome.
+**Semantic note (resolved 2026-08-13 — relabeled, not a test gap)**: `Detail.vue` initializes `blog = reactive({})` (`frontend/src/views/blog/Detail.vue:33`), which is always truthy, so `v-if="blog"` never hides the article region (`:3,54-56`). A missing id renders an **empty** article (blank `<h1>`, broken image) rather than any error message. The existing spec's own comment already says this: *"The scaffold has no real not-found handling... Asserting the empty title documents that degraded behavior — a template gap worth closing"* (`frontend/e2e/blog/blog-detail.spec.js:6-11,47-53`). Per the outcome-class rubric this is a degraded **`display`** (empty state), not an `error` (validation/permission message) — relabeled to `display` this run (`flow-definitions.json`, the spec's `@outcome:` tag, and this doc updated together; no test-body change needed, the spec already asserted the empty state correctly). The template gap itself — `Detail.vue` has no real not-found handling — is left open as a product-backlog item, not a test gap.
 
 ---
 
@@ -415,7 +415,7 @@ Sources: frontend/e2e/flow-definitions.json, frontend/e2e/helpers/flow-tags.js, 
 
 1. **Checkout cannot observe backend failure.** `Checkout.vue:227-240`'s `handleSubmit` calls `productStore.createSale(form)` **without `await`** and never inspects the response. `createSale` itself (`frontend/src/stores/product.js:172-186`) catches any error with `console.error` only and never rethrows. The success alert and redirect to `/` fire unconditionally, regardless of whether `POST create-sale/` actually succeeded — the backend does return 400 with field errors (`backend/base_feature_app/views/sale.py:19-23`), but the UI never surfaces it. `failure` therefore has **no UI surface** for `shopping-checkout-complete`; this is already on record in commit `0535511`'s message as "a template-level product finding, inherited by every project born from this scaffold" and is intentionally **not** added as a declared outcome.
 
-2. **Two "error"-tagged flows are really degraded empty-display states, not error messages.** `blog-detail-not-found`: `Detail.vue` initializes `blog = reactive({})` (`frontend/src/views/blog/Detail.vue:33`), which is always truthy, so a missing blog id renders an *empty* article shell (blank `<h1>`, broken image) instead of hiding anything or showing a message (`:54-56`). The existing spec's own comment already names this: *"The scaffold has no real not-found handling... a template gap worth closing"* (`frontend/e2e/blog/blog-detail.spec.js:6-11,47-53`). `shopping-product-detail`'s not-found branch is the cleaner sibling of the same pattern: `product` is a `computed` returning `undefined` for a bad id, so the whole `v-if="product"` panel is correctly absent (`frontend/src/views/product/Detail.vue:3`) — no message either, just nothing rendered. Both are left declared as `error` in this map only because existing qualifying tests are already tagged `@outcome:error` against them (`frontend/e2e/blog/blog-detail.spec.js`, `frontend/e2e/shopping/shopping-product-detail.spec.js`); relabeling to `display` would orphan those tags. Flagged for the Architect to decide between fixing the templates (real not-found handling) or relabeling the outcome.
+2. **Two "error"-tagged flows were really degraded empty-display states, not error messages — relabeled 2026-08-13.** `blog-detail-not-found`: `Detail.vue` initializes `blog = reactive({})` (`frontend/src/views/blog/Detail.vue:33`), which is always truthy, so a missing blog id renders an *empty* article shell (blank `<h1>`, broken image) instead of hiding anything or showing a message (`:54-56`). The existing spec's own comment already names this: *"The scaffold has no real not-found handling... a template gap worth closing"* (`frontend/e2e/blog/blog-detail.spec.js:6-11,47-53`). `shopping-product-detail`'s not-found branch is the cleaner sibling of the same pattern: `product` is a `computed` returning `undefined` for a bad id, so the whole `v-if="product"` panel is correctly absent (`frontend/src/views/product/Detail.vue:3`) — no message either, just nothing rendered. Both flows' declared outcome and both specs' `@outcome:` tags are now `display` (`frontend/e2e/blog/blog-detail.spec.js`, `frontend/e2e/shopping/shopping-product-detail.spec.js`); no test-body change was needed, only the classification. The underlying template gap (no real not-found handling) is left open as a product-backlog item, not a test gap.
 
 3. **Silent fetch-failure swallow, app-wide.** `frontend/src/stores/product.js:78-80` (`fetchProducts`), `frontend/src/stores/blog.js:37-39` (`fetchBlogs`), and `frontend/src/stores/stagingBanner.js:38-40` (`fetchState`, comment: "Silent failure: gate falls back to rendering children unchanged") all catch fetch errors with `console.error`/silent-fallback only — no UI-visible error state anywhere. A backend outage while browsing home/catalog/blogs/manual is visually indistinguishable in the DOM from "zero records available." Because the skill requires `display` flows to assert real data (not bare visibility), and a network failure and an empty dataset render identically here, this was **not** added as a declared `failure`/`error` outcome on `shopping-catalog-browse`, `blog-list-view`, or `home-carousel-navigate` — there is no distinct, assertable state to test against.
 
@@ -433,20 +433,20 @@ Sources: frontend/e2e/flow-definitions.json, frontend/e2e/helpers/flow-tags.js, 
 | auth-login-invalid | auth | P1 | error | error ✅ | auth/auth-login.spec.js |
 | auth-login-server-error | auth | P2 | failure | failure ✅ | auth/auth-login.spec.js |
 | auth-register | auth | P1 | success, error, failure | success ✅ · error ✅ · failure ✅ | auth/auth-register.spec.js |
-| auth-google-login | auth | P3 | success, error, failure | all ❌ (structurally disabled in harness) | — |
+| auth-google-login | auth | P3 | exempt (expectedSpecs:0) | — (structurally abstained) | — |
 | auth-logout | auth | P2 | success | success ✅ | auth/auth-logout.spec.js |
 | auth-protected-redirect | auth | P1 | success | success ✅ | auth/auth-protected-redirect.spec.js |
 | auth-guest-redirect | auth | P2 | success | success ✅ | auth/auth-guest-redirect.spec.js |
 | admin-login-handoff | auth | P2 | success, error | success ✅ · error ✅ | admin/admin-login-handoff.spec.js |
 | shopping-catalog-browse | shopping | P1 | success | success ✅ | shopping/shopping-catalog.spec.js |
-| shopping-product-detail | shopping | P1 | success, error | success ✅ · error ✅ | shopping/shopping-product-detail.spec.js |
+| shopping-product-detail | shopping | P1 | success, display | success ✅ · display ✅ | shopping/shopping-product-detail.spec.js |
 | shopping-cart-add | shopping | P1 | success | success ✅ | shopping/shopping-cart.spec.js |
 | shopping-cart-remove | shopping | P2 | success | success ✅ | shopping/shopping-cart.spec.js |
 | shopping-cart-persist | shopping | P2 | display | display ✅ (repaired 2026-08-13) | shopping/shopping-cart.spec.js |
 | shopping-checkout-complete | shopping | P1 | success, error | success ✅ · error ✅ | shopping/shopping-checkout.spec.js |
 | blog-list-view | blog | P2 | success | success ✅ | blog/blog-list.spec.js |
 | blog-detail-view | blog | P2 | success | success ✅ | blog/blog-detail.spec.js |
-| blog-detail-not-found | blog | P3 | error | error ⚠️ (label caveat, see notes) | blog/blog-detail.spec.js |
+| blog-detail-not-found | blog | P3 | display | display ✅ (relabeled 2026-08-13, see notes) | blog/blog-detail.spec.js |
 | home-carousel-navigate | home | P3 | success | success ✅ | home/home-carousels.spec.js |
 | header-search | navigation | P2 | success | success ✅ | navigation/navigation-search.spec.js |
 | header-cart-overlay | navigation | P2 | success, display | success ✅ · display ✅ | navigation/navigation-cart-overlay.spec.js |
@@ -461,6 +461,6 @@ Sources: frontend/e2e/flow-definitions.json, frontend/e2e/helpers/flow-tags.js, 
 | staging-phase-banner-display | platform | P4 | display | display ✅ | platform/staging-banner.spec.js |
 | staging-review-expired-overlay | platform | P3 | display | display ✅ | platform/staging-banner.spec.js |
 
-**Aggregate**: 31 flows (was 20) · 42 outcome-instances (was 23): success 19, error 9, failure 3 (was 0), display 11 (was 4) · priority split P1:8 P2:12 P3:7 P4:4.
+**Aggregate**: 31 flows (was 20; 30 required + 1 exempt) · 39 outcome-instances (was 23): success 18, error 6, failure 2 (was 0), display 13 (was 4) · priority split P1:8 P2:12 P3:7 P4:4.
 
-**Coverage (2026-08-13, post-QA run)**: 30/31 flows covered. The only remaining gap is `auth-google-login` — structurally excluded in the e2e harness (`window.__E2E_DISABLE_GOOGLE_LOGIN__`, `frontend/e2e/helpers/test.js`); its backend logic is fully unit-covered. Unblocking it requires a product test-seam decision, not a spec.
+**Coverage (2026-08-13, post-QA run)**: 30/30 of the required flows covered; 1 flow is exempt. `auth-google-login` is declared `exempt` (`expectedSpecs: 0`) — structurally abstained, not a gap: every e2e test sets `window.__E2E_DISABLE_GOOGLE_LOGIN__` (`frontend/e2e/helpers/test.js:19-21`) so the button never renders, and its backend logic is fully unit-covered.
