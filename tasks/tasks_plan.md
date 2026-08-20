@@ -41,6 +41,8 @@ description: Task backlog, progress tracking and known issues with exact verifie
 
 ## 4. Backlog
 
+- [x] Document `allow-negation-only` in the canonical testing standard so the
+  published contract matches the existing quality-gate implementation.
 - [ ] **QA run 2026-08-12 (in progress)**: close outcome-class gaps (target 20/20 or declared abstentions), purge orphans/duplicates, land on `qa/12082026` + PR.
 - [ ] Sync quality-gate core from toolkit (declared divergence).
 - [ ] Register `db_type`/work branch for this project in fleet `projects.yml`.
