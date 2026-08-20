@@ -5,16 +5,13 @@ description: Current work focus, recent changes and next steps. The most volatil
 
 # Active Context — Base Django Vue Feature
 
-_Last update: 2026-08-12_
+_Last update: 2026-08-20_
 
 ## Current focus
 
-**Full QA closure run** (`/qa base_django_vue_feature --apply`, all 3 layers) on branch **`qa/12082026`**:
-
-1. ✅ Preflight + provisioning: `backend/venv` created (Django 6.0.5), migrations applied, SQLite dev seeded (`admin@gmail.com` + `create_fake_data 12`).
-2. ✅ Memory Bank regenerated (this file set).
-3. 🔄 `docs/USER_FLOW_MAP.md` regeneration from real code (qa-analyst).
-4. ▶️ Next: coverage audit (`qa-agent.sh --check`) → Architect briefs → 3 engineer fan-out → quality gate (CI severity) → junk purge (operator-approved) → PR to `master` (never merged by QA).
+Align the canonical testing standard with the quality-gate implementation. The
+gate already supports `allow-negation-only`; this change documents the marker
+without changing detector behavior.
 
 ## Active decisions
 
@@ -31,6 +28,7 @@ _Last update: 2026-08-12_
 
 ## Next steps (after the QA run)
 
+- Merge the testing-standard documentation PR after CI is green.
 - `/merge-when-green` to integrate the QA PR once CI is green.
 - `sync-test-quality-core.sh` for the drifted in-repo gate.
 - Fleet registry: add `db_type`/branch metadata for this project.
