@@ -20,6 +20,8 @@ This document applies to:
 
 > **Note:** These standards focus on test quality and maintainability only. They do not change production business logic.
 
+> **Responsive behaviour** has its own canonical standard — `RESPONSIVE_STANDARDS.md` (synced next to this file, consumed by `/responsive-pass`). Viewport-scoped E2E tests follow both documents: that one fixes the widths and the invariants, this one fixes the junk gate and the definition of done.
+
 ---
 
 ## Mandatory Rules (Pass/Fail)
@@ -127,7 +129,7 @@ backend/<app>/tests/
 ├── contracts/        # OpenAPI/schema contract tests
 ├── integration/      # Cross-layer integration tests
 ├── management/       # Management command tests
-└── admin/            # Django admin tests
+└── test_admin.py     # Django admin tests (standalone)
 ```
 
 **Frontend Structure:**
